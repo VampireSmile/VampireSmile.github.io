@@ -18,4 +18,18 @@
 <p>More info: <a href="https://hexo.io/docs/one-command-deployment.html" target="_blank" rel="noopener">Deployment</a></p>
 ]]></content>
   </entry>
+  <entry>
+    <title>test</title>
+    <url>/2020/05/24/test/</url>
+    <content><![CDATA[<p>this is just test!!!</p>
+]]></content>
+      <categories>
+        <category>java</category>
+        <category>技术</category>
+      </categories>
+      <tags>
+        <tag>java</tag>
+        <tag>测试</tag>
+      </tags>
+  </entry>
 </search>
