@@ -83,7 +83,7 @@
 
 
 
-  <meta name="keywords" content="Hexo, NexT" />
+  <meta name="keywords" content="mysql索引,offer," />
 
 
 
@@ -96,16 +96,23 @@
 
 
 
-<meta name="description" content="Welcome to yinjiawei’s blog!">
+<meta name="description" content="MySQL索引本质：是一种用来帮助mysql高速获取数据排好序的数据结构。 MySQL索引原理： 索引分类 从存储结构上来划分：BTree索引(B-Tree或B+Tree索引)，Hash索引，full-index全文索引，R-Tree索引。 从应用层次来分：普通索引，唯一索引，复合索引。 根据数据的物理顺序与键值的逻辑(索引)顺序关系：聚集索引，非聚集索引。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Hello World">
-<meta property="og:url" content="https://vampiresmile.github.io/2020/05/24/hello-world/index.html">
+<meta property="og:title" content="mysql索引总结-原理篇">
+<meta property="og:url" content="https://vampiresmile.github.io/2020/05/26/mysql%E7%B4%A2%E5%BC%95%E6%80%BB%E7%BB%93-%E5%8E%9F%E7%90%86%E7%AF%87/index.html">
 <meta property="og:site_name" content="Zachary">
-<meta property="og:description" content="Welcome to yinjiawei’s blog!">
-<meta property="article:published_time" content="2020-05-24T03:46:04.600Z">
-<meta property="article:modified_time" content="2020-05-25T02:26:38.323Z">
+<meta property="og:description" content="MySQL索引本质：是一种用来帮助mysql高速获取数据排好序的数据结构。 MySQL索引原理： 索引分类 从存储结构上来划分：BTree索引(B-Tree或B+Tree索引)，Hash索引，full-index全文索引，R-Tree索引。 从应用层次来分：普通索引，唯一索引，复合索引。 根据数据的物理顺序与键值的逻辑(索引)顺序关系：聚集索引，非聚集索引。">
+<meta property="og:image" content="https://s1.ax1x.com/2020/05/27/tEDrtg.png">
+<meta property="og:image" content="https://s1.ax1x.com/2020/05/27/tE6W24.png">
+<meta property="og:image" content="https://s1.ax1x.com/2020/05/27/tE2UPK.png">
+<meta property="og:image" content="https://s1.ax1x.com/2020/05/27/tE469x.png">
+<meta property="article:published_time" content="2020-05-26T13:53:13.000Z">
+<meta property="article:modified_time" content="2020-05-27T14:40:49.696Z">
 <meta property="article:author" content="yinjiawei">
+<meta property="article:tag" content="mysql索引">
+<meta property="article:tag" content="offer">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://s1.ax1x.com/2020/05/27/tEDrtg.png">
 
 
 
@@ -135,7 +142,7 @@
 
 
 
-  <link rel="canonical" href="https://vampiresmile.github.io/2020/05/24/hello-world/"/>
+  <link rel="canonical" href="https://vampiresmile.github.io/2020/05/26/mysql索引总结-原理篇/"/>
 
 
 
@@ -145,7 +152,7 @@
 
 
 
-  <title>Hello World | Zachary</title>
+  <title>mysql索引总结-原理篇 | Zachary</title>
   
 
 
@@ -336,7 +343,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://vampiresmile.github.io/2020/05/24/hello-world/">
+    <link itemprop="mainEntityOfPage" href="https://vampiresmile.github.io/2020/05/26/mysql%E7%B4%A2%E5%BC%95%E6%80%BB%E7%BB%93-%E5%8E%9F%E7%90%86%E7%AF%87/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="yinjiawei">
@@ -353,7 +360,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">Hello World</h1>
+          <h1 class="post-title" itemprop="name headline">mysql索引总结-原理篇</h1>
         
 
         <div class="post-meta">
@@ -365,8 +372,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-05-24T11:46:04+08:00">
-                2020-05-24
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-05-26T21:53:13+08:00">
+                2020-05-26
               </time>
             
 
@@ -381,12 +388,34 @@
               
                 <span class="post-meta-item-text">更新于&#58;</span>
               
-              <time title="更新于" itemprop="dateModified" datetime="2020-05-25T10:26:38+08:00">
-                2020-05-25
+              <time title="更新于" itemprop="dateModified" datetime="2020-05-27T22:40:49+08:00">
+                2020-05-27
               </time>
             
           </span>
 
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/" itemprop="url" rel="index">
+                    <span itemprop="name">数据库</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
           
 
           
@@ -414,7 +443,7 @@
                   <span class="post-meta-item-text">字数统计&#58;</span>
                 
                 <span title="字数统计">
-                  5 字
+                  3k 字
                 </span>
               
 
@@ -430,7 +459,7 @@
                   <span class="post-meta-item-text">阅读时长 &asymp;</span>
                 
                 <span title="阅读时长">
-                  1 分钟
+                  10 分钟
                 </span>
               
             </div>
@@ -451,7 +480,84 @@
       
 
       
-        <h1 id="Welcome-to-yinjiawei’s-blog"><a href="#Welcome-to-yinjiawei’s-blog" class="headerlink" title="Welcome to yinjiawei’s blog!"></a>Welcome to <a href="https://vampiresmile.github.io/">yinjiawei’s blog</a>!</h1>
+        <ol>
+<li><h3 id="MySQL索引本质：是一种用来帮助mysql高速获取数据排好序的数据结构。"><a href="#MySQL索引本质：是一种用来帮助mysql高速获取数据排好序的数据结构。" class="headerlink" title="MySQL索引本质：是一种用来帮助mysql高速获取数据排好序的数据结构。"></a>MySQL索引本质：是一种用来帮助mysql高速获取数据排好序的<strong>数据结构</strong>。</h3></li>
+<li><h3 id="MySQL索引原理："><a href="#MySQL索引原理：" class="headerlink" title="MySQL索引原理："></a>MySQL索引原理：</h3><ol>
+<li><h4 id="索引分类"><a href="#索引分类" class="headerlink" title="索引分类"></a>索引分类</h4><ol>
+<li>从存储结构上来划分：BTree索引(B-Tree或B+Tree索引)，Hash索引，full-index全文索引，R-Tree索引。</li>
+<li>从应用层次来分：普通索引，唯一索引，复合索引。</li>
+<li>根据数据的物理顺序与键值的逻辑(索引)顺序关系：聚集索引，非聚集索引。</li>
+</ol>
+<a id="more"></a>
+
+<blockquote>
+<p>注意：</p>
+<p>普通索引：即一个索引只包含单个列，一个表可以有多个单列索引，叶节点包含了主键(注意不是记录所在硬盘的地址)，因此有个回表的概念：即普通索引中先找到我们需要的数据的主键，然后再在表中进行一次查询，myISAM是典型的一种需要”回表查询”的引擎。</p>
+<p>额外说一句mysql中主要文件结构，我们主要比较myISAM和InnoDB(后文还会提到)：</p>
+<p>mysql中所有的表存储在mysql目录/data目录下</p>
+<p>对于使用myISAM引擎的表：.frm是表结构文件，.MYD是表记录文件，.MYI是表索引记录文件</p>
+<p>而对于使用innoDB引擎的表：.frm是表结构文件，.ibd是表记录和索引文件</p>
+<p>由上可知，myISAM索引文件和数据文件是分离的（非聚集），所以查询是先从.MYI文件中查找索引(如果有的话),然后根据索引查询表记录所在磁盘地址。innoDB索引文件和数据文件是在一起的（聚集），所以查询是直接在.ibd文件中查询索引(如果有的话)，而叶子节点存储着表记录，所以查询到索引即查询到表记录</p>
+<p>然后，再由上我们可以知道：.InnoDB一定要有主键，因为InnoDB是默认用B+tree数据结构来组织数据记录的，所以如果不设置主键的话，数据就无法进行组织存储。当然InnoDB会自动选一个可以用来唯一标识一张表中所有记录的字段（简单说就是该字段所有记录不重复）来做主键索引字段，如果找不到这样的字段，就会自动生成一个这样的字段用作唯一索引字段row_id</p>
+<p>唯一索引：索引列的值必须唯一，但允许有空值</p>
+<p>复合索引：即一个索引包含多一个列</p>
+<p>聚集索引：并不是一种单独的索引类型，而是一种数据存储方式，也可以说叶节点包含了完整的数据记录。具体细节取决于不同的实现，InnoDB的聚簇索引其实就是在同一个结构中保存了B-Tree索引(技术上来说是B+Tree)和数据行</p>
+<p>非聚集索引：不是聚集索引就是非聚集索引(^_^)，当然了，前面有说过，数据和索引不是在一起存储的可以看做非聚集索引。</p>
+</blockquote>
+</li>
+</ol>
+</li>
+</ol>
+<ol start="2">
+<li><h4 id="各个索引比较"><a href="#各个索引比较" class="headerlink" title="各个索引比较"></a>各个索引比较</h4><p>​    0x01. 默认不使用二叉树的原因:比如给col列加索引，而col列分别为1，2，3，4，5，6，根据二叉树的特点，最终索引将会变成只有右子树形状的二叉树，而这时进行查询的效果就和链表一样了，所以不适用</p>
+<p>​    0x02. 默认不使用红黑树的原因:当数据很大(上百万上千万)时树的高度就比较高，假如我们需要的数值位于叶子节点，那么需要进行的磁盘i/o就比较多(比如树高5，则至少要进行5次磁盘i/o)，而进行磁盘i/o会让效率降低，因为其需要很多的时间</p>
+<p>​    0x03. 默认不使用hash表的原因:1.不支持范围查询。2.不支持排序，也不支持模糊查询。3.当数据量上去了之后，hash冲突的概率也会变大，效率将会明细降低</p>
+<p>​    0x04. b+tree是btree的变种：1.非叶子节点不存储data，只存储索引(冗余)，可以放更多的索引。2.叶子节点包含所有索引字段与data。3.叶子节点用双向指针相连，提高区间访问的性能。很明显非叶子节点不存data之后就可以存储更多的索引，从而可以让树的高度更小，同时叶子节点加了指针相连之后，可以很好的支持范围查找</p>
+<blockquote>
+<p>注意：</p>
+<p>通过上面的比较我们可以知道：</p>
+<ol>
+<li>节点中(数据)索引占用空间越小，那么该节点中数据(索引)的数量就越多，从而数的高度越低，从而IO次数更少。所以一般推荐整型主键做索引，因为这样不仅比较更快，同时占用的空间也小。同时这也是为什么b+tree要求把真正的数据记录放到叶子节点而不是内层节点的原因，因为一旦放到内层节点，那么每个节点中能保存索引的个数会大幅度下降，导致树增高。当每个节点中(数据)索引个数为1时会退化成线性表。</li>
+<li>最左匹配原则(这里只做一个通俗理解，后面文章还会提到)：当b+树的数据项是复合的数据结构，比如(name,age,sex)的时候，b+数是按照从左到右的顺序来建立搜索树的，比如当(张三,20,F)这样的数据来检索的时候，b+树会优先比较name来确定下一步的所搜方向，如果name相同再依次比较age和sex，最后得到检索的数据；但当(20,F)这样的没有name的数据来的时候，b+树就不知道下一步该查哪个节点，因为建立搜索树的时候name就是第一个比较因子，必须要先根据name来搜索才能知道下一步去哪里查询。比如当(张三,F)这样的数据来检索时，b+树可以用name来指定搜索方向，但下一个字段age的缺失，所以只能把名字等于张三的数据都找到，然后再匹配性别是F的数据了， 这个是非常重要的性质，即索引的最左匹配特性。</li>
+</ol>
+</blockquote>
+</li>
+</ol>
+<ol start="3">
+<li><h3 id="MySQL索引实现"><a href="#MySQL索引实现" class="headerlink" title="MySQL索引实现"></a>MySQL索引实现</h3><ol>
+<li><h4 id="myISAM索引实现"><a href="#myISAM索引实现" class="headerlink" title="myISAM索引实现"></a>myISAM索引实现</h4><p>myISAM引擎使用B+Tree作为索引结构，叶节点的data域存放的是<strong>数据记录的地址</strong>。下图是myISAM索引的原理图：</p>
+<p><img src="https://s1.ax1x.com/2020/05/27/tEDrtg.png" alt="tEDrtg.png"></p>
+<p>这里设表共有三列，假设我们以Col1为主键，则上图便是一个myISAM表的主索引示意图。可以看出myISAM的索引文件仅仅保存数据记录的地址。<strong>在myISAM中</strong>，主索引和辅助索引在结构上没有任何区别，只是主索引要求key是唯一的，而辅助索引的key可以重复。如果我们在Col2上建立一个辅助索引，则此索引的结构如下图所示：</p>
+<p><img src="https://s1.ax1x.com/2020/05/27/tE6W24.png" alt="tE6W24.png"></p>
+<p>同样也是一棵B+Tree，data域保存数据记录的地址。因此，myISAM中索引检索的算法为首先按照B+Tree搜索算法搜索索引，如果指定的Key存在，则取出其data域的值，然后以data域的值为地址，读取相应数据记录。</p>
+<p><strong>myISAM的索引是非聚集索引。</strong></p>
+</li>
+<li><h4 id="InnoDB索引实现"><a href="#InnoDB索引实现" class="headerlink" title="InnoDB索引实现"></a>InnoDB索引实现</h4><p>InnoDB索引实现可以和myISAM对比来看。</p>
+<p>1）第一个重大区别是InnoDB的数据文件本身就是索引文件。从上文知道，MyISAM索引文件和数据文件是分离的，索引文件仅保存数据记录的地址。而在InnoDB中，表数据文件本身就是按B+Tree组织的一个索引结构，这棵树的叶节点data域保存了完整的数据记录。这个索引的key是数据表的主键，因此InnoDB表数据文件本身就是主索引。如图：</p>
+<p><img src="https://s1.ax1x.com/2020/05/27/tE2UPK.png" alt="tE2UPK.png"></p>
+</li>
+</ol>
+<p>​        上图是Innodb主索引(同时也是数据文件)的示意图，可以看到可以看到叶节点包含了完整的数据记录。这种索引叫做聚集索引。因为InnoDB的数据文件本身要按主键聚集，所以InnoDB要求表必须有主键(MyISAM可以没有)，如果没有显式指定，则MySQL系统会自动选择一个可以唯一标识数据记录的列作为主键，如果不存在这种列，则MySQL自动为InnoDB表生成一个隐含字段作为主键，这个字段长度为6个字节，类型为长整形。</p>
+<p>​    2）第二个与myISAM索引不同的是InnoDB的辅助索引data域存储的是相应记录的主键值而不是记录地址。换句话说，InnoDB的所有辅助索引都引用主键作为data域。例如，下图为定义在Col3上的一个辅助索引:</p>
+<p><img src="https://s1.ax1x.com/2020/05/27/tE469x.png" alt="tE469x.png"></p>
+<p>这里以英文字符的ASCII码作为比较准则。聚集索引这种实现方式使得按主键的搜索十分高效，但是辅助索引搜索需要检索两遍索引：首先检索辅助索引获得主键，然后用主键到主索引中检索获得记录。</p>
+<p>了解不同存储引擎的索引实现方式对于正确使用和优化索引都非常有帮助，例如知道了InnoDB的索引实现后，就很容易明白为什么不建议使用过长的字段作为主键，因为所有辅助索引都引用主索引，过长的主索引会令辅助索引变得过大。再例如，用非单调的字段作为主键在InnoDB中不是个好主意，因为InnoDB数据文件本身是一颗B+Tree，非单调的主键会造成在插入新记录时数据文件为了维持B+Tree的特性而频繁的分裂调整，十分低效，而使用自增字段作为主键则是一个很好的选择。</p>
+</li>
+<li><p>myISAM和innoDB的区别与选择：</p>
+<p><strong>区别：</strong></p>
+<p>1）InnoDB 支持事务，MyISAM 不支持事务。这是 MySQL 将默认存储引擎从 MyISAM 变成 InnoDB 的重要原因之一；</p>
+<p>2）InnoDB 支持外键，而 MyISAM 不支持。对一个包含外键的 InnoDB 表转为 MYISAM 会失败；  </p>
+<p>3）InnoDB 是聚集索引，MyISAM 是非聚集索引。聚簇索引的文件存放在主键索引的叶子节点上，因此 InnoDB 必须要有主键，通过主键索引效率很高。但是辅助索引需要两次查询，先查询到主键，然后再通过主键查询到数据。因此，主键不应该过大，因为主键太大，其他索引也都会很大。而 MyISAM 是非聚集索引，数据文件是分离的，索引保存的是数据文件的指针。主键索引和辅助索引是独立的。 </p>
+<p>4）InnoDB 不保存表的具体行数，执行 select count(*) from table 时需要全表扫描。而MyISAM 用一个变量保存了整个表的行数，执行上述语句时只需要读出该变量即可，速度很快；    </p>
+<p>5）InnoDB 最小的锁粒度是行锁，MyISAM 最小的锁粒度是表锁。一个更新语句会锁住整张表，导致其他查询和更新都会被阻塞，因此并发访问受限。这也是 MySQL 将默认存储引擎从 MyISAM 变成 InnoDB 的重要原因之一；</p>
+<p><strong>如何选择：</strong></p>
+<p>1） 是否要支持事务，如果要请选择 InnoDB，如果不需要可以考虑 MyISAM；</p>
+<p>2）如果表中绝大多数都只是读查询，可以考虑 MyISAM，如果既有读写也挺频繁，请使用InnoDB。</p>
+<p>3）系统奔溃后，MyISAM恢复起来更困难，能否接受，不能接受就选 InnoDB；</p>
+<p>4）MySQL5.5版本开始Innodb已经成为Mysql的默认引擎(之前是MyISAM)，说明其优势是有目共睹的。如果你不知道用什么存储引擎，那就用InnoDB，至少不会差。</p>
+</li>
+</ol>
+
       
     </div>
     
@@ -471,7 +577,7 @@
   </li>
   <li class="post-copyright-link">
     <strong>本文链接：</strong>
-    <a href="https://vampiresmile.github.io/2020/05/24/hello-world/" title="Hello World">https://vampiresmile.github.io/2020/05/24/hello-world/</a>
+    <a href="https://vampiresmile.github.io/2020/05/26/mysql%E7%B4%A2%E5%BC%95%E6%80%BB%E7%BB%93-%E5%8E%9F%E7%90%86%E7%AF%87/" title="mysql索引总结-原理篇">https://vampiresmile.github.io/2020/05/26/mysql%E7%B4%A2%E5%BC%95%E6%80%BB%E7%BB%93-%E5%8E%9F%E7%90%86%E7%AF%87/</a>
   </li>
   <li class="post-copyright-license">
     <strong>版权声明： </strong>
@@ -483,6 +589,14 @@
     
 
     <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/mysql%E7%B4%A2%E5%BC%95/" rel="tag"># mysql索引</a>
+          
+            <a href="/tags/offer/" rel="tag"># offer</a>
+          
+        </div>
       
 
       
@@ -508,15 +622,15 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
+              <a href="/2020/05/24/hello-world/" rel="next" title="Hello World">
+                <i class="fa fa-chevron-left"></i> Hello World
+              </a>
+            
           </div>
 
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2020/05/26/mysql%E7%B4%A2%E5%BC%95%E6%80%BB%E7%BB%93-%E5%8E%9F%E7%90%86%E7%AF%87/" rel="prev" title="mysql索引总结-原理篇">
-                mysql索引总结-原理篇 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -687,7 +801,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Welcome-to-yinjiawei’s-blog"><span class="nav-number">1.</span> <span class="nav-text">Welcome to yinjiawei’s blog!</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#MySQL索引本质：是一种用来帮助mysql高速获取数据排好序的数据结构。"><span class="nav-number">1.</span> <span class="nav-text">MySQL索引本质：是一种用来帮助mysql高速获取数据排好序的数据结构。</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#MySQL索引原理："><span class="nav-number">2.</span> <span class="nav-text">MySQL索引原理：</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#索引分类"><span class="nav-number">2.1.</span> <span class="nav-text">索引分类</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#各个索引比较"><span class="nav-number">2.2.</span> <span class="nav-text">各个索引比较</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#MySQL索引实现"><span class="nav-number">3.</span> <span class="nav-text">MySQL索引实现</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#myISAM索引实现"><span class="nav-number">3.1.</span> <span class="nav-text">myISAM索引实现</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#InnoDB索引实现"><span class="nav-number">3.2.</span> <span class="nav-text">InnoDB索引实现</span></a></li></ol></li></ol></div>
             
 
           </div>
