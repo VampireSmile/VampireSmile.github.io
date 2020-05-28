@@ -96,14 +96,14 @@
 
 
 
-<meta name="description" content="MySQL优化的一般步骤 通过show status 命令了解各种sql的执行效率​    SHOW STATUS提供msyql服务器的状态信息 ​    一般情况下，我们只需要了解以”Com”开头的指令 ​    show session status like ‘Com%’：显示当前的连接的统计结果 ​    show global status like ‘Com%’ ：显示自数据库上次启">
+<meta name="description" content="MySQL优化的一般步骤 通过show status 命令了解各种sql的执行效率 SHOW STATUS提供msyql服务器的状态信息，一般情况下，我们只需要了解以”Com”开头的指令 show session status like ‘Com%’；显示当前的连接的统计结果 show global status like ‘Com%’ ；显示自数据库上次启动至今的统计结果 show statu">
 <meta property="og:type" content="article">
 <meta property="og:title" content="mysql索引总结-优化篇">
 <meta property="og:url" content="https://vampiresmile.github.io/2020/05/28/mysql%E7%B4%A2%E5%BC%95%E6%80%BB%E7%BB%93-%E4%BC%98%E5%8C%96%E7%AF%87/index.html">
 <meta property="og:site_name" content="Zachary">
-<meta property="og:description" content="MySQL优化的一般步骤 通过show status 命令了解各种sql的执行效率​    SHOW STATUS提供msyql服务器的状态信息 ​    一般情况下，我们只需要了解以”Com”开头的指令 ​    show session status like ‘Com%’：显示当前的连接的统计结果 ​    show global status like ‘Com%’ ：显示自数据库上次启">
+<meta property="og:description" content="MySQL优化的一般步骤 通过show status 命令了解各种sql的执行效率 SHOW STATUS提供msyql服务器的状态信息，一般情况下，我们只需要了解以”Com”开头的指令 show session status like ‘Com%’；显示当前的连接的统计结果 show global status like ‘Com%’ ；显示自数据库上次启动至今的统计结果 show statu">
 <meta property="article:published_time" content="2020-05-28T05:12:30.000Z">
-<meta property="article:modified_time" content="2020-05-28T11:29:14.273Z">
+<meta property="article:modified_time" content="2020-05-28T12:22:17.290Z">
 <meta property="article:author" content="yinjiawei">
 <meta property="article:tag" content="mysql索引">
 <meta property="article:tag" content="offer">
@@ -383,7 +383,7 @@
               
                 <span class="post-meta-item-text">更新于&#58;</span>
               
-              <time title="更新于" itemprop="dateModified" datetime="2020-05-28T19:29:14+08:00">
+              <time title="更新于" itemprop="dateModified" datetime="2020-05-28T20:22:17+08:00">
                 2020-05-28
               </time>
             
@@ -438,7 +438,7 @@
                   <span class="post-meta-item-text">字数统计&#58;</span>
                 
                 <span title="字数统计">
-                  2.9k 字
+                  2.7k 字
                 </span>
               
 
@@ -454,7 +454,7 @@
                   <span class="post-meta-item-text">阅读时长 &asymp;</span>
                 
                 <span title="阅读时长">
-                  11 分钟
+                  10 分钟
                 </span>
               
             </div>
@@ -477,72 +477,73 @@
       
         <ol>
 <li><h3 id="MySQL优化的一般步骤"><a href="#MySQL优化的一般步骤" class="headerlink" title="MySQL优化的一般步骤"></a>MySQL优化的一般步骤</h3><ol>
-<li><h4 id="通过show-status-命令了解各种sql的执行效率"><a href="#通过show-status-命令了解各种sql的执行效率" class="headerlink" title="通过show status 命令了解各种sql的执行效率"></a>通过show status 命令了解各种sql的执行效率</h4><p>​    SHOW STATUS提供msyql服务器的状态信息</p>
-<p>​    一般情况下，我们只需要了解以”Com”开头的指令</p>
-<p>​    show session status like ‘Com%’：显示当前的连接的统计结果</p>
-<p>​    show global status like ‘Com%’ ：显示自数据库上次启动至今的统计结果</p>
-<p>​    注：默认是session级别的</p>
+<li><h4 id="通过show-status-命令了解各种sql的执行效率"><a href="#通过show-status-命令了解各种sql的执行效率" class="headerlink" title="通过show status 命令了解各种sql的执行效率"></a>通过show status 命令了解各种sql的执行效率</h4><ul>
+<li>SHOW STATUS提供msyql服务器的状态信息，一般情况下，我们只需要了解以”Com”开头的指令</li>
+<li>show session status like ‘Com%’；显示当前的连接的统计结果</li>
+<li>show global status like ‘Com%’ ；显示自数据库上次启动至今的统计结果</li>
+<li>show status like ‘Connections’；// 试图连接MySQL服务器的次数</li>
+<li>show status like ‘Uptime’；//服务器工作的时间（单位秒）</li>
+<li>show status like ‘Slow_queries’；//慢查询的次数 (默认是10秒中就当做是慢查询)</li>
+<li>Show variables like ‘long_query_time’；//查询mysql的慢查询时间：</li>
+<li>set long_query_time=2；//修改mysql 慢查询时间：如果查询时间超过2秒就算作是慢查询</li>
+</ul>
+<p>注：默认是session级别的，其中Com_XXX表示XXX语句所执行的次数。Com_select，Com_insert，Com_update，Com_delete通过这几个参数，可以容易地了解到当前数据库的应用是以插入更新为主还是以查询操作为主，以及各类的SQL大致的执行比例是多少。</p>
 </li>
-</ol>
-<a id="more"></a>
+<li><h4 id="定位执行效率较低的SQL语句（dql出现问题的概率较dml的大）"><a href="#定位执行效率较低的SQL语句（dql出现问题的概率较dml的大）" class="headerlink" title="定位执行效率较低的SQL语句（dql出现问题的概率较dml的大）"></a>定位执行效率较低的SQL语句（dql出现问题的概率较dml的大）</h4><p>在一个项目中，找到慢查询的select语句：mysql支持把慢查询语句记录到日志文件中。程序员需要修改php.ini的配置文件，默认情况下，慢查询记录是不开启的。开启慢查询记录的方法：打开 my.ini，找到 [mysqld] 在其下面添加：long_query_time = 2和log-slow-queries = D:/mysql/logs/slow.log     #设置把日志写在那里，可以为空，系统会给一个缺省的文件，例子：我们数据表中有1千万条的数据量，DQL语句：SELECT * FROM order_copy WHERE id=12345; 查询耗时：19s &gt; 2s，所以mysql会将该条select语句记录到慢查询日志中，SELECT * FROM order_copy WHERE id=12345的执行时间：<strong>添加索引前：19s</strong>，<strong>添加索引后：0.08s</strong></p>
+</li>
+<li><h4 id="通过explain分析低效率的SQL语句的执行情况"><a href="#通过explain分析低效率的SQL语句的执行情况" class="headerlink" title="通过explain分析低效率的SQL语句的执行情况"></a>通过explain分析低效率的SQL语句的执行情况</h4><p>使用explain分析该dql语句：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">EXPLAIN</span> <span class="keyword">SELECT</span> * <span class="keyword">FROM</span> order_copy <span class="keyword">WHERE</span> <span class="keyword">id</span> = <span class="number">12345</span>;</span><br></pre></td></tr></table></figure>
 
-<p>​            其中Com_XXX表示XXX语句所执行的次数。</p>
-<p>​            重点注意：Com_select,Com_insert,Com_update,Com_delete通过这几个参数，可以容易地了解到当前数据            库的应用是以插入更新为主还是以查询操作为主，以及各类的SQL大致的执行比例是多少。</p>
-<p>​            另外，还有几个参数需要注意下：</p>
-<p>​            show status like ‘Connections’    // 试图连接MySQL服务器的次数</p>
-<p>​            show status like ‘Uptime’    //服务器工作的时间（单位秒）</p>
-<p>​            show status like ‘Slow_queries’    //慢查询的次数 (默认是10秒中就当做是慢查询，如下图所示)</p>
-<p>​            a) 如何查询mysql的慢查询时间</p>
-<p>​            Show variables like ‘long_query_time’;</p>
-<p>​            b) 修改mysql 慢查询时间</p>
-<p>​            set long_query_time=2//如果查询时间超过2秒就算作是慢查询</p>
-<ol start="2">
-<li><h4 id="定位执行效率较低的SQL语句（dql出现问题的概率较dml的大）"><a href="#定位执行效率较低的SQL语句（dql出现问题的概率较dml的大）" class="headerlink" title="定位执行效率较低的SQL语句（dql出现问题的概率较dml的大）"></a>定位执行效率较低的SQL语句（dql出现问题的概率较dml的大）</h4><p>​    问题是：如何在一个项目中，找到慢查询的select语句？</p>
-<p>​    答案：mysql支持把慢查询语句记录到日志文件中。程序员需要修改php.ini的配置文件，默认情况下，慢查询    记录是不开启的。</p>
-<p>​    开启慢查询记录的步骤：</p>
-<p>​    打开 my.ini ,找到 [mysqld] 在其下面添加</p>
-<p>​    long_query_time = 2</p>
-<p>​    log-slow-queries = D:/mysql/logs/slow.log     #设置把日志写在那里，可以为空，系统会给一个缺省的文件</p>
-<p>​    例子：我们数据表中有1千万条的数据量</p>
-<p>​    DQL语句：SELECT * FROM order_copy WHERE id=12345;</p>
-<p>​    查询耗时：19s&gt;2s，所以mysql会将该条select语句记录到慢查询日志中</p>
-<p>​    SELECT * FROM order_copy WHERE id=12345的执行时间：</p>
-<p>​    <strong>添加索引前：19s</strong></p>
-<p>​    <strong>添加索引后：0.08s</strong></p>
+<p>会产生如下信息：</p>
+<ul>
+<li>select_type:表示查询的类型。</li>
+<li>table:输出结果集的表</li>
+<li>type:表示表的连接类型(system和const为佳)</li>
+<li>possible_keys:表示查询时，可能使用的索引</li>
+<li>key:表示实际使用的索引</li>
+<li>key_len:索引字段的长度</li>
+<li>rows:扫描的行数</li>
+<li>Extra:执行情况的描述和说明</li>
+</ul>
+<p><strong>注意：要尽量避免让type的结果为all，extra的结果为：using filesort</strong></p>
 </li>
-<li><h4 id="通过explain分析低效率的SQL语句的执行情况"><a href="#通过explain分析低效率的SQL语句的执行情况" class="headerlink" title="通过explain分析低效率的SQL语句的执行情况"></a>通过explain分析低效率的SQL语句的执行情况</h4><p>​    使用explain分析该dql语句：</p>
-<p>​    EXPLAIN SELECT * FROM order_copy WHERE id=12345</p>
-<p>​    会产生如下信息：</p>
-<p>​    select_type:表示查询的类型。</p>
-<p>​    table:输出结果集的表</p>
-<p>​    type:表示表的连接类型(system和const为佳)</p>
-<p>​    possible_keys:表示查询时，可能使用的索引</p>
-<p>​    key:表示实际使用的索引</p>
-<p>​    key_len:索引字段的长度</p>
-<p>​    rows:扫描的行数</p>
-<p>​    Extra:执行情况的描述和说明</p>
-<p>​    <strong>注意：要尽量避免让type的结果为all，extra的结果为：using filesort</strong></p>
+<li><h4 id="确定问题并采取相应的优化措施"><a href="#确定问题并采取相应的优化措施" class="headerlink" title="确定问题并采取相应的优化措施"></a>确定问题并采取相应的优化措施</h4><p>常用的优化措施是添加索引。添加索引，我们不用加内存，不用改程序，不用调sql，只要执行个正确的’create index’，查询速度就可能提高百倍千倍。但是天下没有免费的午餐，查询速度的提高是以插入、更新、删除的速度为代价的，这些写操作，增加了大量的I/O。例如：给字段id添加索引：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">ALTER</span> <span class="keyword">TABLE</span> order_copy <span class="keyword">ADD</span> PRIMARY <span class="keyword">KEY</span>(<span class="keyword">id</span>);</span><br></pre></td></tr></table></figure>
+
+<p>给1千万的数据添加primary key 需要耗时： 428秒（7分钟）</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">EXPLAIN</span> <span class="keyword">SELECT</span> * <span class="keyword">FROM</span> order_copy <span class="keyword">WHERE</span> <span class="keyword">id</span> = <span class="number">12345</span>;</span><br></pre></td></tr></table></figure>
+
+<p>正是因为给id添加了索引，才使得rows的结果为1，<strong>但是索引并不是可以随便添加的，以下几种情况需牢记在心：</strong></p>
+<ul>
+<li>较频繁的作为查询条件字段应该创建索引</li>
+</ul>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> * <span class="keyword">FROM</span> order_copy <span class="keyword">WHERE</span> <span class="keyword">id</span> = $<span class="keyword">id</span>;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>唯一性太差的字段不适合单独创建索引，即使频繁作为查询条件</li>
+</ul>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> * <span class="keyword">FROM</span> order_copy <span class="keyword">WHERE</span> sex = <span class="string">'女'</span>;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>更新非常频繁的字段不适合创建索引</li>
+</ul>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> * <span class="keyword">FROM</span> order_copy <span class="keyword">WHERE</span> order_state = <span class="string">'未付款'</span>;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>不会出现在WHERE子句中的字段不该创建索引</li>
+</ul>
+<p><strong>索引的使用</strong></p>
+<ul>
+<li><p>建立索引</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> [<span class="keyword">UNIQUE</span>|FULLTEXT] <span class="keyword">index</span> index_name <span class="keyword">ON</span> tbl_name (col_name [(<span class="keyword">length</span>)] [<span class="keyword">ASC</span> | <span class="keyword">DESC</span>],...);</span><br><span class="line"><span class="keyword">ALTER</span> <span class="keyword">TABLE</span> table_name <span class="keyword">ADD</span> <span class="keyword">INDEX</span> index_name (column_list);</span><br><span class="line"><span class="keyword">ALTER</span> <span class="keyword">TABLE</span> table_name <span class="keyword">ADD</span> <span class="keyword">UNIQUE</span> (column_list);</span><br><span class="line"><span class="keyword">ALTER</span> <span class="keyword">TABLE</span> table_name <span class="keyword">ADD</span> PRIMARY <span class="keyword">KEY</span> (column_list);</span><br></pre></td></tr></table></figure>
 </li>
-<li><h4 id="确定问题并采取相应的优化措施"><a href="#确定问题并采取相应的优化措施" class="headerlink" title="确定问题并采取相应的优化措施"></a>确定问题并采取相应的优化措施</h4><p>​    常用的优化措施是添加索引。添加索引，我们不用加内存，不用改程序，不用调sql，只要执行个正确的’create     index’，查询速度就可能提高百倍千倍。但是天下没有免费的午餐，查询速度的提高是以插入、更新、删除的    速度为代价的，这些写操作，增加了大量的I/O。</p>
-<p>​    例如：给字段id添加索引：</p>
-<p>​    ALTER TABLE order_copy ADD PRIMARY KEY(id)</p>
-<p>​    给1千万的数据添加primary key 需要耗时： 428秒（7分钟）</p>
-<p>​    EXPLAIN SELECT * FROM order_copy WHERE id=12345</p>
-<p>​    正是因为给id添加了索引，才使得rows的结果为1</p>
-<p>​    <strong>但是索引并不是可以随便添加的，以下几种情况需牢记在心：</strong></p>
-<p>​    较频繁的作为查询条件字段应该创建索引</p>
-<p>​    select * from order_copy where id = $id</p>
-<p>​    唯一性太差的字段不适合单独创建索引，即使频繁作为查询条件</p>
-<p>​    select * from order_copy where sex=’女’</p>
-<p>​    更新非常频繁的字段不适合创建索引</p>
-<p>​    select * from order_copy where order_state=’未付款’</p>
-<p>​    不会出现在WHERE子句中字段不该创建索引</p>
-<p>​    <strong>索引的类型：</strong></p>
-<p>​    PRIMARY 索引 =&gt; 在主键上自动创建INDEX 索引 =&gt; 就是普通索引UNIQUE 索引 =&gt; 相当于INDEX                 +UniqueFULLTEXT =&gt; 只在MYISAM 存储引擎支持，目的是全文索引，在内容系统中用的多，在全英文网站用多    (英文词独立). 中文数据不常用，意义不大国内全文索引通常使用 sphinx 来完成.</p>
-<p>​    <strong>索引的使用</strong></p>
-<p>​    建立索引 create [UNIQUE|FULLTEXT] index index_name on tbl_name (<em>col_name</em> [(<em>length</em>)] [ASC | DESC] , …..);<br>​    alter table table_name ADD INDEX [<em>index_name<em>] (</em>index_col_name</em>,…)</p>
-<p>​    添加主键(索引) ALTER TABLE 表名 ADD PRIMARY KEY(列名,..); 联合主键</p>
-<p>​    删除索引 DROP INDEX <em>index_name</em> ON <em>tbl_name</em>;<br>​    alter table table_name drop index index_name;删除主键(索引)比较特别: alter table t_b drop primary key;查询    索引(均可) show index from table_name;<br>​    show keys from table_name;<br>​    desc table_Name;</p>
+<li><p>删除索引</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">DROP</span> <span class="keyword">INDEX</span> index_name <span class="keyword">ON</span> talbe_name;</span><br><span class="line"><span class="keyword">ALTER</span> <span class="keyword">TABLE</span> table_name <span class="keyword">DROP</span> <span class="keyword">INDEX</span> index_name;//等价于第一条</span><br><span class="line"><span class="keyword">ALTER</span> <span class="keyword">TABLE</span> table_name <span class="keyword">DROP</span> PRIMARY <span class="keyword">KEY</span>;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>查询索引(均可) </p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SHOW</span> <span class="keyword">keys</span> <span class="keyword">FROM</span> table_name;</span><br><span class="line"><span class="keyword">SHOW</span> <span class="keyword">index</span> <span class="keyword">FROM</span> table_name;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
 </li>
 </ol>
 </li>
