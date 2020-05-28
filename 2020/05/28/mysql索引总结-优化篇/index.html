@@ -103,7 +103,7 @@
 <meta property="og:site_name" content="Zachary">
 <meta property="og:description" content="MySQL优化的一般步骤 通过show status 命令了解各种sql的执行效率 SHOW STATUS提供msyql服务器的状态信息，一般情况下，我们只需要了解以”Com”开头的指令 show session status like ‘Com%’；显示当前的连接的统计结果 show global status like ‘Com%’ ；显示自数据库上次启动至今的统计结果 show statu">
 <meta property="article:published_time" content="2020-05-28T05:12:30.000Z">
-<meta property="article:modified_time" content="2020-05-28T12:22:17.290Z">
+<meta property="article:modified_time" content="2020-05-28T12:25:00.368Z">
 <meta property="article:author" content="yinjiawei">
 <meta property="article:tag" content="mysql索引">
 <meta property="article:tag" content="offer">
@@ -383,7 +383,7 @@
               
                 <span class="post-meta-item-text">更新于&#58;</span>
               
-              <time title="更新于" itemprop="dateModified" datetime="2020-05-28T20:22:17+08:00">
+              <time title="更新于" itemprop="dateModified" datetime="2020-05-28T20:25:00+08:00">
                 2020-05-28
               </time>
             
@@ -488,6 +488,7 @@
 <li>set long_query_time=2；//修改mysql 慢查询时间：如果查询时间超过2秒就算作是慢查询</li>
 </ul>
 <p>注：默认是session级别的，其中Com_XXX表示XXX语句所执行的次数。Com_select，Com_insert，Com_update，Com_delete通过这几个参数，可以容易地了解到当前数据库的应用是以插入更新为主还是以查询操作为主，以及各类的SQL大致的执行比例是多少。</p>
+<a id="more"></a>
 </li>
 <li><h4 id="定位执行效率较低的SQL语句（dql出现问题的概率较dml的大）"><a href="#定位执行效率较低的SQL语句（dql出现问题的概率较dml的大）" class="headerlink" title="定位执行效率较低的SQL语句（dql出现问题的概率较dml的大）"></a>定位执行效率较低的SQL语句（dql出现问题的概率较dml的大）</h4><p>在一个项目中，找到慢查询的select语句：mysql支持把慢查询语句记录到日志文件中。程序员需要修改php.ini的配置文件，默认情况下，慢查询记录是不开启的。开启慢查询记录的方法：打开 my.ini，找到 [mysqld] 在其下面添加：long_query_time = 2和log-slow-queries = D:/mysql/logs/slow.log     #设置把日志写在那里，可以为空，系统会给一个缺省的文件，例子：我们数据表中有1千万条的数据量，DQL语句：SELECT * FROM order_copy WHERE id=12345; 查询耗时：19s &gt; 2s，所以mysql会将该条select语句记录到慢查询日志中，SELECT * FROM order_copy WHERE id=12345的执行时间：<strong>添加索引前：19s</strong>，<strong>添加索引后：0.08s</strong></p>
 </li>
