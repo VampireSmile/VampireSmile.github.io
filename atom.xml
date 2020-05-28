@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://vampiresmile.github.io/"/>
-  <updated>2020-05-28T12:50:03.264Z</updated>
+  <updated>2020-05-28T12:25:00.368Z</updated>
   <id>https://vampiresmile.github.io/</id>
   
   <author>
@@ -15,28 +15,6 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
-  
-  <entry>
-    <title>google00607db728845074</title>
-    <link href="https://vampiresmile.github.io/2020/05/28/google00607db728845074/"/>
-    <id>https://vampiresmile.github.io/2020/05/28/google00607db728845074/</id>
-    <published>2020-05-28T12:58:12.076Z</published>
-    <updated>2020-05-28T12:50:03.264Z</updated>
-    
-    <content type="html"><![CDATA[google-site-verification: google00607db728845074.html]]></content>
-    
-    <summary type="html">
-    
-      
-      
-        google-site-verification: google00607db728845074.html
-      
-    
-    </summary>
-    
-    
-    
-  </entry>
   
   <entry>
     <title>mysql索引总结-优化篇</title>
