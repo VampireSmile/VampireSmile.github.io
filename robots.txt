@@ -2,9 +2,9 @@
 User-agent: *
 Allow: /
 Allow: /archives/
-Allow: /about/
 Allow: /categories/
 Allow: /tags/
+Allow: /about/
 Disallow: /google00607db728845074/
 Disallow: /我的简历/
 Sitemap: https://vampiresmile.github.io/sitemap.xml
