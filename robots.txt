@@ -1,5 +1,6 @@
 # hexo robots.txt
 User-agent: *
+User-agent: AdsBot-Google
 Allow: /
 Allow: /archives/
 Allow: /categories/
