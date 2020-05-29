@@ -1,4 +1,4 @@
-#hexo robots.txt
+# hexo robots.txt
 User-agent: *
 Allow: /
 Allow: /archives/
@@ -6,6 +6,7 @@ Allow: /categories/
 Allow: /tags/
 Allow: /about/
 Disallow: /google00607db728845074/
+Disallow: /myresume
 Disallow: /myresume/
 Sitemap: https://vampiresmile.github.io/sitemap.xml
 Sitemap: https://vampiresmile.github.io/baidusitemap.xml
