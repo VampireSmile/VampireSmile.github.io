@@ -1,0 +1,10 @@
+# hexo robots.txt
+User-agent: *
+Allow: /
+Allow: /archives/
+Allow: /about/
+Allow: /categories/
+Allow: /tags/
+Disallow: /google00607db728845074/
+Sitemap: https://vampiresmile.github.io/sitemap.xml
+Sitemap: https://vampiresmile.github.io/baidusitemap.xml
