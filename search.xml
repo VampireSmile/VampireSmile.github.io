@@ -1,9 +1,475 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>java集合总结</title>
+    <url>/2020/05/30/java%E9%9B%86%E5%90%88%E6%80%BB%E7%BB%93/</url>
+    <content><![CDATA[<ol>
+<li><h2 id="接口继承关系与实现"><a href="#接口继承关系与实现" class="headerlink" title="接口继承关系与实现"></a>接口继承关系与实现</h2><p><img src="https://s1.ax1x.com/2020/05/30/tQywS1.png" alt="tQywS1.png"></p>
+<p>注意：java容器分为Collection和Map两大类，Map接口不是Collection的子接口。区分上图中的依赖、实现、继承各个关系。</p>
+</li>
+<li><h2 id="java集合思维导图"><a href="#java集合思维导图" class="headerlink" title="java集合思维导图"></a>java集合思维导图</h2><p><img src="https://s1.ax1x.com/2020/05/30/tQR7Je.png" alt="tQR7Je.png"></p>
+<p>注意：上面只是展示了一个大概的集合思维导图。<a id="more"></a></p>
+</li>
+<li><h2 id="java集合—-Map-重点"><a href="#java集合—-Map-重点" class="headerlink" title="java集合—-Map(重点)"></a>java集合—-Map(重点)</h2><ol>
+<li><h3 id="Map家族关系图"><a href="#Map家族关系图" class="headerlink" title="Map家族关系图"></a>Map家族关系图</h3><p><img src="https://s1.ax1x.com/2020/05/30/tQWT00.png" alt="tQWT00.png"></p>
+</li>
+<li><h3 id="HashMap-重中之重-，分1-7和1-8来看"><a href="#HashMap-重中之重-，分1-7和1-8来看" class="headerlink" title="HashMap(重中之重)，分1.7和1.8来看"></a>HashMap(重中之重)，分1.7和1.8来看</h3><ol>
+<li><h4 id="存储结构"><a href="#存储结构" class="headerlink" title="存储结构"></a>存储结构</h4><ul>
+<li>1.7：Table数组+Entry链表</li>
+<li>1.8：Table数组+Entry(Node)链表+红黑树</li>
+</ul>
+</li>
+<li><h4 id="hashmap处理冲突方法-都是使用拉链法，但是有区别"><a href="#hashmap处理冲突方法-都是使用拉链法，但是有区别" class="headerlink" title="hashmap处理冲突方法(都是使用拉链法，但是有区别)"></a>hashmap处理冲突方法(都是使用拉链法，但是有区别)</h4><ul>
+<li><p>1.7：使用头插法</p>
+</li>
+<li><p>1.8：使用尾插法</p>
+</li>
+<li><p>拉链法工作原理：</p>
+<p>比如我们有下面代码：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">HashMap&lt;String, String&gt; map = <span class="keyword">new</span> HashMap&lt;&gt;();</span><br><span class="line">map.put(<span class="string">"K1"</span>, <span class="string">"V1"</span>);</span><br><span class="line">map.put(<span class="string">"K2"</span>, <span class="string">"V2"</span>);</span><br><span class="line">map.put(<span class="string">"K3"</span>, <span class="string">"V3"</span>);</span><br></pre></td></tr></table></figure>
+
+<p>解读：</p>
+<ol>
+<li>首先创建一个hashmap，默认容量为16</li>
+<li>插入&lt;K1,V1&gt;键值对，先计算K1的hashCode为115，使用除留余数法得到所在的桶下标115%16=3。</li>
+<li>插入&lt;K2,V2&gt;键值对，先计算K2的hashCode为118，使用除留余数法得到所在的桶下标118%16=6。</li>
+<li>插入&lt;K3,V3&gt;键值对，先计算K3的hashCode为118，使用除留余数法得到所在的桶下标118%16=6，插在&lt;K2,V2&gt;前面(<strong>头插法</strong>)。</li>
+</ol>
+</li>
+<li><p><strong>头插法会形成环链</strong></p>
+<p>假设现在是头插法有2个线程，线程A resize 执行遍历到了1，然后线程B执行，执行完了整个 resize，链表变成了 3-&gt;2-&gt;1。然后线程A回来继续执行，那么它在rehash 1后继续rehash 2，这时候发现2的next是1，这就形成了一个环，所以会一直循环下去直到资源耗尽。而尾插法很好的避免的这个问题，所以即使牺牲了一点点搜索的性能（也没有差很多），解决了这个多线程的问题。</p>
+</li>
+</ul>
+</li>
+<li><h4 id="hashmap查找步骤-get方法"><a href="#hashmap查找步骤-get方法" class="headerlink" title="hashmap查找步骤(get方法)"></a>hashmap查找步骤(get方法)</h4><ol>
+<li><p>计算键值对所在桶下标，对key的hashCode()做hash运算，计算index</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">int</span> <span class="title">indexFor</span><span class="params">(<span class="keyword">int</span> h, <span class="keyword">int</span> length)</span> </span>&#123;<span class="comment">//length为Table.length</span></span><br><span class="line">    <span class="keyword">return</span> h &amp; (length-<span class="number">1</span>);<span class="comment">//为了提高效率，取模不使用%，而是与运算</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//其中h的计算</span></span><br><span class="line"><span class="comment">//1.7进行了四次扰动</span></span><br><span class="line"><span class="function"><span class="keyword">final</span> <span class="keyword">int</span> <span class="title">hash</span><span class="params">(Object k)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> h = hashSeed;</span><br><span class="line">    <span class="keyword">if</span> (<span class="number">0</span> != h &amp;&amp; k <span class="keyword">instanceof</span> String) &#123;</span><br><span class="line">        <span class="keyword">return</span> sun.misc.Hashing.stringHash32((String) k);</span><br><span class="line">    &#125;</span><br><span class="line">    h ^= k.hashCode();</span><br><span class="line">    <span class="comment">// This function ensures that hashCodes that differ only by</span></span><br><span class="line">    <span class="comment">// constant multiples at each bit position have a bounded</span></span><br><span class="line">    <span class="comment">// number of collisions (approximately 8 at default load factor).</span></span><br><span class="line">    h ^= (h &gt;&gt;&gt; <span class="number">20</span>) ^ (h &gt;&gt;&gt; <span class="number">12</span>);</span><br><span class="line">    <span class="keyword">return</span> h ^ (h &gt;&gt;&gt; <span class="number">7</span>) ^ (h &gt;&gt;&gt; <span class="number">4</span>);</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//1.8只进行了一次扰动</span></span><br><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> <span class="title">hash</span><span class="params">(Object key)</span> </span>&#123;</span><br><span class="line">     <span class="keyword">int</span> h;</span><br><span class="line">     <span class="keyword">return</span> (key == <span class="keyword">null</span>) ? <span class="number">0</span> : (h = key.hashCode()) ^ (h &gt;&gt;&gt; <span class="number">16</span>);</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> <span class="title">tableSizeFor</span><span class="params">(<span class="keyword">int</span> cap)</span> </span>&#123;</span><br><span class="line"><span class="comment">//当传入的容量值不为2的n次方时，通过这个方法将该值转为最接近它的那个2的n次方值,其中MAXIMUM_CAPACITY为2的30次方</span></span><br><span class="line">    <span class="keyword">int</span> n = cap - <span class="number">1</span>;</span><br><span class="line">    n |= n &gt;&gt;&gt; <span class="number">1</span>;</span><br><span class="line">    n |= n &gt;&gt;&gt; <span class="number">2</span>;</span><br><span class="line">    n |= n &gt;&gt;&gt; <span class="number">4</span>;</span><br><span class="line">    n |= n &gt;&gt;&gt; <span class="number">8</span>;</span><br><span class="line">    n |= n &gt;&gt;&gt; <span class="number">16</span>;</span><br><span class="line">    <span class="keyword">return</span> (n &lt; <span class="number">0</span>) ? <span class="number">1</span> : (n &gt;= MAXIMUM_CAPACITY) ? MAXIMUM_CAPACITY : n + <span class="number">1</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>==注意：==</p>
+<ol>
+<li>在1.8中，为什么需要进行1次扰动(在1.7中4次扰动)：我们对key值进行hashcode以后，进行相与时候都是只用到了后四位，前面的很多位都没有能够得到使用,这样也可能会导致我们所生成的下标值不能够完全散列，为了解决这个问题将生成的hashcode值的高16位和低16位进行异或运算，这样得到的值再进行相与，得到最散列的下标值。<strong>总的来说就是让高16位有机会参与决定hash的值</strong>。</li>
+<li>需要保证Table数组的长度为2的n次方，只有这样，n-1才能够达到最大的n-1值。反证：如果length = 15，那么length - 1 = 14，用二进制表示为1110，进行相与的时候，最后一位总为0，这样Table数组总会有些桶下标无法通过取模得到，从而导致这些空间被浪费掉。<strong>总的来说就是为了数据均匀分布。</strong></li>
+</ol>
+</li>
+<li><p>如果在bucket(桶)⾥的第⼀个节点⾥直接命中，则直接返回；</p>
+</li>
+<li><p>如果有冲突，则通过key.equals(k)去查找对应的Entry;</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">int</span> <span class="title">hashCode</span><span class="params">()</span> </span>&#123;<span class="comment">//重写hashCode方法</span></span><br><span class="line">    <span class="keyword">return</span> Objects.hashCode(key) ^ Objects.hashCode(value);</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">boolean</span> <span class="title">equals</span><span class="params">(Object o)</span> </span>&#123;<span class="comment">//重写equals方法</span></span><br><span class="line">        <span class="comment">//此处单独比较的是Node</span></span><br><span class="line">       <span class="keyword">if</span> (o == <span class="keyword">this</span>)</span><br><span class="line">         <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">       <span class="keyword">if</span> (o <span class="keyword">instanceof</span> Map.Entry) &#123;</span><br><span class="line">         Map.Entry&lt;?,?&gt; e = (Map.Entry&lt;?,?&gt;)o;</span><br><span class="line">       <span class="keyword">if</span> (Objects.equals(key, e.getKey()) &amp;&amp;</span><br><span class="line">         Objects.equals(value, e.getValue()))</span><br><span class="line">         <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line">   <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//1.8 getNode源码</span></span><br><span class="line"><span class="function"><span class="keyword">final</span> Node&lt;K,V&gt; <span class="title">getNode</span><span class="params">(<span class="keyword">int</span> hash, Object key)</span> </span>&#123;</span><br><span class="line">	Node&lt;K,V&gt;[] tab; Node&lt;K,V&gt; first, e; <span class="keyword">int</span> n; K k;</span><br><span class="line">        <span class="comment">// 判断表是否为空，表重读是否大于零，并且根据此 key 对应的表内是否存在 Node节点。   </span></span><br><span class="line">	<span class="keyword">if</span> ((tab = table) != <span class="keyword">null</span> &amp;&amp; (n = tab.length) &gt; <span class="number">0</span> &amp;&amp;</span><br><span class="line">    	(first = tab[(n - <span class="number">1</span>) &amp; hash]) != <span class="keyword">null</span>) &#123;</span><br><span class="line">     	<span class="keyword">if</span> (first.hash == hash &amp;&amp; <span class="comment">// always check first node</span></span><br><span class="line">    		((k = first.key) == key || (key != <span class="keyword">null</span> &amp;&amp; key.equals(k))))</span><br><span class="line">        <span class="comment">// 检查第一个Node节点，若是命中则不需要进行do... whirle循环。</span></span><br><span class="line">           <span class="keyword">return</span> first;</span><br><span class="line">        <span class="keyword">if</span> ((e = first.next) != <span class="keyword">null</span>) &#123;</span><br><span class="line">        	<span class="keyword">if</span> (first <span class="keyword">instanceof</span> TreeNode)</span><br><span class="line">                <span class="comment">//树形结构，采用对应的检索方法，进行检索。</span></span><br><span class="line">             	<span class="keyword">return</span> ((TreeNode&lt;K,V&gt;)first).getTreeNode(hash, key);</span><br><span class="line">        	<span class="keyword">do</span> &#123;</span><br><span class="line">                <span class="comment">//链表方法做while循环，直到命中结束或者遍历结束。</span></span><br><span class="line">        		<span class="keyword">if</span> (e.hash == hash &amp;&amp;</span><br><span class="line">        			((k = e.key) == key || (key != <span class="keyword">null</span> &amp;&amp; key.equals(k))))</span><br><span class="line">             		<span class="keyword">return</span> e;</span><br><span class="line">        	&#125; <span class="keyword">while</span> ((e = e.next) != <span class="keyword">null</span>);</span><br><span class="line">        &#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>若为树，则在树中通过key.equals(k)查找，O(logn)；</li>
+<li>若为链表，则在链表中通过key.equals(k)查找，O(n)。</li>
+</ul>
+</li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+]]></content>
+      <categories>
+        <category>java后端基础</category>
+      </categories>
+      <tags>
+        <tag>java集合</tag>
+        <tag>offer</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>日常问题记录</title>
+    <url>/2020/05/31/%E6%97%A5%E5%B8%B8%E9%97%AE%E9%A2%98%E8%AE%B0%E5%BD%95/</url>
+    <content><![CDATA[<ol>
+<li><h4 id="解决VMware网络问题的方法："><a href="#解决VMware网络问题的方法：" class="headerlink" title="解决VMware网络问题的方法："></a>解决VMware网络问题的方法：</h4><p>管理员身份运行cmd -&gt; 输入 netsh winsock reset -&gt; 重启电脑 同时也是windows修复网络问题的一种方法</p>
+</li>
+<li><h4 id="解决spring中tx报错问题："><a href="#解决spring中tx报错问题：" class="headerlink" title="解决spring中tx报错问题："></a>解决spring中tx报错问题：</h4><p>在设置xml catalog 时要把key改成<a href="http://www.springframework.org/schema/tx/spring-tx.xsd" target="_blank" rel="external nofollow noopener noreferrer">http://www.springframework.org/schema/tx/spring-tx.xsd</a></p>
+</li>
+<li><h4 id="解决jsp链接数据库中文乱码问题："><a href="#解决jsp链接数据库中文乱码问题：" class="headerlink" title="解决jsp链接数据库中文乱码问题："></a>解决jsp链接数据库中文乱码问题：</h4><ul>
+<li>首先在mysql端使用show variables like ‘%char%；然后把所有都设置为utf-8（反正要一致)，修改/etc/my.cnf(centOS7)中设置default为utf-8；</li>
+<li>然后jsp也面中如果是post传输参数，则需要先设置request.setCharacterEncoding=utf-8,如果是get传输就在链接mysql的url后面加useUnicode=true&amp;characterEncoding(“utf-8”);</li>
+</ul>
+</li>
+<li><h4 id="html中的一个布局问题："><a href="#html中的一个布局问题：" class="headerlink" title="html中的一个布局问题："></a>html中的一个布局问题：</h4><p>div:overflow属性：设置div滚动条；z-index属性：值越大表示显示在上面，在div覆盖时（如二级导航）有用，但要设置position：relative</p>
+</li>
+<li><h4 id="在学校用android-studio下载sdk时问题："><a href="#在学校用android-studio下载sdk时问题：" class="headerlink" title="在学校用android studio下载sdk时问题："></a>在学校用android studio下载sdk时问题：</h4><p>只能用手机热点，无法用校园网（原因未知）,或者修改host文件C:/windows/system32/drivers/etc/hosts<br>如：203.208.41.174   dl.google.com</p>
+</li>
+<li><h4 id="android-studio-5037端口被占用-Unable-to-connect-to-adb-daemon-on-port-5037-："><a href="#android-studio-5037端口被占用-Unable-to-connect-to-adb-daemon-on-port-5037-：" class="headerlink" title="android studio 5037端口被占用(Unable to connect to adb daemon on port: 5037)："></a>android studio 5037端口被占用(Unable to connect to adb daemon on port: 5037)：</h4><p>修改5037端口：环境变量-&gt;新建-&gt;变量名：ANDRIOD_ADB_SERVER_PORT-&gt;变量值：设置在65535之内的有效没被占用的端口号</p>
+</li>
+<li><h4 id="今日升级为win10后，之前安装的VMware不兼容："><a href="#今日升级为win10后，之前安装的VMware不兼容：" class="headerlink" title="今日升级为win10后，之前安装的VMware不兼容："></a>今日升级为win10后，之前安装的VMware不兼容：</h4><p>把之前创建的虚拟机文件备份，重新安装Vmware，再导入这些文件。但之后需要重置虚拟网络适配器：还原默认设置，如果不还原的话会产生诸如ping不通的问题，个人认为可能是电脑升级连带着虚拟网络适配器的ip和DHCP改变了，所以如果不还原手改的话需要改很多地方，最简单的就是直接点还原默认设置，虚拟机会给我们自动搞定之后的一切。重置也可以解决物理机ping不通虚拟机的问题</p>
+</li>
+<li><h4 id="删除Xftp和Xshell之后总是弹出Windows-installar："><a href="#删除Xftp和Xshell之后总是弹出Windows-installar：" class="headerlink" title="删除Xftp和Xshell之后总是弹出Windows installar："></a>删除Xftp和Xshell之后总是弹出Windows installar：</h4><ul>
+<li>原因：注册表没删干净</li>
+<li>解决办法：cmd-&gt;regedit-&gt;搜索注册表-&gt;Xftp，XShell，Xshell，netSarang，Netsarang，NetSarang将搜到的所有关于Xftp，Xshell的注册表项都删除才算删干净-&gt;重启</li>
+</ul>
+</li>
+<li><h4 id="android地图软件打包之后获取不到地图信息"><a href="#android地图软件打包之后获取不到地图信息" class="headerlink" title="android地图软件打包之后获取不到地图信息"></a>android地图软件打包之后获取不到地图信息</h4><p>原因：发布SHA1和调试SHA1设置不一致<br>   方式一 ：</p>
+<pre><code>打开你Android studio底部的terminal 执行keytool -v -list -keystore +签名文件路径+签名文件.jks 。然后回车会提示你输入你的签名密码，输入后回车-&gt;你会看你签名打包后的apk的sha1 </code></pre><p>   方式二 ：</p>
+<pre><code>cmd 打开dos-&gt; cd+keytool路径（keytool 在你jdk bin包下）+keytool -v -list -keystore +签名文件路径+签名文件.jks -&gt;然后回车会提示你输入你的签名密码，输入后回车-&gt;你也会看你签名打包后的apk的sha1 </code></pre><p>然后在相应的平台（比如我的是高德地图API平台）在发布SHA1那一栏输入上面获得的SHA1，调试SHA1那一栏就是之前那个SHA1<br>注意:这个SHA1和你创建key相关，即每一个新的key所生成的SHA1都不一样</p>
+</li>
+<li><h4 id="当某个文件拒绝访问时："><a href="#当某个文件拒绝访问时：" class="headerlink" title="当某个文件拒绝访问时："></a>当某个文件拒绝访问时：</h4><p>我们可以修改该文件的权限：右击该文件-&gt;属性-&gt;修改文件所有者或者权限</p>
+<a id="more"></a>
+</li>
+<li><h4 id="kali开启图形界面卡在鼠标不动："><a href="#kali开启图形界面卡在鼠标不动：" class="headerlink" title="kali开启图形界面卡在鼠标不动："></a>kali开启图形界面卡在鼠标不动：</h4><p>在命令行界面，即level 3下使用startx命令或init 5命令或两者结合(所以提前要默认命令行界面运行)。</p>
+</li>
+<li><h4 id="github创建sshkey-在gitBash中使用命令："><a href="#github创建sshkey-在gitBash中使用命令：" class="headerlink" title="github创建sshkey,在gitBash中使用命令："></a>github创建sshkey,在gitBash中使用命令：</h4><p>ssh-keygen -t rsa -b 4096 -C “你的邮箱”,一路enter,找到创建时存放.rsa.pub的文件，打开，复制，放到github上去</p>
+</li>
+<li><h4 id="VS2017进行网络编程需要配置："><a href="#VS2017进行网络编程需要配置：" class="headerlink" title="VS2017进行网络编程需要配置："></a>VS2017进行网络编程需要配置：</h4><p>项目属性-&gt;链接库-&gt;输入里面加如ws2_32.lib，同时注意上面的debug是x86，而不是x64，同时应使用#include&lt;WS2tcpip.h&gt;头文件，因为#include &lt;Winsock2.h&gt;的方法在x64上会产生不可预知错误</p>
+</li>
+<li><h4 id="vs拓展工具下载太慢解决方法："><a href="#vs拓展工具下载太慢解决方法：" class="headerlink" title="vs拓展工具下载太慢解决方法："></a>vs拓展工具下载太慢解决方法：</h4><p>更改适配器-&gt;属性-&gt;去掉ipv6前的勾</p>
+</li>
+<li><h4 id="网络编程一些测试可能需要关闭防火墙，网络编程一些error4996错误解决："><a href="#网络编程一些测试可能需要关闭防火墙，网络编程一些error4996错误解决：" class="headerlink" title="网络编程一些测试可能需要关闭防火墙，网络编程一些error4996错误解决："></a>网络编程一些测试可能需要关闭防火墙，网络编程一些error4996错误解决：</h4><ol>
+<li>在项目名称上右键，打开属性</li>
+<li>在属性中找到预处理器定义</li>
+<li>在预处理器定义中添加以下代码<br>_WINSOCK_DEPRECATED_NO_WARNINGS</li>
+</ol>
+</li>
+<li><h4 id="Android-Studio-编译不通过，报错“找不到org-apache-http-HttpEntity”"><a href="#Android-Studio-编译不通过，报错“找不到org-apache-http-HttpEntity”" class="headerlink" title="Android Studio 编译不通过，报错“找不到org.apache.http.HttpEntity”"></a>Android Studio 编译不通过，报错“找不到org.apache.http.HttpEntity”</h4><p>如果你使用的target sdk是23以上请在module下的build.gradle加入android{ useLibrary ‘org.apache.http.legacy’ }</p>
+</li>
+<li><h4 id="没有快捷键的eclipse，代码敲起来太慢，还是使用快捷键补全更方便"><a href="#没有快捷键的eclipse，代码敲起来太慢，还是使用快捷键补全更方便" class="headerlink" title="没有快捷键的eclipse，代码敲起来太慢，还是使用快捷键补全更方便:"></a>没有快捷键的eclipse，代码敲起来太慢，还是使用快捷键补全更方便:</h4><ol>
+<li>打开Eclipse，点击”Window － Preferences”;</li>
+<li>在目录树上选择”Java——Editor——Content Assist”，在右侧的”Auto-Activation”找到”Auto Activation triggers for java”选项;</li>
+<li>在”Auto Activation triggers for java”选项中，默认触发代码提示的就是”.”这个符号。将”.”后面加入所有的英文大小写字母，更改：.abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ</li>
+<li>更改完成后就可以使用快捷键，迅速敲代码了。</li>
+</ol>
+</li>
+<li><p>在javaEE中设置自动提示：</p>
+<p>a. 设置html文件的自动代码提示：</p>
+<ol>
+<li>在Preferences中找到Web–&gt;HTML Files–&gt;Editor–&gt;Content Assist</li>
+<li>然后将Prompt when these characters are inserted右边的输入框中的”&lt;=”改为你想输入后就会提示的内容</li>
+<li>我是改为”&lt;=abcdefghijklmnopqrstuvwxyz”。上面的Auto activation delay(ms)是指代码提示延迟的时间(默认500ms)。</li>
+</ol>
+<p>b. 设置xml文件的自动代码提示：</p>
+<ol>
+<li>在Preferences中找到XML–&gt;XML Files–&gt;Editor–&gt;Content Assist</li>
+<li>然后将Prompt when these characters are inserted右边的输入框中的”&lt;=:”改为你想输入后就会提示的内容</li>
+<li>我是改为”&lt;=:abcdefghijklmnopqrstuvwxyz”</li>
+</ol>
+</li>
+<li><h4 id="eclipse会联网下载“代码建议器”的东西，有时没网或有代理等情况，会失败，弹出这类提示："><a href="#eclipse会联网下载“代码建议器”的东西，有时没网或有代理等情况，会失败，弹出这类提示：" class="headerlink" title="eclipse会联网下载“代码建议器”的东西，有时没网或有代理等情况，会失败，弹出这类提示："></a>eclipse会联网下载“代码建议器”的东西，有时没网或有代理等情况，会失败，弹出这类提示：</h4><p>Window-&gt;Preferences-&gt;General-&gt;Network Connections-&gt;以上将Active Provider修改为手动方式，一般情况下不会弹出了，之后还会弹出的话，在弹出对话框选择忽略掉就OK。</p>
+</li>
+<li><h4 id="“https-api-weixin-qq-com-cgi-bin-menu-create-access-token-quot-wxService-needGetAccessToken-微信接口出现40001错误，即accesstoken无效或超时："><a href="#“https-api-weixin-qq-com-cgi-bin-menu-create-access-token-quot-wxService-needGetAccessToken-微信接口出现40001错误，即accesstoken无效或超时：" class="headerlink" title="“https://api.weixin.qq.com/cgi-bin/menu/create?access_token=&quot;+ wxService.needGetAccessToken();微信接口出现40001错误，即accesstoken无效或超时："></a>“<a href="https://api.weixin.qq.com/cgi-bin/menu/create?access_token=&quot;+" target="_blank" rel="external nofollow noopener noreferrer">https://api.weixin.qq.com/cgi-bin/menu/create?access_token=&quot;+</a> wxService.needGetAccessToken();微信接口出现40001错误，即accesstoken无效或超时：</h4><p>可能是源码页面编码格式不正确(utf-8)尽量别用replace方法，不要直接在类中用字面量，可以用配置文件</p>
+</li>
+<li><h4 id="Android-Studio一片爆红，代码中各种jdk和sdk的类找不到，提示setup-jdk："><a href="#Android-Studio一片爆红，代码中各种jdk和sdk的类找不到，提示setup-jdk：" class="headerlink" title="Android Studio一片爆红，代码中各种jdk和sdk的类找不到，提示setup jdk："></a>Android Studio一片爆红，代码中各种jdk和sdk的类找不到，提示setup jdk：</h4><p>解决方法：点击 File-&gt;Invalidate Caches/Restart ，然后点击Invalidate and Restart</p>
+</li>
+<li><h4 id="eclipse创建maven项目注意："><a href="#eclipse创建maven项目注意：" class="headerlink" title="eclipse创建maven项目注意："></a>eclipse创建maven项目注意：</h4><p>elcipse没有src/main/java和src/test/java两个路径:先右击项目&gt;Buildpath&gt;Config…&gt;Source去掉两个missing的路径，然后apply返回&gt;右击项目&gt;新建Source floder&gt;创建两个路径</p>
+</li>
+<li><h4 id="bootstrap4做前端时一个莫名奇妙的问题："><a href="#bootstrap4做前端时一个莫名奇妙的问题：" class="headerlink" title="bootstrap4做前端时一个莫名奇妙的问题："></a>bootstrap4做前端时一个莫名奇妙的问题：</h4><p>当f12打开调试台后，给下拉框添加的Class看不到效果，关了f12即可</p>
+</li>
+<li><h4 id="maven中配置spring报如下错误-Multiple-annotations-found-at-this-line-lt-…-gt-："><a href="#maven中配置spring报如下错误-Multiple-annotations-found-at-this-line-lt-…-gt-：" class="headerlink" title="maven中配置spring报如下错误:Multiple annotations found at this line&lt;…&gt;："></a>maven中配置spring报如下错误:Multiple annotations found at this line&lt;…&gt;：</h4><ul>
+<li>原因:文件中的配置和我pom.xml下载的spring版本不一致导致</li>
+<li>解决:给我的spring配置文件中的带.xsd后缀的那一部分的版本改为我pom.xml中的版本，如果还不行，就再执行一次clean操作</li>
+</ul>
+</li>
+<li><h4 id="解决spring配置文件和国际化资源文件不在同一个目录下路径访问不到问题：不知道可不可以用相对路径-有待测试"><a href="#解决spring配置文件和国际化资源文件不在同一个目录下路径访问不到问题：不知道可不可以用相对路径-有待测试" class="headerlink" title="解决spring配置文件和国际化资源文件不在同一个目录下路径访问不到问题：不知道可不可以用相对路径(有待测试)"></a>解决spring配置文件和国际化资源文件不在同一个目录下路径访问不到问题：不知道可不可以用相对路径(有待测试)</h4><p>文件路径未被spring读取，message_zh_CN.properties存放在src/conf包下。最后将配置message文件目录修改如下，最终问题解决</p>
+<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">"messageSource"</span></span></span><br><span class="line"><span class="tag">     <span class="attr">class</span>=<span class="string">"org.springframework.context.support.ResourceBundleMessageSource"</span>&gt;</span></span><br><span class="line">     <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"basename"</span> <span class="attr">value</span>=<span class="string">"conf/message"</span> /&gt;</span></span><br><span class="line">     <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"defaultEncoding"</span> <span class="attr">value</span>=<span class="string">"UTF-8"</span> /&gt;</span></span><br><span class="line">     <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"useCodeAsDefaultMessage"</span> <span class="attr">value</span>=<span class="string">"true"</span> /&gt;</span></span><br><span class="line"> <span class="tag">&lt;/<span class="name">bean</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>在加载其他资源文件&lt;context:property-placeholder location=”classpath:conf/resource.properties” ignore-unresolvable=”true” /&gt;，加入classpath是可以的，但是放到messageSource却不可以</p>
+</li>
+<li><h4 id="eclipse-javaEE常用快捷键："><a href="#eclipse-javaEE常用快捷键：" class="headerlink" title="eclipse javaEE常用快捷键："></a>eclipse javaEE常用快捷键：</h4><ol>
+<li>alt+↑当前行和上一行交换；alt+↓当前行和下一行交换</li>
+<li>ctrl+d删除当前行，ctrl+shift+o快速导包</li>
+<li>shift+enter光标移到下一行，ctrl+shift+enter移到下一行光标不动</li>
+<li>ctrl+shift+f格式化代码，Ctrl+Shift+S保存全部</li>
+<li>Ctrl+Alt+↓ 复制当前行到下一行(复制增加)，Ctrl+Alt+↑ 复制当前行到上一行(复制增加)</li>
+<li>一整块后移是：tab，一整块前移是：shift+tab</li>
+</ol>
+</li>
+<li><h4 id="androidStudio常用快捷键"><a href="#androidStudio常用快捷键" class="headerlink" title="androidStudio常用快捷键:"></a>androidStudio常用快捷键:</h4><ol>
+<li>Ctrl + Shift +↑ 或 ↓：把当前作用域的代码提前或者后退一行，Ctrl + D：复制当前行到下一行</li>
+<li>Ctrl + P：把光标移动到方法后面的括号内，点击后可以提示你方法的参数类型</li>
+<li>Ctrl+J：同时按下Ctrl和J快捷键，弹出快捷代码框,对于一些常用的代码Android Studio中进行了封装，直接选中即可快速生成，在开发中十分实用，这里以打印log和弹出Toast为例。首先按下Ctrl+J快捷键，弹出快捷代码框，然后直接输入logd这一快捷代码的“命令”，打印Log需要TAG，在类的最上方输入快捷代码logt，即可快速生成一个TAG同样，先输入Ctrl+J键，弹出快捷代码框，然后直接输入toast按下Enter键，或者有了Toast以后按下Ta,快速生成了一行Toast语句，在引号中输入要Toast显示的信息即可</li>
+<li>Ctrl+F12：在类中方法比较多的情况下，同时按下Ctrl和F12键可以快速查看类中所有的方法，弹出这个框的同时可以直接输入想要搜索的方法，进行快速匹配。</li>
+<li><strong>Ctrl+Alt+L：对当前类的所有代码进行格式化</strong></li>
+<li>Ctrl+Alt+V：此快捷键可以快速声明一个变量，本地变量赋值</li>
+<li>Ctrl+Alt+H：点中某一个方法按下这个快捷键，在左边栏上弹出此方法的调用关系，此快捷键在开发中十分常用。</li>
+<li><strong>Ctrl+Alt+O：这个快捷键可以自动导包或删除无用的包，这时候按下快捷键即可自动删除这些无用的包</strong></li>
+<li>Alt+Insert：同时按下Alt和Insert键，弹出快速代码生成框，有构造方法、getter/setter方法、toString方法等Android Studio快速代码生成框。</li>
+</ol>
+</li>
+<li><h4 id="win10修复系统组件"><a href="#win10修复系统组件" class="headerlink" title="win10修复系统组件"></a>win10修复系统组件</h4><p>搜索命令提示符，右击以<strong>管理员身份</strong>运行命令提示符，输入以下命令，注意空格(可以直接复制)</p>
+<ol>
+<li>扫描映像：DISM.exe /Online /Cleanup-image /Scanhealth</li>
+<li><strong>如果第一条命令提示存在错误，则输入以下命令，检测映像。如果无错误就输入第四条命令</strong>：DISM.exe /Online /Cleanup-image /Checkhealth</li>
+<li>修复映像：DISM.exe /Online /Cleanup-image /Restorehealth</li>
+<li>最后检查系统并修复：sfc /scannow</li>
+<li><strong>注意以上命令需要在正常联网的情况下使用</strong></li>
+</ol>
+</li>
+<li><h4 id="win10安全中心一片空白解决办法：将下面代码复制为-reg文件执行然后重启即可。"><a href="#win10安全中心一片空白解决办法：将下面代码复制为-reg文件执行然后重启即可。" class="headerlink" title="win10安全中心一片空白解决办法：将下面代码复制为.reg文件执行然后重启即可。"></a>win10安全中心一片空白解决办法：将下面代码复制为.reg文件执行然后重启即可。</h4><figure class="highlight bat"><table><tr><td class="code"><pre><span class="line">Windows Registry Editor Version <span class="number">5</span>.<span class="number">00</span></span><br><span class="line">[HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows Defender]</span><br><span class="line">"DisableAntiSpyware"=dword:<span class="number">00000000</span></span><br><span class="line">[HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows Defender\Real-<span class="built_in">Time</span> Protection]</span><br><span class="line">"DisableBehaviorMonitoring"=dword:<span class="number">00000000</span></span><br><span class="line">"DisableIOAVProtection"=dword:<span class="number">00000000</span></span><br><span class="line">"DisableOnAccessProtection"=dword:<span class="number">00000000</span></span><br><span class="line">"DisableRealtimeMonitoring"=dword:<span class="number">00000000</span></span><br><span class="line">[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\SecurityHealthService]</span><br><span class="line">"<span class="built_in">Start</span>"=dword:<span class="number">00000002</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><h4 id="初始化顺序-（优先级从高到低）"><a href="#初始化顺序-（优先级从高到低）" class="headerlink" title="初始化顺序:（优先级从高到低）"></a>初始化顺序:（优先级从高到低）</h4><p>静态代码块&gt;mian方法&gt;构造代码块&gt;构造方法。<br>其中静态代码块只执行一次。构造代码块在每次创建对象是都会执行。</p>
+</li>
+<li><h4 id="Android上使用Smack踩坑："><a href="#Android上使用Smack踩坑：" class="headerlink" title="Android上使用Smack踩坑："></a>Android上使用Smack踩坑：</h4><ol>
+<li><p>不要将所有的包导入，将一些需要的包导入即可，因为一些包在Android上会起冲突</p>
+</li>
+<li><p>注意一些api的更新，比如setHost不能用于设置ip，需要使用setHostAddressByNameOrIp方法，否则会报空指针异常</p>
+</li>
+<li><p>使用smack之前需要初始化</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">static</span> &#123;</span><br><span class="line">        AndroidSmackInitializer androidSmackInitializer = <span class="keyword">new</span> AndroidSmackInitializer();</span><br><span class="line">        androidSmackInitializer.initialize();</span><br><span class="line">        <span class="comment">//需要手动加载下面这个类，否则会报找不到该类的错误</span></span><br><span class="line">        <span class="comment">//Caused by: java.lang.ClassNotFoundException:</span></span><br><span class="line">        <span class="comment">//Didn't find class "org.minidns.hla.DnssecResolverApi" on path</span></span><br><span class="line">       SmackConfiguration.addDisabledSmackClass(<span class="string">"org.jivesoftware.smack.util.dns.minidns.MiniDnsResolver"</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>需要导入一些额外的包，比如org.jxmpp…</p>
+</li>
+</ol>
+</li>
+<li><h4 id="android在gradle出现can’t-connect错误："><a href="#android在gradle出现can’t-connect错误：" class="headerlink" title="android在gradle出现can’t connect错误："></a>android在gradle出现can’t connect错误：</h4><p>主要是无法链接下载网站，因为一般都是从Google、国外镜像获取的资源，所以有时很慢甚至连接不上<br>解决方法：找到build.gradle(Project:你的项目名)-&gt;在该文件中找到如下的部分对应修改(<strong>！！！两个，两个都要改！！！！</strong>)</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">repositories&#123;</span><br><span class="line">		<span class="comment">//注释掉原来的镜像</span></span><br><span class="line">		<span class="comment">//google()</span></span><br><span class="line">		<span class="comment">//jcenter()</span></span><br><span class="line">		<span class="comment">//改成阿里云的镜像</span></span><br><span class="line">        maven &#123; url <span class="string">'http://maven.aliyun.com/nexus/content/groups/public/'</span> &#125;</span><br><span class="line">        maven &#123; url <span class="string">'http://maven.aliyun.com/nexus/content/repositories/jcenter'</span> &#125;</span><br><span class="line">        maven &#123; url <span class="string">'http://maven.aliyun.com/nexus/content/repositories/google'</span> &#125;</span><br><span class="line">        maven &#123; url <span class="string">'http://maven.aliyun.com/nexus/content/repositories/gradle-plugin'</span> &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><h4 id="java存在继承的情况下，初始化顺序为-从上到下-："><a href="#java存在继承的情况下，初始化顺序为-从上到下-：" class="headerlink" title="java存在继承的情况下，初始化顺序为(从上到下)："></a>java存在继承的情况下，初始化顺序为(从上到下)：</h4><p>​    父类（静态变量、静态语句块）<br>​    子类（静态变量、静态语句块）<br>​    父类（实例变量、普通语句块）<br>​    父类（构造函数）<br>​    子类（实例变量、普通语句块）<br>​    子类（构造函数）</p>
+</li>
+<li><h4 id="maven项目下classpath："><a href="#maven项目下classpath：" class="headerlink" title="maven项目下classpath："></a>maven项目下classpath：</h4><p><strong>假设资源文件放在maven工程的 src/main/resources 资源文件夹下,源码文件放在 src/main/java/下,</strong><br><strong>那么java文件夹和resources文件夹在运行时就是classpath的真实位置</strong>，如果：<br>有一个文件位于 src/main/resources/test.txt，有一个类位于 src/main/java/com/qunar/MyClass.java<br>FILE_NAME = “test.txt”<br>通过如下代码：MyClass.class.getClassLoder().getResource(FILE_NAME).getPath();直接获取文件路径而classpath可以通过如下代码获取：MyClass.class.getClassLoder().getResource(“”).getPath();<br>还有一种方法可以通过当前类的加载路径使用相对路径来获取资源地址：<br>MyClass.class.getResource(FILE_NAME).getPath();<br>那么这种就会有问题,因为此时的路径是相对于MyClass这个类在运行时路径而言的,test.txt和MyClass并不在一个层级,因为MyClass之前还有两个包<br>可以如下解决：<br>MyClass.class.getResource(File.separator + “FILE_NAME”).getPath(); // 这种方法相当于使用绝对运行时路径<br>MyClass.class.getResource(“..” + File.separator + “..” + File.separator + FILE_NAME).getPath(); // 这种方法相当于使用相对MyClass的运行时路径</p>
+</li>
+<li><h4 id="maven构建spring配置文件时出现无法读取文案文档错误："><a href="#maven构建spring配置文件时出现无法读取文案文档错误：" class="headerlink" title="maven构建spring配置文件时出现无法读取文案文档错误："></a>maven构建spring配置文件时出现无法读取文案文档错误：</h4><p>通过查看日志文档：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Loaded schema mappings: &#123;</span><br><span class="line">http:<span class="comment">//www.springframework.org/schema/tx/spring-tx-2.5.xsd=org/springframework/transaction/config/spring-tx-2.5.xsd, </span></span><br><span class="line">http:<span class="comment">//www.springframework.org/schema/aop/spring-aop-4.1.xsd=org/springframework/aop/config/spring-aop-4.1.xsd, </span></span><br><span class="line">http:<span class="comment">//www.springframework.org/schema/context/spring-context-3.1.xsd=org/springframework/context/config/spring-context-3.1.xsd, </span></span><br><span class="line">http:<span class="comment">//www.springframework.org/schema/util/spring-util-3.0.xsd=org/springframework/beans/factory/xml/spring-util-3.0.xsd,</span></span><br><span class="line">http:<span class="comment">//www.springframework.org/schema/mvc/spring-mvc-4.1.xsd=org/springframework/web/servlet/config/spring-mvc-4.1.xsd,</span></span><br><span class="line">    ...</span><br></pre></td></tr></table></figure>
+
+<p><strong>发现这些xsd配置都没有如4.1.7这样版本的。</strong></p>
+<p>解决方法：如果pom.xml是如下配置</p>
+<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-tx<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">version</span>&gt;</span>4.1.7.RELEASE<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>那么spring配置文件中应该如此配置：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">http:<span class="comment">//www.springframework.org/schema/tx </span></span><br><span class="line">http:<span class="comment">//www.springframework.org/schema/tx/spring-tx-4.1.xsd</span></span><br></pre></td></tr></table></figure>
+
+<p>而不应该如此配置：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">http:<span class="comment">//www.springframework.org/schema/tx </span></span><br><span class="line">http:<span class="comment">//www.springframework.org/schema/tx/spring-tx-4.1.7.xsd</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><h4 id="spring-mvc开发过程中-经常会给model-addAttribute-然后通过EL在jsp中显示-比如-msg-但是有时候会出现jsp最后显示的还是-msg-而不是msg赋值过的："><a href="#spring-mvc开发过程中-经常会给model-addAttribute-然后通过EL在jsp中显示-比如-msg-但是有时候会出现jsp最后显示的还是-msg-而不是msg赋值过的：" class="headerlink" title="spring mvc开发过程中, 经常会给model addAttribute, 然后通过EL在jsp中显示,比如 ${msg},但是有时候会出现jsp最后显示的还是${msg},而不是msg赋值过的："></a>spring mvc开发过程中, 经常会给model addAttribute, 然后通过EL在jsp中显示,比如 ${msg},但是有时候会出现jsp最后显示的还是${msg},而不是msg赋值过的：</h4><ol>
+<li><p>原因在于老的JSP 1.2 声明，web.xml中是这样的：</p>
+<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;!DOCTYPE <span class="meta-keyword">web-app</span> <span class="meta-keyword">PUBLIC</span></span></span><br><span class="line"><span class="meta"> <span class="meta-string">"-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"</span></span></span><br><span class="line"><span class="meta"> <span class="meta-string">"http://java.sun.com/dtd/web-app_2_3.dtd"</span> &gt;</span></span><br><span class="line"> </span><br><span class="line"><span class="tag">&lt;<span class="name">web-app</span>&gt;</span></span><br><span class="line">//...</span><br><span class="line"><span class="tag">&lt;/<span class="name">web-app</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>EL是默认关闭的。。。必须<strong>手动打开</strong>，即添加&lt;%@ page isELIgnored=”false” %&gt;</p>
+</li>
+<li><p>将web.xml头部信息改为如下：</p>
+<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version="1.0" encoding="UTF-8"?&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">web-app</span> <span class="attr">xmlns</span>=<span class="string">"http://xmlns.jcp.org/xml/ns/javaee"</span></span></span><br><span class="line"><span class="tag">         <span class="attr">xmlns:xsi</span>=<span class="string">"http://www.w3.org/2001/XMLSchema-instance"</span></span></span><br><span class="line"><span class="tag">         <span class="attr">xsi:schemaLocation</span>=<span class="string">"http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"</span></span></span><br><span class="line"><span class="tag">         <span class="attr">version</span>=<span class="string">"3.1"</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">web-app</span>&gt;</span></span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+</li>
+<li><h4 id="spring配置文件头需要在最后一个后面加一个空格，否则最后一个不会生效，如："><a href="#spring配置文件头需要在最后一个后面加一个空格，否则最后一个不会生效，如：" class="headerlink" title="spring配置文件头需要在最后一个后面加一个空格，否则最后一个不会生效，如："></a>spring配置文件头需要在最后一个后面加一个空格，否则最后一个不会生效，如：</h4><figure class="highlight java"><table><tr><td class="code"><pre><span class="line">xsi:schemaLocation=<span class="string">" http://www.springframework.org/schema/beans </span></span><br><span class="line"><span class="string">				   http://www.springframework.org/schema/beans/spring-beans-4.1.xsd</span></span><br><span class="line"><span class="string">				   http://www.springframework.org/schema/context </span></span><br><span class="line"><span class="string">				   http://www.springframework.org/schema/context/spring-context-4.1.xsd "</span>&gt;</span><br></pre></td></tr></table></figure>
+
+<p><a href="http://www.springframework.org/schema/context/spring-context-4.1.xsd后面加了个**空格**！！！" target="_blank" rel="external nofollow noopener noreferrer">http://www.springframework.org/schema/context/spring-context-4.1.xsd后面加了个**空格**！！！</a></p>
+</li>
+<li><h4 id="IDEA控制台莫名其妙乱码问题，然后莫名其妙的解决："><a href="#IDEA控制台莫名其妙乱码问题，然后莫名其妙的解决：" class="headerlink" title="IDEA控制台莫名其妙乱码问题，然后莫名其妙的解决："></a>IDEA控制台莫名其妙乱码问题，然后莫名其妙的解决：</h4><p>因为工程中添加了其他编码文件，当我把其他编码文件都去掉(或者都改为utf-8)后，乱码问题解决。。。。。</p>
+</li>
+<li><h4 id="ASCII须记住-’0’对应十进制48-’A’对应十进制65-’a’对应十进制97"><a href="#ASCII须记住-’0’对应十进制48-’A’对应十进制65-’a’对应十进制97" class="headerlink" title="ASCII须记住:’0’对应十进制48,’A’对应十进制65,’a’对应十进制97"></a>ASCII须记住:’0’对应十进制48,’A’对应十进制65,’a’对应十进制97</h4></li>
+<li><h4 id="jdk自带有个jvisualvm工具、该工具是用来监控java运行程序的cpu、内存、线程等的使用情况，在cmd中输入jvisualvm即可看到。"><a href="#jdk自带有个jvisualvm工具、该工具是用来监控java运行程序的cpu、内存、线程等的使用情况，在cmd中输入jvisualvm即可看到。" class="headerlink" title="jdk自带有个jvisualvm工具、该工具是用来监控java运行程序的cpu、内存、线程等的使用情况，在cmd中输入jvisualvm即可看到。"></a>jdk自带有个jvisualvm工具、该工具是用来监控java运行程序的cpu、内存、线程等的使用情况，在cmd中输入jvisualvm即可看到。</h4></li>
+<li><h4 id="ResourBundle读取资源包下的配置文件时要注意路径，注意下面这个最简单的读取配置文件实例："><a href="#ResourBundle读取资源包下的配置文件时要注意路径，注意下面这个最简单的读取配置文件实例：" class="headerlink" title="ResourBundle读取资源包下的配置文件时要注意路径，注意下面这个最简单的读取配置文件实例："></a>ResourBundle读取资源包下的配置文件时要注意路径，注意下面这个最简单的读取配置文件实例：</h4><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">RedProFile</span> </span>&#123;</span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] a)</span></span>&#123;</span><br><span class="line">	String resourceFile = <span class="string">"Forum.CNS"</span>;    </span><br><span class="line"><span class="comment">//	        创建一个默认的ResourceBundle对象   </span></span><br><span class="line"><span class="comment">//	        ResourceBundle会查找包Forum下的CNS.properties的文件   </span></span><br><span class="line"><span class="comment">//	        Forum是资源的包名，它跟普通java类的命名规则完全一样：   </span></span><br><span class="line"><span class="comment">//	        - 区分大小写   </span></span><br><span class="line"><span class="comment">//	        - 扩展名 .properties 省略。就像对于类可以省略掉 .class扩展名一样   </span></span><br><span class="line"><span class="comment">//	        - 资源文件必须位于指定包的路径之下（位于所指定的classpath中）   </span></span><br><span class="line"><span class="comment">//            假如你是在非Web项目中使用，则一定要写资源文件的路径，也就是包路径必须存在。</span></span><br><span class="line"><span class="comment">//            如果是Web项目，不写包路径可以，此时将资源文件放在WEB-INF\classes\目录下就可以。</span></span><br><span class="line">	ResourceBundle rb = ResourceBundle.getBundle(resourceFile);</span><br><span class="line">	System.out.println(rb.getString(<span class="string">"DRIVER"</span>));<span class="comment">//这里是分大小写的，嘿嘿输出值为jdbc:mysql://localhost:3306/cns</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><h4 id="redis错误：Caused-by-redis-clients-jedis-exceptions-JedisDataException"><a href="#redis错误：Caused-by-redis-clients-jedis-exceptions-JedisDataException" class="headerlink" title="redis错误：Caused by: redis.clients.jedis.exceptions.JedisDataException:"></a>redis错误：Caused by: redis.clients.jedis.exceptions.JedisDataException:</h4><p>官方解释：DENIED Redis is running in protected mode because protected mode is enabled, no bind address was specified,  no authentication password is requested to clients. In this mode connections are only accepted from the loopback interface.</p>
+<p>If you want to connect from external computers to Redis you may adopt one of the following solutions:</p>
+<ol>
+<li>Just disable protected mode sending the command ‘CONFIG SET protected-mode no’ from the loopback interface by connecting to Redis from the same host the server is running,however MAKE SURE Redis is not publicly accessible from internet if you do so. Use CONFIG REWRITE to make this change permanent.</li>
+<li>Alternatively you can just disable the protected mode by editing the Redis configuration file,and setting the protected mode option to ‘no’, and then restarting the server. </li>
+<li>If you started the server manually just for testing, restart it with the ‘–protected-mode no’ option.</li>
+<li><strong>Setup a bind address or an authentication password.</strong> </li>
+<li>NOTE: You only need to do one of the above things in order for the server to start accepting connections from the outside.</li>
+<li>一般就是没有设置密码，可以设置密码后认证登录，也就是方案4</li>
+</ol>
+</li>
+<li><h4 id="ubuntu18-04配置静态ip"><a href="#ubuntu18-04配置静态ip" class="headerlink" title="ubuntu18.04配置静态ip"></a>ubuntu18.04配置静态ip</h4><ol>
+<li><p>配置静态ip相关链接：</p>
+<p><a href="https://www.cnblogs.com/SH170706/p/10357676.html" target="_blank" rel="external nofollow noopener noreferrer">https://www.cnblogs.com/SH170706/p/10357676.html</a></p>
+<p><a href="https://blog.csdn.net/makenothing/article/details/9527149" target="_blank" rel="external nofollow noopener noreferrer">https://blog.csdn.net/makenothing/article/details/9527149</a></p>
+<p><a href="https://www.cnblogs.com/ermao0423/p/9954314.html" target="_blank" rel="external nofollow noopener noreferrer">https://www.cnblogs.com/ermao0423/p/9954314.html</a></p>
+</li>
+<li><p>ubuntu修改用户名和主机名<br><a href="https://www.cnblogs.com/zeusmyth/p/6231350.html" target="_blank" rel="external nofollow noopener noreferrer">https://www.cnblogs.com/zeusmyth/p/6231350.html</a></p>
+</li>
+<li><p>oracle官网(和标题无关)<br><a href="http://www.oracle.com/technetwork/java/javase/downloads/" target="_blank" rel="external nofollow noopener noreferrer">http://www.oracle.com/technetwork/java/javase/downloads/</a></p>
+</li>
+</ol>
+</li>
+<li><h4 id="idea从GitHub或码云中导入maven项目时pom-xml爆红："><a href="#idea从GitHub或码云中导入maven项目时pom-xml爆红：" class="headerlink" title="idea从GitHub或码云中导入maven项目时pom.xml爆红："></a>idea从GitHub或码云中导入maven项目时pom.xml爆红：</h4><p>首先将该项目弄为maven项目(因为可能一开始还不是)-&gt;找到右边的maven标签下的Lifecycle-&gt;clean-&gt;install-&gt;reimportant-&gt;重启</p>
+</li>
+<li><p><a href="https://source.unsplash.com/random/1600x900?wallpapers免费背景图地址" target="_blank" rel="external nofollow noopener noreferrer">https://source.unsplash.com/random/1600x900?wallpapers免费背景图地址</a></p>
+<ol>
+<li>next主题中一些东西失效解决办法：f12查看-&gt;找到失效链接-&gt;更新该链接</li>
+<li>next主题中不想首页显示全文方法：在写.md文件时在你想截断的地方加上&lt;!– more –&gt;</li>
+</ol>
+</li>
+</ol>
+]]></content>
+      <categories>
+        <category>总结</category>
+      </categories>
+      <tags>
+        <tag>记录</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Hello World</title>
     <url>/2020/05/24/hello-world/</url>
     <content><![CDATA[<h1 id="Welcome-to-yinjiawei’s-blog"><a href="#Welcome-to-yinjiawei’s-blog" class="headerlink" title="Welcome to yinjiawei’s blog!"></a>Welcome to <a href="https://vampiresmile.github.io/">yinjiawei’s blog</a>!</h1>]]></content>
+  </entry>
+  <entry>
+    <title>mysql索引总结-基础原理篇</title>
+    <url>/2020/05/26/mysql%E7%B4%A2%E5%BC%95%E6%80%BB%E7%BB%93-%E5%9F%BA%E7%A1%80%E5%8E%9F%E7%90%86%E7%AF%87/</url>
+    <content><![CDATA[<ol>
+<li><h3 id="MySQL索引本质"><a href="#MySQL索引本质" class="headerlink" title="MySQL索引本质"></a>MySQL索引本质</h3><p>是一种用来帮助mysql高速获取排好序的数据的<strong>数据结构</strong>。</p>
+</li>
+</ol>
+<ol start="2">
+<li><h3 id="MySQL索引原理"><a href="#MySQL索引原理" class="headerlink" title="MySQL索引原理"></a>MySQL索引原理</h3><ol>
+<li><h4 id="索引分类"><a href="#索引分类" class="headerlink" title="索引分类"></a>索引分类</h4><ol>
+<li>从存储结构上来划分：BTree索引(B-Tree或B+Tree索引)，Hash索引，full-index全文索引，R-Tree索引。</li>
+<li>从应用层次来分：普通索引，唯一索引，复合索引，主键索引</li>
+<li>根据数据的物理顺序与键值的逻辑(索引)顺序关系：聚集索引，非聚集索引。</li>
+</ol>
+<a id="more"></a>
+
+<blockquote>
+<p>注意：</p>
+<p>普通索引：基本的索引类型，没有唯一性的限制，允许为NULL值，即一个索引只包含单个列，一个表可以有多个单列索引，叶节点包含了主键(注意不是记录所在硬盘的地址)，因此有个回表的概念：即普通索引中先找到我们需要的数据的主键，然后再在表中进行一次查询，myISAM是典型的一种需要”回表查询”的引擎。</p>
+<p><strong>回表：</strong>当对一个列创建索引之后，索引会包含该列的键值及键值对应行所在的 rowid。通过索引中记录的 rowid 访问表中的数据就叫回表。回表次数太多会严重影响 SQL 性能，如果回表次数太多，就不应该走索引扫描，应该直接走全表扫描。</p>
+<p><strong>EXPLAIN命令结果中的<code>Using Index</code>意味着不会回表，通过索引就可以获得主要的数据。<code>Using Where</code>则意味着需要回表取数据。</strong></p>
+<p>额外说一句mysql中主要文件结构，我们主要比较myISAM和InnoDB(后文还会提到)：</p>
+<p>mysql中所有的表存储在mysql目录/data目录下</p>
+<p>对于使用myISAM引擎的表：.frm是表结构文件，.MYD是表记录文件，.MYI是表索引记录文件</p>
+<p>而对于使用innoDB引擎的表：.frm是表结构文件，.ibd是表记录和索引文件</p>
+<p>由上可知，myISAM索引文件和数据文件是分离的（非聚集），所以查询是先从.MYI文件中查找索引(如果有的话),然后根据索引查询表记录所在磁盘地址。innoDB索引文件和数据文件是在一起的（聚集），所以查询是直接在.ibd文件中查询索引(如果有的话)，而叶子节点存储着表记录，所以查询到索引即查询到表记录</p>
+<p>然后，再由上我们可以知道：InnoDB一定要有主键，因为InnoDB是默认用B+tree数据结构来组织数据记录的，所以如果不设置主键的话，数据就无法进行组织存储。当然InnoDB会自动选一个可以用来唯一标识一张表中所有记录的字段（简单说就是该字段所有记录不重复）来做主键索引字段，如果找不到这样的字段，就会自动生成一个这样的字段用作唯一索引字段row_id</p>
+<p>唯一索引：索引列的值必须唯一，但允许有空值，一个表允许多个列创建唯一索引。</p>
+<p>主键索引：数据列不允许重复，不允许为NULL，一个表只能有一个主键。</p>
+<p>复合索引：即一个索引包含多一个列</p>
+<p>聚集索引：并不是一种单独的索引类型，而是一种数据存储方式，也可以说叶节点包含了完整的数据记录。具体细节取决于不同的实现，InnoDB的聚簇索引其实就是在同一个结构中保存了B-Tree索引(技术上来说是B+Tree)和数据行</p>
+<p>非聚集索引：不是聚集索引就是非聚集索引(^_^)，当然了，前面有说过，数据和索引不是在一起存储的可以看做非聚集索引。</p>
+<p><strong>注意区分主键和索引的区别：</strong></p>
+<p>​    定义：</p>
+<p>​    主键：唯一标识一条记录，不能有重复的，不允许为空</p>
+<p>​    外键：表的外键是另一表的主键, 外键可以有重复的, 可以是空值</p>
+<p>​    索引：是对数据库表中一列或多列的值进行排序的一种结构</p>
+<p>​    作用：</p>
+<p>​    主键：用来保证数据完整性</p>
+<p>​    外键：用来和其他表建立联系用的</p>
+<p>​    索引：是提高查询排序的速度</p>
+<p>​    个数：</p>
+<p>​    主键：主键只能有一个</p>
+<p>​    外键：一个表可以有多个外键</p>
+<p>​    索引：一个表可以有多个唯一索引</p>
+<p>​    添加：</p>
+<p>​    主键：ALTER TABLE “表名” ADD PRIMARY KEY (字段名)</p>
+<p>​    外键：ALTER TABLE “表名” ADD FOREIGN KEY (字段名) REFERENCES “另一张表名”( 字段名)</p>
+<p>​    索引：ALTER TABLE “表名” ADD INDEX (字段名)</p>
+</blockquote>
+</li>
+</ol>
+</li>
+</ol>
+<ol start="2">
+<li><h4 id="各个索引比较"><a href="#各个索引比较" class="headerlink" title="各个索引比较"></a>各个索引比较</h4><p>​    0x01. 默认不使用二叉查找树的原因:比如给col列加索引，而col列分别为1，2，3，4，5，6，根据二叉查找树的特点，最终索引将会变成只有右子树形状的二叉树，而这时进行查询的效果就和链表一样了，所以不适用</p>
+<p>​    0x02. 默认不使用红黑树的原因:当数据很大(上百万上千万)时树的高度就比较高，假如我们需要的数值位于叶子节点，那么需要进行的磁盘i/o就比较多(比如树高5，则至少要进行5次磁盘i/o)，而进行磁盘i/o会让效率降低，因为其需要很多的时间</p>
+<p>​    0x03. 默认不使用hash表的原因:1.不支持范围查询。2.不支持排序，也不支持模糊查询以及多列索引的最左前缀匹配。3.当数据量上去了之后，hash冲突的概率也会变大，效率将会明细降低。4.hash索引任何时候都避免不了回表查询数据，而B+树在符合某些条件(聚簇索引，覆盖索引等)的时候可以只通过索引完成查询。5.hash索引虽然在等值查询上较快，但是不稳定。性能不可预测，当某个键值存在大量重复的时候，发生hash碰撞，此时效率可能极差。而B+树的查询效率比较稳定，对于所有的查询都是从根节点到叶子节点，且树的高度较低。</p>
+<p>​    0x04. b+tree是btree的变种：1.非叶子节点不存储data，只存储索引(冗余)，可以放更多的索引。2.叶子节点包含所有索引字段与data。3.叶子节点用双向指针相连，提高区间访问的性能。很明显非叶子节点不存data之后就可以存储更多的索引，从而可以让树的高度更小，同时叶子节点加了指针相连之后，可以很好的支持范围查找</p>
+<p>​    0x05. b树也有好处：B树可以在内部节点同时存储键和值，因此，把频繁访问的数据放在靠近根节点的地方将会大大提高热点数据的查询效率。这种特性使得B树在特定数据重复多次查询的场景中更加高效。</p>
+<blockquote>
+<p>注意：</p>
+<p>通过上面的比较我们可以知道：</p>
+<ol>
+<li>节点中(数据)索引占用空间越小，那么该节点中数据(索引)的数量就越多，从而数的高度越低，从而IO次数更少。所以一般推荐整型主键做索引，因为这样不仅比较更快，同时占用的空间也小。同时这也是为什么b+tree要求把真正的数据记录放到叶子节点而不是内层节点的原因，因为一旦放到内层节点，那么每个节点中能保存索引的个数会大幅度下降，导致树增高。当每个节点中(数据)索引个数为1时会退化成线性表。</li>
+<li>最左匹配原则(这里只做一个通俗理解，后面文章还会提到)：当b+树的数据项是复合的数据结构，比如(name,age,sex)的时候，b+数是按照从左到右的顺序来建立搜索树的，比如当(张三,20,F)这样的数据来检索的时候，b+树会优先比较name来确定下一步的所搜方向，如果name相同再依次比较age和sex，最后得到检索的数据；但当(20,F)这样的没有name的数据来的时候，b+树就不知道下一步该查哪个节点，因为建立搜索树的时候name就是第一个比较因子，必须要先根据name来搜索才能知道下一步去哪里查询。比如当(张三,F)这样的数据来检索时，b+树可以用name来指定搜索方向，但下一个字段age的缺失，所以只能把名字等于张三的数据都找到，然后再匹配性别是F的数据了， 这个是非常重要的性质，即索引的最左匹配特性。</li>
+</ol>
+</blockquote>
+</li>
+</ol>
+<ol start="3">
+<li><h3 id="MySQL索引实现"><a href="#MySQL索引实现" class="headerlink" title="MySQL索引实现"></a>MySQL索引实现</h3><ol>
+<li><h4 id="myISAM索引实现"><a href="#myISAM索引实现" class="headerlink" title="myISAM索引实现"></a>myISAM索引实现</h4><p>myISAM引擎使用B+Tree作为索引结构，叶节点的data域存放的是<strong>数据记录的地址</strong>。下图是myISAM索引的原理图：</p>
+<p><img src="https://s1.ax1x.com/2020/05/27/tEDrtg.png" alt="tEDrtg.png"></p>
+<p>这里设表共有三列，假设我们以Col1为主键，则上图便是一个myISAM表的主索引示意图。可以看出myISAM的索引文件仅仅保存数据记录的地址。<strong>在myISAM中</strong>，主索引和辅助索引在结构上没有任何区别，只是主索引要求key是唯一的，而辅助索引的key可以重复。如果我们在Col2上建立一个辅助索引，则此索引的结构如下图所示：</p>
+<p><img src="https://s1.ax1x.com/2020/05/27/tE6W24.png" alt="tE6W24.png"></p>
+<p>同样也是一棵B+Tree，data域保存数据记录的地址。因此，myISAM中索引检索的算法为首先按照B+Tree搜索算法搜索索引，如果指定的Key存在，则取出其data域的值，然后以data域的值为地址，读取相应数据记录。</p>
+<p><strong>myISAM的索引是非聚集索引。</strong></p>
+</li>
+<li><h4 id="InnoDB索引实现"><a href="#InnoDB索引实现" class="headerlink" title="InnoDB索引实现"></a>InnoDB索引实现</h4><p>InnoDB索引实现可以和myISAM对比来看。</p>
+<p>1）第一个重大区别是InnoDB的数据文件本身就是索引文件。从上文知道，MyISAM索引文件和数据文件是分离的，索引文件仅保存数据记录的地址。而在InnoDB中，表数据文件本身就是按B+Tree组织的一个索引结构，这棵树的叶节点data域保存了完整的数据记录。这个索引的key是数据表的主键，因此InnoDB表数据文件本身就是主索引。如图：</p>
+<p><img src="https://s1.ax1x.com/2020/05/27/tE2UPK.png" alt="tE2UPK.png"></p>
+</li>
+</ol>
+<p>​        上图是Innodb主索引(同时也是数据文件)的示意图，可以看到可以看到叶节点包含了完整的数据记录。这种索引叫做聚集索引。因为InnoDB的数据文件本身要按主键聚集，所以InnoDB要求表必须有主键(MyISAM可以没有)，如果没有显式指定，则MySQL系统会自动选择一个可以唯一标识数据记录的列作为主键，如果不存在这种列，则MySQL自动为InnoDB表生成一个隐含字段作为主键，这个字段长度为6个字节，类型为长整形。</p>
+<p>​    2）第二个与myISAM索引不同的是InnoDB的辅助索引data域存储的是相应记录的主键而不是记录地址。换句话说，InnoDB的所有辅助索引都引用主键作为data域。例如，下图为定义在Col3上的一个辅助索引:</p>
+<p><img src="https://s1.ax1x.com/2020/05/27/tE469x.png" alt="tE469x.png"></p>
+<p>这里以英文字符的ASCII码作为比较准则。聚集索引这种实现方式使得按主键的搜索十分高效，但是辅助索引搜索需要检索两遍索引：首先检索辅助索引获得主键，然后用主键到主索引中检索获得记录。</p>
+<p>了解不同存储引擎的索引实现方式对于正确使用和优化索引都非常有帮助，例如知道了InnoDB的索引实现后，就很容易明白为什么不建议使用过长的字段作为主键，因为所有辅助索引都引用主索引，过长的主索引会令辅助索引变得过大。再例如，用非单调的字段作为主键在InnoDB中不是个好主意，因为InnoDB数据文件本身是一颗B+Tree，非单调的主键会造成在插入新记录时数据文件为了维持B+Tree的特性而频繁的分裂调整，十分低效，而使用自增字段作为主键则是一个很好的选择。</p>
+</li>
+<li><h3 id="myISAM和innoDB的区别与选择："><a href="#myISAM和innoDB的区别与选择：" class="headerlink" title="myISAM和innoDB的区别与选择："></a>myISAM和innoDB的区别与选择：</h3><ol>
+<li><h4 id="区别"><a href="#区别" class="headerlink" title="区别"></a>区别</h4></li>
+</ol>
+<p>​    1）InnoDB 支持事务，MyISAM 不支持事务。这是 MySQL 将默认存储引擎从 MyISAM 变成 InnoDB 的重要原因之一；</p>
+<p>​    2）InnoDB 支持外键，而 MyISAM 不支持。对一个包含外键的 InnoDB 表转为 MYISAM 会失败；  </p>
+<p>​    3）InnoDB 是聚集索引，MyISAM 是非聚集索引。聚簇索引的文件存放在主键索引的叶子节点上，因此 InnoDB 必    须要有主键，通过主键索引效率很高。但是辅助索引需要两次查询，先查询到主键，然后再通过主键查询到数据。    因此，主键不应该过大，因为主键太大，其他索引也都会很大。而 MyISAM 是非聚集索引，数据文件是分离的，索    引保存的是数据文件的指针。主键索引和辅助索引是独立的。 </p>
+<p>​    4）InnoDB 不保存表的具体行数，执行 select count(*) from table 时需要全表扫描。而MyISAM 用一个变量保存了整个表的行数，执行上述语句时只需要读出该变量即可，速度很快；    </p>
+<p>​    5）InnoDB 最小的锁粒度是行锁，MyISAM 最小的锁粒度是表锁。一个更新语句会锁住整张表，导致其他查询和更新都会被阻塞，因此并发访问受限。这也是 MySQL 将默认存储引擎从 MyISAM 变成 InnoDB 的重要原因之一；</p>
+<ol start="2">
+<li><h4 id="如何选择"><a href="#如何选择" class="headerlink" title="如何选择"></a>如何选择</h4><p>1）是否要支持事务，如果要请选择 InnoDB，如果不需要可以考虑 MyISAM；</p>
+<p>2）如果表中绝大多数都只是读查询，可以考虑 MyISAM，如果既有读写也挺频繁，请使用InnoDB。</p>
+<p>3）系统崩溃后，MyISAM恢复起来更困难，能否接受，不能接受就选 InnoDB；</p>
+<p>4）MySQL5.5版本开始Innodb已经成为Mysql的默认引擎(之前是MyISAM)，说明其优势是有目共睹的。如果你不知道用什么存储引擎，那就用InnoDB，至少不会差。</p>
+</li>
+</ol>
+</li>
+<li><h3 id="建立一个合适索引-为后面索引优化做一个抛砖引玉"><a href="#建立一个合适索引-为后面索引优化做一个抛砖引玉" class="headerlink" title="建立一个合适索引(为后面索引优化做一个抛砖引玉)"></a>建立一个合适索引(为后面索引优化做一个抛砖引玉)</h3><ol>
+<li><h4 id="建立索引的原理"><a href="#建立索引的原理" class="headerlink" title="建立索引的原理"></a>建立索引的原理</h4><p>一个最重要的原则是最左前缀原理，在提这个之前要先说下联合索引，MySQL中的索引可以以一定顺序引用多个列，这种索引叫做联合索引，一般的，一个联合索引是一个有序元组&lt;a1, a2, …, an&gt;，其中各个元素均为数据表的一列。另外，单列索引可以看成联合索引元素数为1的特例。</p>
+<p>索引匹配的最左原则具体是说，假如索引列分别为A，B，C，顺序也是A，B，C：</p>
+<ul>
+<li>那么查询的时候，如果查询【A】【A，B】 【A，B，C】，那么可以通过索引查询</li>
+<li>如果查询的时候，采用【A，C】，那么C这个虽然是索引，但是由于中间缺失了B，因此C这个索引是用不到的，只能用到A索引</li>
+<li>如果查询的时候，采用【B】 【B，C】 【C】，由于没有用到第一列索引，不是最左前缀，那么后面的索引也是用不到了</li>
+<li>如果查询的时候，采用范围查询，并且是最左前缀，也就是第一列索引，那么可以用到索引，但是范围后面的列无法用到索引</li>
+</ul>
+<p>因为索引虽然加快了查询速度，但索引也是有代价的：索引文件本身要消耗存储空间，同时索引会加重插入、删除和修改记录时的负担(要维护索引数据结构)，另外，MySQL在运行时也要消耗资源维护索引，因此索引并不是越多越好。</p>
+<p>在使用InnoDB存储引擎时，如果没有特别的需要，请永远使用一个与业务无关的自增字段作为主键。如果从数据库索引优化角度看，使用InnoDB引擎而不使用自增主键绝对是一个糟糕的主意。</p>
+<p>InnoDB使用聚集索引，数据记录本身被存于主索引(一颗B+Tree)的叶子节点上。这就要求同一个叶子节点内(大小为一个内存页或磁盘页)的各条数据记录按主键顺序存放，因此每当有一条新的记录插入时，MySQL会根据其主键将其插入适当的节点和位置，如果页面达到装载因子(InnoDB默认为15/16)，则开辟一个新的页(节点)。如果表使用自增主键，那么每次插入新的记录，记录就会顺序添加到当前索引节点的后续位置，当一页写满，就会自动开辟一个新的页。如下：</p>
+<p><img src="https://s1.ax1x.com/2020/05/28/tVfght.gif" alt="tVfght.gif"></p>
+<p>这样就会形成一个紧凑的索引结构，近似顺序填满。由于每次插入时也不需要移动已有数据，因此效率很高，也不会增加很多开销在维护索引上。</p>
+<p>如果使用非自增主键（如果身份证号或学号等），由于每次插入主键的值近似于随机，因此每次新纪录都要被插到现有索引页得中间某个位置，如下<strong>(注意D080的位置)</strong>：</p>
+<p><img src="https://s1.ax1x.com/2020/05/28/tVhKUA.gif" alt="tVhKUA.gif"></p>
+<p>此时MySQL不得不为了将新记录插到合适位置而移动数据，甚至目标页面可能已经被回写到磁盘上而从缓存中清掉，此时又要从磁盘上读回来，这增加了很多开销，同时频繁的移动、分页操作造成了大量的碎片，得到了不够紧凑的索引结构，后续不得不通过OPTIMIZE TABLE来重建表并优化填充页面。</p>
+<p>页分裂：如果主键是非自增 id，为了确保索引有序，mysql 就需要将每次插入的数据都放到合适的位置上。当往一个快满或已满的数据页中插入数据时，新插入的数据会将数据页写满，mysql 就需要申请新的数据页，并且把上个数据页中的部分数据挪到新的数据页上。这就造成了页分裂，这个大量移动数据的过程是会严重影响插入效率的。</p>
+</li>
+<li><h4 id="建立索引的一些注意点"><a href="#建立索引的一些注意点" class="headerlink" title="建立索引的一些注意点"></a>建立索引的一些注意点</h4><ol>
+<li><p>最左前缀匹配原则，非常重要的原则，mysql会一直向右匹配直到遇到范围查询(&gt;、&lt;、between、like)就停止匹配，比如a = 1 and b = 2 and c &gt; 3 and d = 4 如果建立(a,b,c,d)顺序的索引，d是用不到索引的，如果建立(a,b,d,c)的索引则都可以用到，a,b,d的顺序可以任意调整。where子句中使用最频繁的一列放在最左边。</p>
+</li>
+<li><p>=和in可以乱序，比如a = 1 and b = 2 and c = 3 建立(a,b,c)索引可以任意顺序，mysql的查询优化器会帮你优化成索引可以识别的形式</p>
+</li>
+<li><p>尽量选择区分度高的列作为索引,区分度的公式是count(distinct col)/count(*)，表示字段不重复的比例，比例越大我们扫描的记录数越少，唯一键(索引)的区分度是1，而一些状态、性别字段可能在大数据面前区分度就是0，那可能有人会问，这个比例有什么经验值吗？使用场景不同，这个值也很难确定，一般需要join的字段我们都要求是0.1以上，即平均1条扫描10条记录</p>
+</li>
+<li><p>索引列不能参与计算和函数运算，保持列“干净”，比如from_unixtime(create_time) = ’2014-05-29’就不能使用到索引，原因很简单，b+树中存的都是数据表中的字段值，但进行检索时，需要把所有元素都应用函数才能比较，显然成本太大。所以语句应该写成create_time = unix_timestamp(’2014-05-29’);</p>
+</li>
+<li><p>尽量的扩展索引，不要新建索引。比如表中已经有a的索引，现在要加(a,b)的索引，那么只需要修改原来的索引即可，当然要考虑原有数据和线上使用情况</p>
+</li>
+<li><p>主键不推荐有业务含义：(1)因为任何有业务含义的列都有改变的可能性,主键一旦带上了业务含义，那么主键就有可能发生变更。主键一旦发生变更，该数据在磁盘上的存储位置就会发生变更，有可能会引发页分裂，产生空间碎片。(2)带有业务含义的主键，不一定是顺序自增的。那么就会导致数据的插入顺序，并不能保证后面插入数据的主键一定比前面的数据大。如果出现了，后面插入数据的主键比前面的小，就有可能引发页分裂，产生空间碎片。</p>
+</li>
+<li><p>较频繁作为查询条件的字段才去创建索引，更新频繁字段不适合创建索引</p>
+</li>
+<li><p>定义有外键的数据列一定要建立索引</p>
+</li>
+<li><p>索引字段越小越好，为较长的字符串使用前缀索引，当然前提是前缀的标识度高。比如密码就适合建立前缀索引，因为密码几乎各不相同。</p>
+<p>[^前缀索引：如果索引列长度过长，这种列索引时将会产生很大的索引文件，不便于操作，可以使用前缀索引方式进行索引前缀索引应该控制在一个合适的点，控制在0.31黄金值即可（大于这个值就可以创建）。SELECT COUNT(DISTINCT(LEFT(<code>title</code>,10)))/COUNT(*) FROM Arctic; — 这个值大于0.31就可以创建前缀索引，Distinct去重复 ALTER TABLE <code>user</code> ADD INDEX <code>uname</code>(title(10)); — 增加前缀索引SQL，将人名的索引建立在10，这样可以减少索引文件大小，加快索引查询速度。]: </p>
+</li>
+<li><p>使用组合索引，可以减少文件索引大小，在使用时速度要优于多个单列索引</p>
+</li>
+<li><p>不要过多创建索引，除了增加额外的磁盘空间外，对于DML操作的速度影响很大，因为其每增删改一次就得从新建立索引</p>
+</li>
+<li><p>数字和字符串比较不会使用索引，前缀模糊查询不走索引(如select * from table_name where name like ‘%jack’;)</p>
+</li>
+<li><p>应该指定列为NOT NULL，除非你想存储NULL。在mysql中，含有空值的列很难进行查询优化，因为它们使得索引、索引的统计信息以及比较运算更加复杂。你应该用0、一个特殊的值或者一个空串代替空值；</p>
+</li>
+<li><p>通常，通过索引查询数据比全表扫描要快。但是我们也必须注意到它的代价。</p>
+<p>索引需要空间来存储，也需要定期维护， 每当有记录在表中增减或索引列被修改时，索引本身也会被修改。 这意味着每条记录的INSERT，DELETE，UPDATE将为此多付出4，5 次的磁盘I/O。 因为索引需要额外的存储空间和处理，那些不必要的索引反而会使查询反应时间变慢。使用索引查询不一定能提高查询性能，索引范围查询(INDEX RANGE SCAN)适用于两种情况:</p>
+<p>​    1. 基于一个范围的检索，一般查询返回结果集小于表中记录数的30%</p>
+<p>​    2. 基于非唯一性索引的检索</p>
+</li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+]]></content>
+      <categories>
+        <category>数据库</category>
+      </categories>
+      <tags>
+        <tag>offer</tag>
+        <tag>mysql索引</tag>
+      </tags>
   </entry>
   <entry>
     <title>mysql索引总结-优化篇</title>
@@ -175,423 +641,8 @@
         <category>数据库</category>
       </categories>
       <tags>
+        <tag>offer</tag>
         <tag>mysql索引</tag>
-        <tag>offer</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>mysql索引总结-基础原理篇</title>
-    <url>/2020/05/26/mysql%E7%B4%A2%E5%BC%95%E6%80%BB%E7%BB%93-%E5%9F%BA%E7%A1%80%E5%8E%9F%E7%90%86%E7%AF%87/</url>
-    <content><![CDATA[<ol>
-<li><h3 id="MySQL索引本质"><a href="#MySQL索引本质" class="headerlink" title="MySQL索引本质"></a>MySQL索引本质</h3><p>是一种用来帮助mysql高速获取排好序的数据的<strong>数据结构</strong>。</p>
-</li>
-</ol>
-<ol start="2">
-<li><h3 id="MySQL索引原理"><a href="#MySQL索引原理" class="headerlink" title="MySQL索引原理"></a>MySQL索引原理</h3><ol>
-<li><h4 id="索引分类"><a href="#索引分类" class="headerlink" title="索引分类"></a>索引分类</h4><ol>
-<li>从存储结构上来划分：BTree索引(B-Tree或B+Tree索引)，Hash索引，full-index全文索引，R-Tree索引。</li>
-<li>从应用层次来分：普通索引，唯一索引，复合索引，主键索引</li>
-<li>根据数据的物理顺序与键值的逻辑(索引)顺序关系：聚集索引，非聚集索引。</li>
-</ol>
-<a id="more"></a>
-
-<blockquote>
-<p>注意：</p>
-<p>普通索引：基本的索引类型，没有唯一性的限制，允许为NULL值，即一个索引只包含单个列，一个表可以有多个单列索引，叶节点包含了主键(注意不是记录所在硬盘的地址)，因此有个回表的概念：即普通索引中先找到我们需要的数据的主键，然后再在表中进行一次查询，myISAM是典型的一种需要”回表查询”的引擎。</p>
-<p><strong>回表：</strong>当对一个列创建索引之后，索引会包含该列的键值及键值对应行所在的 rowid。通过索引中记录的 rowid 访问表中的数据就叫回表。回表次数太多会严重影响 SQL 性能，如果回表次数太多，就不应该走索引扫描，应该直接走全表扫描。</p>
-<p><strong>EXPLAIN命令结果中的<code>Using Index</code>意味着不会回表，通过索引就可以获得主要的数据。<code>Using Where</code>则意味着需要回表取数据。</strong></p>
-<p>额外说一句mysql中主要文件结构，我们主要比较myISAM和InnoDB(后文还会提到)：</p>
-<p>mysql中所有的表存储在mysql目录/data目录下</p>
-<p>对于使用myISAM引擎的表：.frm是表结构文件，.MYD是表记录文件，.MYI是表索引记录文件</p>
-<p>而对于使用innoDB引擎的表：.frm是表结构文件，.ibd是表记录和索引文件</p>
-<p>由上可知，myISAM索引文件和数据文件是分离的（非聚集），所以查询是先从.MYI文件中查找索引(如果有的话),然后根据索引查询表记录所在磁盘地址。innoDB索引文件和数据文件是在一起的（聚集），所以查询是直接在.ibd文件中查询索引(如果有的话)，而叶子节点存储着表记录，所以查询到索引即查询到表记录</p>
-<p>然后，再由上我们可以知道：InnoDB一定要有主键，因为InnoDB是默认用B+tree数据结构来组织数据记录的，所以如果不设置主键的话，数据就无法进行组织存储。当然InnoDB会自动选一个可以用来唯一标识一张表中所有记录的字段（简单说就是该字段所有记录不重复）来做主键索引字段，如果找不到这样的字段，就会自动生成一个这样的字段用作唯一索引字段row_id</p>
-<p>唯一索引：索引列的值必须唯一，但允许有空值，一个表允许多个列创建唯一索引。</p>
-<p>主键索引：数据列不允许重复，不允许为NULL，一个表只能有一个主键。</p>
-<p>复合索引：即一个索引包含多一个列</p>
-<p>聚集索引：并不是一种单独的索引类型，而是一种数据存储方式，也可以说叶节点包含了完整的数据记录。具体细节取决于不同的实现，InnoDB的聚簇索引其实就是在同一个结构中保存了B-Tree索引(技术上来说是B+Tree)和数据行</p>
-<p>非聚集索引：不是聚集索引就是非聚集索引(^_^)，当然了，前面有说过，数据和索引不是在一起存储的可以看做非聚集索引。</p>
-<p><strong>注意区分主键和索引的区别：</strong></p>
-<p>​    定义：</p>
-<p>​    主键：唯一标识一条记录，不能有重复的，不允许为空</p>
-<p>​    外键：表的外键是另一表的主键, 外键可以有重复的, 可以是空值</p>
-<p>​    索引：是对数据库表中一列或多列的值进行排序的一种结构</p>
-<p>​    作用：</p>
-<p>​    主键：用来保证数据完整性</p>
-<p>​    外键：用来和其他表建立联系用的</p>
-<p>​    索引：是提高查询排序的速度</p>
-<p>​    个数：</p>
-<p>​    主键：主键只能有一个</p>
-<p>​    外键：一个表可以有多个外键</p>
-<p>​    索引：一个表可以有多个唯一索引</p>
-<p>​    添加：</p>
-<p>​    主键：ALTER TABLE “表名” ADD PRIMARY KEY (字段名)</p>
-<p>​    外键：ALTER TABLE “表名” ADD FOREIGN KEY (字段名) REFERENCES “另一张表名”( 字段名)</p>
-<p>​    索引：ALTER TABLE “表名” ADD INDEX (字段名)</p>
-</blockquote>
-</li>
-</ol>
-</li>
-</ol>
-<ol start="2">
-<li><h4 id="各个索引比较"><a href="#各个索引比较" class="headerlink" title="各个索引比较"></a>各个索引比较</h4><p>​    0x01. 默认不使用二叉查找树的原因:比如给col列加索引，而col列分别为1，2，3，4，5，6，根据二叉查找树的特点，最终索引将会变成只有右子树形状的二叉树，而这时进行查询的效果就和链表一样了，所以不适用</p>
-<p>​    0x02. 默认不使用红黑树的原因:当数据很大(上百万上千万)时树的高度就比较高，假如我们需要的数值位于叶子节点，那么需要进行的磁盘i/o就比较多(比如树高5，则至少要进行5次磁盘i/o)，而进行磁盘i/o会让效率降低，因为其需要很多的时间</p>
-<p>​    0x03. 默认不使用hash表的原因:1.不支持范围查询。2.不支持排序，也不支持模糊查询以及多列索引的最左前缀匹配。3.当数据量上去了之后，hash冲突的概率也会变大，效率将会明细降低。4.hash索引任何时候都避免不了回表查询数据，而B+树在符合某些条件(聚簇索引，覆盖索引等)的时候可以只通过索引完成查询。5.hash索引虽然在等值查询上较快，但是不稳定。性能不可预测，当某个键值存在大量重复的时候，发生hash碰撞，此时效率可能极差。而B+树的查询效率比较稳定，对于所有的查询都是从根节点到叶子节点，且树的高度较低。</p>
-<p>​    0x04. b+tree是btree的变种：1.非叶子节点不存储data，只存储索引(冗余)，可以放更多的索引。2.叶子节点包含所有索引字段与data。3.叶子节点用双向指针相连，提高区间访问的性能。很明显非叶子节点不存data之后就可以存储更多的索引，从而可以让树的高度更小，同时叶子节点加了指针相连之后，可以很好的支持范围查找</p>
-<p>​    0x05. b树也有好处：B树可以在内部节点同时存储键和值，因此，把频繁访问的数据放在靠近根节点的地方将会大大提高热点数据的查询效率。这种特性使得B树在特定数据重复多次查询的场景中更加高效。</p>
-<blockquote>
-<p>注意：</p>
-<p>通过上面的比较我们可以知道：</p>
-<ol>
-<li>节点中(数据)索引占用空间越小，那么该节点中数据(索引)的数量就越多，从而数的高度越低，从而IO次数更少。所以一般推荐整型主键做索引，因为这样不仅比较更快，同时占用的空间也小。同时这也是为什么b+tree要求把真正的数据记录放到叶子节点而不是内层节点的原因，因为一旦放到内层节点，那么每个节点中能保存索引的个数会大幅度下降，导致树增高。当每个节点中(数据)索引个数为1时会退化成线性表。</li>
-<li>最左匹配原则(这里只做一个通俗理解，后面文章还会提到)：当b+树的数据项是复合的数据结构，比如(name,age,sex)的时候，b+数是按照从左到右的顺序来建立搜索树的，比如当(张三,20,F)这样的数据来检索的时候，b+树会优先比较name来确定下一步的所搜方向，如果name相同再依次比较age和sex，最后得到检索的数据；但当(20,F)这样的没有name的数据来的时候，b+树就不知道下一步该查哪个节点，因为建立搜索树的时候name就是第一个比较因子，必须要先根据name来搜索才能知道下一步去哪里查询。比如当(张三,F)这样的数据来检索时，b+树可以用name来指定搜索方向，但下一个字段age的缺失，所以只能把名字等于张三的数据都找到，然后再匹配性别是F的数据了， 这个是非常重要的性质，即索引的最左匹配特性。</li>
-</ol>
-</blockquote>
-</li>
-</ol>
-<ol start="3">
-<li><h3 id="MySQL索引实现"><a href="#MySQL索引实现" class="headerlink" title="MySQL索引实现"></a>MySQL索引实现</h3><ol>
-<li><h4 id="myISAM索引实现"><a href="#myISAM索引实现" class="headerlink" title="myISAM索引实现"></a>myISAM索引实现</h4><p>myISAM引擎使用B+Tree作为索引结构，叶节点的data域存放的是<strong>数据记录的地址</strong>。下图是myISAM索引的原理图：</p>
-<p><img src="https://s1.ax1x.com/2020/05/27/tEDrtg.png" alt="tEDrtg.png"></p>
-<p>这里设表共有三列，假设我们以Col1为主键，则上图便是一个myISAM表的主索引示意图。可以看出myISAM的索引文件仅仅保存数据记录的地址。<strong>在myISAM中</strong>，主索引和辅助索引在结构上没有任何区别，只是主索引要求key是唯一的，而辅助索引的key可以重复。如果我们在Col2上建立一个辅助索引，则此索引的结构如下图所示：</p>
-<p><img src="https://s1.ax1x.com/2020/05/27/tE6W24.png" alt="tE6W24.png"></p>
-<p>同样也是一棵B+Tree，data域保存数据记录的地址。因此，myISAM中索引检索的算法为首先按照B+Tree搜索算法搜索索引，如果指定的Key存在，则取出其data域的值，然后以data域的值为地址，读取相应数据记录。</p>
-<p><strong>myISAM的索引是非聚集索引。</strong></p>
-</li>
-<li><h4 id="InnoDB索引实现"><a href="#InnoDB索引实现" class="headerlink" title="InnoDB索引实现"></a>InnoDB索引实现</h4><p>InnoDB索引实现可以和myISAM对比来看。</p>
-<p>1）第一个重大区别是InnoDB的数据文件本身就是索引文件。从上文知道，MyISAM索引文件和数据文件是分离的，索引文件仅保存数据记录的地址。而在InnoDB中，表数据文件本身就是按B+Tree组织的一个索引结构，这棵树的叶节点data域保存了完整的数据记录。这个索引的key是数据表的主键，因此InnoDB表数据文件本身就是主索引。如图：</p>
-<p><img src="https://s1.ax1x.com/2020/05/27/tE2UPK.png" alt="tE2UPK.png"></p>
-</li>
-</ol>
-<p>​        上图是Innodb主索引(同时也是数据文件)的示意图，可以看到可以看到叶节点包含了完整的数据记录。这种索引叫做聚集索引。因为InnoDB的数据文件本身要按主键聚集，所以InnoDB要求表必须有主键(MyISAM可以没有)，如果没有显式指定，则MySQL系统会自动选择一个可以唯一标识数据记录的列作为主键，如果不存在这种列，则MySQL自动为InnoDB表生成一个隐含字段作为主键，这个字段长度为6个字节，类型为长整形。</p>
-<p>​    2）第二个与myISAM索引不同的是InnoDB的辅助索引data域存储的是相应记录的主键而不是记录地址。换句话说，InnoDB的所有辅助索引都引用主键作为data域。例如，下图为定义在Col3上的一个辅助索引:</p>
-<p><img src="https://s1.ax1x.com/2020/05/27/tE469x.png" alt="tE469x.png"></p>
-<p>这里以英文字符的ASCII码作为比较准则。聚集索引这种实现方式使得按主键的搜索十分高效，但是辅助索引搜索需要检索两遍索引：首先检索辅助索引获得主键，然后用主键到主索引中检索获得记录。</p>
-<p>了解不同存储引擎的索引实现方式对于正确使用和优化索引都非常有帮助，例如知道了InnoDB的索引实现后，就很容易明白为什么不建议使用过长的字段作为主键，因为所有辅助索引都引用主索引，过长的主索引会令辅助索引变得过大。再例如，用非单调的字段作为主键在InnoDB中不是个好主意，因为InnoDB数据文件本身是一颗B+Tree，非单调的主键会造成在插入新记录时数据文件为了维持B+Tree的特性而频繁的分裂调整，十分低效，而使用自增字段作为主键则是一个很好的选择。</p>
-</li>
-<li><h3 id="myISAM和innoDB的区别与选择："><a href="#myISAM和innoDB的区别与选择：" class="headerlink" title="myISAM和innoDB的区别与选择："></a>myISAM和innoDB的区别与选择：</h3><ol>
-<li><h4 id="区别"><a href="#区别" class="headerlink" title="区别"></a>区别</h4></li>
-</ol>
-<p>​    1）InnoDB 支持事务，MyISAM 不支持事务。这是 MySQL 将默认存储引擎从 MyISAM 变成 InnoDB 的重要原因之一；</p>
-<p>​    2）InnoDB 支持外键，而 MyISAM 不支持。对一个包含外键的 InnoDB 表转为 MYISAM 会失败；  </p>
-<p>​    3）InnoDB 是聚集索引，MyISAM 是非聚集索引。聚簇索引的文件存放在主键索引的叶子节点上，因此 InnoDB 必    须要有主键，通过主键索引效率很高。但是辅助索引需要两次查询，先查询到主键，然后再通过主键查询到数据。    因此，主键不应该过大，因为主键太大，其他索引也都会很大。而 MyISAM 是非聚集索引，数据文件是分离的，索    引保存的是数据文件的指针。主键索引和辅助索引是独立的。 </p>
-<p>​    4）InnoDB 不保存表的具体行数，执行 select count(*) from table 时需要全表扫描。而MyISAM 用一个变量保存了整个表的行数，执行上述语句时只需要读出该变量即可，速度很快；    </p>
-<p>​    5）InnoDB 最小的锁粒度是行锁，MyISAM 最小的锁粒度是表锁。一个更新语句会锁住整张表，导致其他查询和更新都会被阻塞，因此并发访问受限。这也是 MySQL 将默认存储引擎从 MyISAM 变成 InnoDB 的重要原因之一；</p>
-<ol start="2">
-<li><h4 id="如何选择"><a href="#如何选择" class="headerlink" title="如何选择"></a>如何选择</h4><p>1）是否要支持事务，如果要请选择 InnoDB，如果不需要可以考虑 MyISAM；</p>
-<p>2）如果表中绝大多数都只是读查询，可以考虑 MyISAM，如果既有读写也挺频繁，请使用InnoDB。</p>
-<p>3）系统崩溃后，MyISAM恢复起来更困难，能否接受，不能接受就选 InnoDB；</p>
-<p>4）MySQL5.5版本开始Innodb已经成为Mysql的默认引擎(之前是MyISAM)，说明其优势是有目共睹的。如果你不知道用什么存储引擎，那就用InnoDB，至少不会差。</p>
-</li>
-</ol>
-</li>
-<li><h3 id="建立一个合适索引-为后面索引优化做一个抛砖引玉"><a href="#建立一个合适索引-为后面索引优化做一个抛砖引玉" class="headerlink" title="建立一个合适索引(为后面索引优化做一个抛砖引玉)"></a>建立一个合适索引(为后面索引优化做一个抛砖引玉)</h3><ol>
-<li><h4 id="建立索引的原理"><a href="#建立索引的原理" class="headerlink" title="建立索引的原理"></a>建立索引的原理</h4><p>一个最重要的原则是最左前缀原理，在提这个之前要先说下联合索引，MySQL中的索引可以以一定顺序引用多个列，这种索引叫做联合索引，一般的，一个联合索引是一个有序元组&lt;a1, a2, …, an&gt;，其中各个元素均为数据表的一列。另外，单列索引可以看成联合索引元素数为1的特例。</p>
-<p>索引匹配的最左原则具体是说，假如索引列分别为A，B，C，顺序也是A，B，C：</p>
-<ul>
-<li>那么查询的时候，如果查询【A】【A，B】 【A，B，C】，那么可以通过索引查询</li>
-<li>如果查询的时候，采用【A，C】，那么C这个虽然是索引，但是由于中间缺失了B，因此C这个索引是用不到的，只能用到A索引</li>
-<li>如果查询的时候，采用【B】 【B，C】 【C】，由于没有用到第一列索引，不是最左前缀，那么后面的索引也是用不到了</li>
-<li>如果查询的时候，采用范围查询，并且是最左前缀，也就是第一列索引，那么可以用到索引，但是范围后面的列无法用到索引</li>
-</ul>
-<p>因为索引虽然加快了查询速度，但索引也是有代价的：索引文件本身要消耗存储空间，同时索引会加重插入、删除和修改记录时的负担(要维护索引数据结构)，另外，MySQL在运行时也要消耗资源维护索引，因此索引并不是越多越好。</p>
-<p>在使用InnoDB存储引擎时，如果没有特别的需要，请永远使用一个与业务无关的自增字段作为主键。如果从数据库索引优化角度看，使用InnoDB引擎而不使用自增主键绝对是一个糟糕的主意。</p>
-<p>InnoDB使用聚集索引，数据记录本身被存于主索引(一颗B+Tree)的叶子节点上。这就要求同一个叶子节点内(大小为一个内存页或磁盘页)的各条数据记录按主键顺序存放，因此每当有一条新的记录插入时，MySQL会根据其主键将其插入适当的节点和位置，如果页面达到装载因子(InnoDB默认为15/16)，则开辟一个新的页(节点)。如果表使用自增主键，那么每次插入新的记录，记录就会顺序添加到当前索引节点的后续位置，当一页写满，就会自动开辟一个新的页。如下：</p>
-<p><img src="https://s1.ax1x.com/2020/05/28/tVfght.gif" alt="tVfght.gif"></p>
-<p>这样就会形成一个紧凑的索引结构，近似顺序填满。由于每次插入时也不需要移动已有数据，因此效率很高，也不会增加很多开销在维护索引上。</p>
-<p>如果使用非自增主键（如果身份证号或学号等），由于每次插入主键的值近似于随机，因此每次新纪录都要被插到现有索引页得中间某个位置，如下<strong>(注意D080的位置)</strong>：</p>
-<p><img src="https://s1.ax1x.com/2020/05/28/tVhKUA.gif" alt="tVhKUA.gif"></p>
-<p>此时MySQL不得不为了将新记录插到合适位置而移动数据，甚至目标页面可能已经被回写到磁盘上而从缓存中清掉，此时又要从磁盘上读回来，这增加了很多开销，同时频繁的移动、分页操作造成了大量的碎片，得到了不够紧凑的索引结构，后续不得不通过OPTIMIZE TABLE来重建表并优化填充页面。</p>
-<p>页分裂：如果主键是非自增 id，为了确保索引有序，mysql 就需要将每次插入的数据都放到合适的位置上。当往一个快满或已满的数据页中插入数据时，新插入的数据会将数据页写满，mysql 就需要申请新的数据页，并且把上个数据页中的部分数据挪到新的数据页上。这就造成了页分裂，这个大量移动数据的过程是会严重影响插入效率的。</p>
-</li>
-<li><h4 id="建立索引的一些注意点"><a href="#建立索引的一些注意点" class="headerlink" title="建立索引的一些注意点"></a>建立索引的一些注意点</h4><ol>
-<li><p>最左前缀匹配原则，非常重要的原则，mysql会一直向右匹配直到遇到范围查询(&gt;、&lt;、between、like)就停止匹配，比如a = 1 and b = 2 and c &gt; 3 and d = 4 如果建立(a,b,c,d)顺序的索引，d是用不到索引的，如果建立(a,b,d,c)的索引则都可以用到，a,b,d的顺序可以任意调整。where子句中使用最频繁的一列放在最左边。</p>
-</li>
-<li><p>=和in可以乱序，比如a = 1 and b = 2 and c = 3 建立(a,b,c)索引可以任意顺序，mysql的查询优化器会帮你优化成索引可以识别的形式</p>
-</li>
-<li><p>尽量选择区分度高的列作为索引,区分度的公式是count(distinct col)/count(*)，表示字段不重复的比例，比例越大我们扫描的记录数越少，唯一键(索引)的区分度是1，而一些状态、性别字段可能在大数据面前区分度就是0，那可能有人会问，这个比例有什么经验值吗？使用场景不同，这个值也很难确定，一般需要join的字段我们都要求是0.1以上，即平均1条扫描10条记录</p>
-</li>
-<li><p>索引列不能参与计算和函数运算，保持列“干净”，比如from_unixtime(create_time) = ’2014-05-29’就不能使用到索引，原因很简单，b+树中存的都是数据表中的字段值，但进行检索时，需要把所有元素都应用函数才能比较，显然成本太大。所以语句应该写成create_time = unix_timestamp(’2014-05-29’);</p>
-</li>
-<li><p>尽量的扩展索引，不要新建索引。比如表中已经有a的索引，现在要加(a,b)的索引，那么只需要修改原来的索引即可，当然要考虑原有数据和线上使用情况</p>
-</li>
-<li><p>主键不推荐有业务含义：(1)因为任何有业务含义的列都有改变的可能性,主键一旦带上了业务含义，那么主键就有可能发生变更。主键一旦发生变更，该数据在磁盘上的存储位置就会发生变更，有可能会引发页分裂，产生空间碎片。(2)带有业务含义的主键，不一定是顺序自增的。那么就会导致数据的插入顺序，并不能保证后面插入数据的主键一定比前面的数据大。如果出现了，后面插入数据的主键比前面的小，就有可能引发页分裂，产生空间碎片。</p>
-</li>
-<li><p>较频繁作为查询条件的字段才去创建索引，更新频繁字段不适合创建索引</p>
-</li>
-<li><p>定义有外键的数据列一定要建立索引</p>
-</li>
-<li><p>索引字段越小越好，为较长的字符串使用前缀索引，当然前提是前缀的标识度高。比如密码就适合建立前缀索引，因为密码几乎各不相同。</p>
-<p>[^前缀索引：如果索引列长度过长，这种列索引时将会产生很大的索引文件，不便于操作，可以使用前缀索引方式进行索引前缀索引应该控制在一个合适的点，控制在0.31黄金值即可（大于这个值就可以创建）。SELECT COUNT(DISTINCT(LEFT(<code>title</code>,10)))/COUNT(*) FROM Arctic; — 这个值大于0.31就可以创建前缀索引，Distinct去重复 ALTER TABLE <code>user</code> ADD INDEX <code>uname</code>(title(10)); — 增加前缀索引SQL，将人名的索引建立在10，这样可以减少索引文件大小，加快索引查询速度。]: </p>
-</li>
-<li><p>使用组合索引，可以减少文件索引大小，在使用时速度要优于多个单列索引</p>
-</li>
-<li><p>不要过多创建索引，除了增加额外的磁盘空间外，对于DML操作的速度影响很大，因为其每增删改一次就得从新建立索引</p>
-</li>
-<li><p>数字和字符串比较不会使用索引，前缀模糊查询不走索引(如select * from table_name where name like ‘%jack’;)</p>
-</li>
-<li><p>应该指定列为NOT NULL，除非你想存储NULL。在mysql中，含有空值的列很难进行查询优化，因为它们使得索引、索引的统计信息以及比较运算更加复杂。你应该用0、一个特殊的值或者一个空串代替空值；</p>
-</li>
-<li><p>通常，通过索引查询数据比全表扫描要快。但是我们也必须注意到它的代价。</p>
-<p>索引需要空间来存储，也需要定期维护， 每当有记录在表中增减或索引列被修改时，索引本身也会被修改。 这意味着每条记录的INSERT，DELETE，UPDATE将为此多付出4，5 次的磁盘I/O。 因为索引需要额外的存储空间和处理，那些不必要的索引反而会使查询反应时间变慢。使用索引查询不一定能提高查询性能，索引范围查询(INDEX RANGE SCAN)适用于两种情况:</p>
-<p>​    1. 基于一个范围的检索，一般查询返回结果集小于表中记录数的30%</p>
-<p>​    2. 基于非唯一性索引的检索</p>
-</li>
-</ol>
-</li>
-</ol>
-</li>
-</ol>
-]]></content>
-      <categories>
-        <category>数据库</category>
-      </categories>
-      <tags>
-        <tag>mysql索引</tag>
-        <tag>offer</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>日常问题记录</title>
-    <url>/2020/05/31/%E6%97%A5%E5%B8%B8%E9%97%AE%E9%A2%98%E8%AE%B0%E5%BD%95/</url>
-    <content><![CDATA[<ol>
-<li><h4 id="解决VMware网络问题的方法："><a href="#解决VMware网络问题的方法：" class="headerlink" title="解决VMware网络问题的方法："></a>解决VMware网络问题的方法：</h4><p>管理员身份运行cmd -&gt; 输入 netsh winsock reset -&gt; 重启电脑 同时也是windows修复网络问题的一种方法</p>
-</li>
-<li><h4 id="解决spring中tx报错问题："><a href="#解决spring中tx报错问题：" class="headerlink" title="解决spring中tx报错问题："></a>解决spring中tx报错问题：</h4><p>在设置xml catalog 时要把key改成<a href="http://www.springframework.org/schema/tx/spring-tx.xsd" target="_blank" rel="external nofollow noopener noreferrer">http://www.springframework.org/schema/tx/spring-tx.xsd</a></p>
-</li>
-<li><h4 id="解决jsp链接数据库中文乱码问题："><a href="#解决jsp链接数据库中文乱码问题：" class="headerlink" title="解决jsp链接数据库中文乱码问题："></a>解决jsp链接数据库中文乱码问题：</h4><ul>
-<li>首先在mysql端使用show variables like ‘%char%；然后把所有都设置为utf-8（反正要一致)，修改/etc/my.cnf(centOS7)中设置default为utf-8；</li>
-<li>然后jsp也面中如果是post传输参数，则需要先设置request.setCharacterEncoding=utf-8,如果是get传输就在链接mysql的url后面加useUnicode=true&amp;characterEncoding(“utf-8”);</li>
-</ul>
-</li>
-<li><h4 id="html中的一个布局问题："><a href="#html中的一个布局问题：" class="headerlink" title="html中的一个布局问题："></a>html中的一个布局问题：</h4><p>div:overflow属性：设置div滚动条；z-index属性：值越大表示显示在上面，在div覆盖时（如二级导航）有用，但要设置position：relative</p>
-</li>
-<li><h4 id="在学校用android-studio下载sdk时问题："><a href="#在学校用android-studio下载sdk时问题：" class="headerlink" title="在学校用android studio下载sdk时问题："></a>在学校用android studio下载sdk时问题：</h4><p>只能用手机热点，无法用校园网（原因未知）,或者修改host文件C:/windows/system32/drivers/etc/hosts<br>如：203.208.41.174   dl.google.com</p>
-</li>
-<li><h4 id="android-studio-5037端口被占用-Unable-to-connect-to-adb-daemon-on-port-5037-："><a href="#android-studio-5037端口被占用-Unable-to-connect-to-adb-daemon-on-port-5037-：" class="headerlink" title="android studio 5037端口被占用(Unable to connect to adb daemon on port: 5037)："></a>android studio 5037端口被占用(Unable to connect to adb daemon on port: 5037)：</h4><p>修改5037端口：环境变量-&gt;新建-&gt;变量名：ANDRIOD_ADB_SERVER_PORT-&gt;变量值：设置在65535之内的有效没被占用的端口号</p>
-</li>
-<li><h4 id="今日升级为win10后，之前安装的VMware不兼容："><a href="#今日升级为win10后，之前安装的VMware不兼容：" class="headerlink" title="今日升级为win10后，之前安装的VMware不兼容："></a>今日升级为win10后，之前安装的VMware不兼容：</h4><p>把之前创建的虚拟机文件备份，重新安装Vmware，再导入这些文件。但之后需要重置虚拟网络适配器：还原默认设置，如果不还原的话会产生诸如ping不通的问题，个人认为可能是电脑升级连带着虚拟网络适配器的ip和DHCP改变了，所以如果不还原手改的话需要改很多地方，最简单的就是直接点还原默认设置，虚拟机会给我们自动搞定之后的一切。重置也可以解决物理机ping不通虚拟机的问题</p>
-</li>
-<li><h4 id="删除Xftp和Xshell之后总是弹出Windows-installar："><a href="#删除Xftp和Xshell之后总是弹出Windows-installar：" class="headerlink" title="删除Xftp和Xshell之后总是弹出Windows installar："></a>删除Xftp和Xshell之后总是弹出Windows installar：</h4><ul>
-<li>原因：注册表没删干净</li>
-<li>解决办法：cmd-&gt;regedit-&gt;搜索注册表-&gt;Xftp,XShell,Xshell,netSarang,Netsarang,NetSarang将搜到的所有关于Xftp,Xshell的注册表项都删除才算删干净-&gt;重启</li>
-</ul>
-</li>
-<li><h4 id="android地图软件打包之后获取不到地图信息"><a href="#android地图软件打包之后获取不到地图信息" class="headerlink" title="android地图软件打包之后获取不到地图信息"></a>android地图软件打包之后获取不到地图信息</h4><p>原因：发布SHA1和调试SHA1设置不一致<br>   方式一 ：</p>
-<pre><code>打开你Android studio底部的terminal 执行keytool -v -list -keystore +签名文件路径+签名文件.jks 。然后回车会提示你输入你的签名密码，输入后回车-&gt;你会看你签名打包后的apk的sha1 </code></pre><p>   方式二 ：</p>
-<pre><code>cmd 打开dos-&gt; cd+keytool路径（keytool 在你jdk bin包下）+keytool -v -list -keystore +签名文件路径+签名文件.jks -&gt;然后回车会提示你输入你的签名密码，输入后回车-&gt;你也会看你签名打包后的apk的sha1 </code></pre><p>然后在相应的平台（比如我的是高德地图API平台）在发布SHA1那一栏输入上面获得的SHA1，调试SHA1那一栏就是之前那个SHA1<br>注意:这个SHA1和你创建key相关，即每一个新的key所生成的SHA1都不一样</p>
-</li>
-<li><h4 id="当某个文件拒绝访问时："><a href="#当某个文件拒绝访问时：" class="headerlink" title="当某个文件拒绝访问时："></a>当某个文件拒绝访问时：</h4><p>我们可以修改该文件的权限：右击该文件-&gt;属性-&gt;修改文件所有者或者权限</p>
-<a id="more"></a>
-</li>
-<li><h4 id="kali开启图形界面卡在鼠标不动："><a href="#kali开启图形界面卡在鼠标不动：" class="headerlink" title="kali开启图形界面卡在鼠标不动："></a>kali开启图形界面卡在鼠标不动：</h4><p>在命令行界面，即level 3下使用startx命令或init 5命令或两者结合(所以提前要默认命令行界面运行)。</p>
-</li>
-<li><h4 id="github创建sshkey-在gitBash中使用命令："><a href="#github创建sshkey-在gitBash中使用命令：" class="headerlink" title="github创建sshkey,在gitBash中使用命令："></a>github创建sshkey,在gitBash中使用命令：</h4><p>ssh-keygen -t rsa -b 4096 -C “你的邮箱”,一路enter,找到创建时存放.rsa.pub的文件，打开，复制，放到github上去</p>
-</li>
-<li><h4 id="VS2017进行网络编程需要配置："><a href="#VS2017进行网络编程需要配置：" class="headerlink" title="VS2017进行网络编程需要配置："></a>VS2017进行网络编程需要配置：</h4><p>项目属性-&gt;链接库-&gt;输入里面加如ws2_32.lib，同时注意上面的debug是x86，而不是x64，同时应使用#include&lt;WS2tcpip.h&gt;头文件，因为#include &lt;Winsock2.h&gt;的方法在x64上会产生不可预知错误</p>
-</li>
-<li><h4 id="vs拓展工具下载太慢解决方法："><a href="#vs拓展工具下载太慢解决方法：" class="headerlink" title="vs拓展工具下载太慢解决方法："></a>vs拓展工具下载太慢解决方法：</h4><p>更改适配器-&gt;属性-&gt;去掉ipv6前的勾</p>
-</li>
-<li><h4 id="网络编程一些测试可能需要关闭防火墙，网络编程一些error4996错误解决："><a href="#网络编程一些测试可能需要关闭防火墙，网络编程一些error4996错误解决：" class="headerlink" title="网络编程一些测试可能需要关闭防火墙，网络编程一些error4996错误解决："></a>网络编程一些测试可能需要关闭防火墙，网络编程一些error4996错误解决：</h4><ol>
-<li>在项目名称上右键，打开属性</li>
-<li>在属性中找到预处理器定义</li>
-<li>在预处理器定义中添加以下代码<br>_WINSOCK_DEPRECATED_NO_WARNINGS</li>
-</ol>
-</li>
-<li><h4 id="Android-Studio-编译不通过，报错“找不到org-apache-http-HttpEntity”"><a href="#Android-Studio-编译不通过，报错“找不到org-apache-http-HttpEntity”" class="headerlink" title="Android Studio 编译不通过，报错“找不到org.apache.http.HttpEntity”"></a>Android Studio 编译不通过，报错“找不到org.apache.http.HttpEntity”</h4><p>如果你使用的target sdk是23以上请在module下的build.gradle加入android{ useLibrary ‘org.apache.http.legacy’ }</p>
-</li>
-<li><h4 id="没有快捷键的eclipse，代码敲起来太慢，还是使用快捷键补全更方便"><a href="#没有快捷键的eclipse，代码敲起来太慢，还是使用快捷键补全更方便" class="headerlink" title="没有快捷键的eclipse，代码敲起来太慢，还是使用快捷键补全更方便:"></a>没有快捷键的eclipse，代码敲起来太慢，还是使用快捷键补全更方便:</h4><ol>
-<li>打开Eclipse，点击”Window － Preferences”;</li>
-<li>在目录树上选择”Java——Editor——Content Assist”，在右侧的”Auto-Activation”找到”Auto Activation triggers for java”选项;</li>
-<li>在”Auto Activation triggers for java”选项中，默认触发代码提示的就是”.”这个符号。将”.”后面加入所有的英文大小写字母，更改：.abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ</li>
-<li>更改完成后就可以使用快捷键，迅速敲代码了。</li>
-</ol>
-</li>
-<li><p>在javaEE中设置自动提示：</p>
-<p>a. 设置html文件的自动代码提示：</p>
-<ol>
-<li>在Preferences中找到Web–&gt;HTML Files–&gt;Editor–&gt;Content Assist</li>
-<li>然后将Prompt when these characters are inserted右边的输入框中的”&lt;=”改为你想输入后就会提示的内容</li>
-<li>我是改为”&lt;=abcdefghijklmnopqrstuvwxyz”。上面的Auto activation delay(ms)是指代码提示延迟的时间(默认500ms)。</li>
-</ol>
-<p>b. 设置xml文件的自动代码提示：</p>
-<ol>
-<li>在Preferences中找到XML–&gt;XML Files–&gt;Editor–&gt;Content Assist</li>
-<li>然后将Prompt when these characters are inserted右边的输入框中的”&lt;=:”改为你想输入后就会提示的内容</li>
-<li>我是改为”&lt;=:abcdefghijklmnopqrstuvwxyz”</li>
-</ol>
-</li>
-<li><h4 id="eclipse会联网下载“代码建议器”的东西，有时没网或有代理等情况，会失败，弹出这类提示："><a href="#eclipse会联网下载“代码建议器”的东西，有时没网或有代理等情况，会失败，弹出这类提示：" class="headerlink" title="eclipse会联网下载“代码建议器”的东西，有时没网或有代理等情况，会失败，弹出这类提示："></a>eclipse会联网下载“代码建议器”的东西，有时没网或有代理等情况，会失败，弹出这类提示：</h4><p>Window-&gt;Preferences-&gt;General-&gt;Network Connections-&gt;以上将Active Provider修改为手动方式，一般情况下不会弹出了，之后还会弹出的话，在弹出对话框选择忽略掉就OK。</p>
-</li>
-<li><h4 id="“https-api-weixin-qq-com-cgi-bin-menu-create-access-token-quot-wxService-needGetAccessToken-微信接口出现40001错误，即accesstoken无效或超时："><a href="#“https-api-weixin-qq-com-cgi-bin-menu-create-access-token-quot-wxService-needGetAccessToken-微信接口出现40001错误，即accesstoken无效或超时：" class="headerlink" title="“https://api.weixin.qq.com/cgi-bin/menu/create?access_token=&quot;+ wxService.needGetAccessToken();微信接口出现40001错误，即accesstoken无效或超时："></a>“<a href="https://api.weixin.qq.com/cgi-bin/menu/create?access_token=&quot;+" target="_blank" rel="external nofollow noopener noreferrer">https://api.weixin.qq.com/cgi-bin/menu/create?access_token=&quot;+</a> wxService.needGetAccessToken();微信接口出现40001错误，即accesstoken无效或超时：</h4><p>可能是源码页面编码格式不正确(utf-8)尽量别用replace方法，不要直接在类中用字面量，可以用配置文件</p>
-</li>
-<li><h4 id="Android-Studio一片爆红，代码中各种jdk和sdk的类找不到，提示setup-jdk："><a href="#Android-Studio一片爆红，代码中各种jdk和sdk的类找不到，提示setup-jdk：" class="headerlink" title="Android Studio一片爆红，代码中各种jdk和sdk的类找不到，提示setup jdk："></a>Android Studio一片爆红，代码中各种jdk和sdk的类找不到，提示setup jdk：</h4><p>解决方法：点击 File-&gt;Invalidate Caches/Restart ，然后点击Invalidate and Restart</p>
-</li>
-<li><h4 id="eclipse创建maven项目注意："><a href="#eclipse创建maven项目注意：" class="headerlink" title="eclipse创建maven项目注意："></a>eclipse创建maven项目注意：</h4><p>elcipse没有src/main/java和src/test/java两个路径:先右击项目&gt;Buildpath&gt;Config…&gt;Source去掉两个missing的路径，然后apply返回&gt;右击项目&gt;新建Source floder&gt;创建两个路径</p>
-</li>
-<li><h4 id="bootstrap4做前端时一个莫名奇妙的问题："><a href="#bootstrap4做前端时一个莫名奇妙的问题：" class="headerlink" title="bootstrap4做前端时一个莫名奇妙的问题："></a>bootstrap4做前端时一个莫名奇妙的问题：</h4><p>当f12打开调试台后，给下拉框添加的Class看不到效果，关了f12即可</p>
-</li>
-<li><h4 id="maven中配置spring报如下错误-Multiple-annotations-found-at-this-line-lt-…-gt-："><a href="#maven中配置spring报如下错误-Multiple-annotations-found-at-this-line-lt-…-gt-：" class="headerlink" title="maven中配置spring报如下错误:Multiple annotations found at this line&lt;…&gt;："></a>maven中配置spring报如下错误:Multiple annotations found at this line&lt;…&gt;：</h4><ul>
-<li>原因:文件中的配置和我pom.xml下载的spring版本不一致导致</li>
-<li>解决:给我的spring配置文件中的带.xsd后缀的那一部分的版本改为我pom.xml中的版本，如果还不行，就再执行一次clean操作</li>
-</ul>
-</li>
-<li><h4 id="解决spring配置文件和国际化资源文件不在同一个目录下路径访问不到问题：不知道可不可以用相对路径-有待测试"><a href="#解决spring配置文件和国际化资源文件不在同一个目录下路径访问不到问题：不知道可不可以用相对路径-有待测试" class="headerlink" title="解决spring配置文件和国际化资源文件不在同一个目录下路径访问不到问题：不知道可不可以用相对路径(有待测试)"></a>解决spring配置文件和国际化资源文件不在同一个目录下路径访问不到问题：不知道可不可以用相对路径(有待测试)</h4><p>文件路径未被spring读取，message_zh_CN.properties存放在src/conf包下。最后将配置message文件目录修改如下，最终问题解决</p>
-<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">"messageSource"</span></span></span><br><span class="line"><span class="tag">     <span class="attr">class</span>=<span class="string">"org.springframework.context.support.ResourceBundleMessageSource"</span>&gt;</span></span><br><span class="line">     <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"basename"</span> <span class="attr">value</span>=<span class="string">"conf/message"</span> /&gt;</span></span><br><span class="line">     <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"defaultEncoding"</span> <span class="attr">value</span>=<span class="string">"UTF-8"</span> /&gt;</span></span><br><span class="line">     <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"useCodeAsDefaultMessage"</span> <span class="attr">value</span>=<span class="string">"true"</span> /&gt;</span></span><br><span class="line"> <span class="tag">&lt;/<span class="name">bean</span>&gt;</span></span><br></pre></td></tr></table></figure>
-
-<p>在加载其他资源文件&lt;context:property-placeholder location=”classpath:conf/resource.properties” ignore-unresolvable=”true” /&gt;，加入classpath是可以的，但是放到messageSource却不可以</p>
-</li>
-<li><h4 id="eclipse-javaEE常用快捷键："><a href="#eclipse-javaEE常用快捷键：" class="headerlink" title="eclipse javaEE常用快捷键："></a>eclipse javaEE常用快捷键：</h4><ol>
-<li>alt+↑当前行和上一行交换；alt+↓当前行和下一行交换</li>
-<li>ctrl+d删除当前行，ctrl+shift+o快速导包</li>
-<li>shift+enter光标移到下一行，ctrl+shift+enter移到下一行光标不动</li>
-<li>ctrl+shift+f格式化代码，Ctrl+Shift+S保存全部</li>
-<li>Ctrl+Alt+↓ 复制当前行到下一行(复制增加)，Ctrl+Alt+↑ 复制当前行到上一行(复制增加)</li>
-<li>一整块后移是：tab，一整块前移是：shift+tab</li>
-</ol>
-</li>
-<li><h4 id="androidStudio常用快捷键"><a href="#androidStudio常用快捷键" class="headerlink" title="androidStudio常用快捷键:"></a>androidStudio常用快捷键:</h4><ol>
-<li>Ctrl + Shift +↑ 或 ↓：把当前作用域的代码提前或者后退一行，Ctrl + D：复制当前行到下一行</li>
-<li>Ctrl + P：把光标移动到方法后面的括号内，点击后可以提示你方法的参数类型</li>
-<li>Ctrl+J：同时按下Ctrl和J快捷键，弹出快捷代码框,对于一些常用的代码Android Studio中进行了封装，直接选中即可快速生成，在开发中十分实用，这里以打印log和弹出Toast为例。首先按下Ctrl+J快捷键，弹出快捷代码框，然后直接输入logd这一快捷代码的“命令”，打印Log需要TAG，在类的最上方输入快捷代码logt，即可快速生成一个TAG同样，先输入Ctrl+J键，弹出快捷代码框，然后直接输入toast按下Enter键，或者有了Toast以后按下Ta,快速生成了一行Toast语句，在引号中输入要Toast显示的信息即可</li>
-<li>Ctrl+F12：在类中方法比较多的情况下，同时按下Ctrl和F12键可以快速查看类中所有的方法，弹出这个框的同时可以直接输入想要搜索的方法，进行快速匹配。</li>
-<li><strong>Ctrl+Alt+L：对当前类的所有代码进行格式化</strong></li>
-<li>Ctrl+Alt+V：此快捷键可以快速声明一个变量，本地变量赋值</li>
-<li>Ctrl+Alt+H：点中某一个方法按下这个快捷键，在左边栏上弹出此方法的调用关系，此快捷键在开发中十分常用。</li>
-<li><strong>Ctrl+Alt+O：这个快捷键可以自动导包或删除无用的包，这时候按下快捷键即可自动删除这些无用的包</strong></li>
-<li>Alt+Insert：同时按下Alt和Insert键，弹出快速代码生成框，有构造方法、getter/setter方法、toString方法等Android Studio快速代码生成框。</li>
-</ol>
-</li>
-<li><h4 id="win10修复系统组件"><a href="#win10修复系统组件" class="headerlink" title="win10修复系统组件"></a>win10修复系统组件</h4><p>搜索命令提示符，右击以<strong>管理员身份</strong>运行命令提示符，输入以下命令，注意空格(可以直接复制)</p>
-<ol>
-<li>扫描映像：DISM.exe /Online /Cleanup-image /Scanhealth</li>
-<li><strong>如果第一条命令提示存在错误，则输入以下命令，检测映像。如果无错误就输入第四条命令</strong>：DISM.exe /Online /Cleanup-image /Checkhealth</li>
-<li>修复映像：DISM.exe /Online /Cleanup-image /Restorehealth</li>
-<li>最后检查系统并修复：sfc /scannow</li>
-<li><strong>注意以上命令需要在正常联网的情况下使用</strong></li>
-</ol>
-</li>
-<li><h4 id="win10安全中心一片空白解决办法：将下面代码复制为-reg文件执行然后重启即可。"><a href="#win10安全中心一片空白解决办法：将下面代码复制为-reg文件执行然后重启即可。" class="headerlink" title="win10安全中心一片空白解决办法：将下面代码复制为.reg文件执行然后重启即可。"></a>win10安全中心一片空白解决办法：将下面代码复制为.reg文件执行然后重启即可。</h4><figure class="highlight bat"><table><tr><td class="code"><pre><span class="line">Windows Registry Editor Version <span class="number">5</span>.<span class="number">00</span></span><br><span class="line">[HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows Defender]</span><br><span class="line">"DisableAntiSpyware"=dword:<span class="number">00000000</span></span><br><span class="line">[HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows Defender\Real-<span class="built_in">Time</span> Protection]</span><br><span class="line">"DisableBehaviorMonitoring"=dword:<span class="number">00000000</span></span><br><span class="line">"DisableIOAVProtection"=dword:<span class="number">00000000</span></span><br><span class="line">"DisableOnAccessProtection"=dword:<span class="number">00000000</span></span><br><span class="line">"DisableRealtimeMonitoring"=dword:<span class="number">00000000</span></span><br><span class="line">[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\SecurityHealthService]</span><br><span class="line">"<span class="built_in">Start</span>"=dword:<span class="number">00000002</span></span><br></pre></td></tr></table></figure>
-</li>
-<li><h4 id="初始化顺序-（优先级从高到低）"><a href="#初始化顺序-（优先级从高到低）" class="headerlink" title="初始化顺序:（优先级从高到低）"></a>初始化顺序:（优先级从高到低）</h4><p>静态代码块&gt;mian方法&gt;构造代码块&gt;构造方法。<br>其中静态代码块只执行一次。构造代码块在每次创建对象是都会执行。</p>
-</li>
-<li><h4 id="Android上使用Smack踩坑："><a href="#Android上使用Smack踩坑：" class="headerlink" title="Android上使用Smack踩坑："></a>Android上使用Smack踩坑：</h4><ol>
-<li><p>不要将所有的包导入，将一些需要的包导入即可，因为一些包在Android上会起冲突</p>
-</li>
-<li><p>注意一些api的更新，比如setHost不能用于设置ip，需要使用setHostAddressByNameOrIp方法，否则会报空指针异常</p>
-</li>
-<li><p>使用smack之前需要初始化</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">static</span> &#123;</span><br><span class="line">        AndroidSmackInitializer androidSmackInitializer = <span class="keyword">new</span> AndroidSmackInitializer();</span><br><span class="line">        androidSmackInitializer.initialize();</span><br><span class="line">        <span class="comment">//需要手动加载下面这个类，否则会报找不到该类的错误</span></span><br><span class="line">        <span class="comment">//Caused by: java.lang.ClassNotFoundException:</span></span><br><span class="line">        <span class="comment">//Didn't find class "org.minidns.hla.DnssecResolverApi" on path</span></span><br><span class="line">       SmackConfiguration.addDisabledSmackClass(<span class="string">"org.jivesoftware.smack.util.dns.minidns.MiniDnsResolver"</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>需要导入一些额外的包，比如org.jxmpp…</p>
-</li>
-</ol>
-</li>
-<li><h4 id="android在gradle出现can’t-connect错误："><a href="#android在gradle出现can’t-connect错误：" class="headerlink" title="android在gradle出现can’t connect错误："></a>android在gradle出现can’t connect错误：</h4><p>主要是无法链接下载网站，因为一般都是从Google、国外镜像获取的资源，所以有时很慢甚至连接不上<br>解决方法：找到build.gradle(Project:你的项目名)-&gt;在该文件中找到如下的部分对应修改(<strong>！！！两个，两个都要改！！！！</strong>)</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">repositories&#123;</span><br><span class="line">		<span class="comment">//注释掉原来的镜像</span></span><br><span class="line">		<span class="comment">//google()</span></span><br><span class="line">		<span class="comment">//jcenter()</span></span><br><span class="line">		<span class="comment">//改成阿里云的镜像</span></span><br><span class="line">        maven &#123; url <span class="string">'http://maven.aliyun.com/nexus/content/groups/public/'</span> &#125;</span><br><span class="line">        maven &#123; url <span class="string">'http://maven.aliyun.com/nexus/content/repositories/jcenter'</span> &#125;</span><br><span class="line">        maven &#123; url <span class="string">'http://maven.aliyun.com/nexus/content/repositories/google'</span> &#125;</span><br><span class="line">        maven &#123; url <span class="string">'http://maven.aliyun.com/nexus/content/repositories/gradle-plugin'</span> &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-</li>
-<li><h4 id="java存在继承的情况下，初始化顺序为-从上到下-："><a href="#java存在继承的情况下，初始化顺序为-从上到下-：" class="headerlink" title="java存在继承的情况下，初始化顺序为(从上到下)："></a>java存在继承的情况下，初始化顺序为(从上到下)：</h4><p>​    父类（静态变量、静态语句块）<br>​    子类（静态变量、静态语句块）<br>​    父类（实例变量、普通语句块）<br>​    父类（构造函数）<br>​    子类（实例变量、普通语句块）<br>​    子类（构造函数）</p>
-</li>
-<li><h4 id="maven项目下classpath："><a href="#maven项目下classpath：" class="headerlink" title="maven项目下classpath："></a>maven项目下classpath：</h4><p><strong>假设资源文件放在maven工程的 src/main/resources 资源文件夹下,源码文件放在 src/main/java/下,</strong><br><strong>那么java文件夹和resources文件夹在运行时就是classpath的真实位置</strong>，如果：<br>有一个文件位于 src/main/resources/test.txt，有一个类位于 src/main/java/com/qunar/MyClass.java<br>FILE_NAME = “test.txt”<br>通过如下代码：MyClass.class.getClassLoder().getResource(FILE_NAME).getPath();直接获取文件路径而classpath可以通过如下代码获取：MyClass.class.getClassLoder().getResource(“”).getPath();<br>还有一种方法可以通过当前类的加载路径使用相对路径来获取资源地址：<br>MyClass.class.getResource(FILE_NAME).getPath();<br>那么这种就会有问题,因为此时的路径是相对于MyClass这个类在运行时路径而言的,test.txt和MyClass并不在一个层级,因为MyClass之前还有两个包<br>可以如下解决：<br>MyClass.class.getResource(File.separator + “FILE_NAME”).getPath(); // 这种方法相当于使用绝对运行时路径<br>MyClass.class.getResource(“..” + File.separator + “..” + File.separator + FILE_NAME).getPath(); // 这种方法相当于使用相对MyClass的运行时路径</p>
-</li>
-<li><h4 id="maven构建spring配置文件时出现无法读取文案文档错误："><a href="#maven构建spring配置文件时出现无法读取文案文档错误：" class="headerlink" title="maven构建spring配置文件时出现无法读取文案文档错误："></a>maven构建spring配置文件时出现无法读取文案文档错误：</h4><p>通过查看日志文档：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Loaded schema mappings: &#123;</span><br><span class="line">http:<span class="comment">//www.springframework.org/schema/tx/spring-tx-2.5.xsd=org/springframework/transaction/config/spring-tx-2.5.xsd, </span></span><br><span class="line">http:<span class="comment">//www.springframework.org/schema/aop/spring-aop-4.1.xsd=org/springframework/aop/config/spring-aop-4.1.xsd, </span></span><br><span class="line">http:<span class="comment">//www.springframework.org/schema/context/spring-context-3.1.xsd=org/springframework/context/config/spring-context-3.1.xsd, </span></span><br><span class="line">http:<span class="comment">//www.springframework.org/schema/util/spring-util-3.0.xsd=org/springframework/beans/factory/xml/spring-util-3.0.xsd,</span></span><br><span class="line">http:<span class="comment">//www.springframework.org/schema/mvc/spring-mvc-4.1.xsd=org/springframework/web/servlet/config/spring-mvc-4.1.xsd,</span></span><br><span class="line">    ...</span><br></pre></td></tr></table></figure>
-
-<p><strong>发现这些xsd配置都没有如4.1.7这样版本的。</strong></p>
-<p>解决方法：如果pom.xml是如下配置</p>
-<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-tx<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">version</span>&gt;</span>4.1.7.RELEASE<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
-
-<p>那么spring配置文件中应该如此配置：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">http:<span class="comment">//www.springframework.org/schema/tx </span></span><br><span class="line">http:<span class="comment">//www.springframework.org/schema/tx/spring-tx-4.1.xsd</span></span><br></pre></td></tr></table></figure>
-
-<p>而不应该如此配置：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">http:<span class="comment">//www.springframework.org/schema/tx </span></span><br><span class="line">http:<span class="comment">//www.springframework.org/schema/tx/spring-tx-4.1.7.xsd</span></span><br></pre></td></tr></table></figure>
-</li>
-<li><h4 id="spring-mvc开发过程中-经常会给model-addAttribute-然后通过EL在jsp中显示-比如-msg-但是有时候会出现jsp最后显示的还是-msg-而不是msg赋值过的："><a href="#spring-mvc开发过程中-经常会给model-addAttribute-然后通过EL在jsp中显示-比如-msg-但是有时候会出现jsp最后显示的还是-msg-而不是msg赋值过的：" class="headerlink" title="spring mvc开发过程中, 经常会给model addAttribute, 然后通过EL在jsp中显示,比如 ${msg},但是有时候会出现jsp最后显示的还是${msg},而不是msg赋值过的："></a>spring mvc开发过程中, 经常会给model addAttribute, 然后通过EL在jsp中显示,比如 ${msg},但是有时候会出现jsp最后显示的还是${msg},而不是msg赋值过的：</h4><ol>
-<li><p>原因在于老的JSP 1.2 声明，web.xml中是这样的：</p>
-<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;!DOCTYPE <span class="meta-keyword">web-app</span> <span class="meta-keyword">PUBLIC</span></span></span><br><span class="line"><span class="meta"> <span class="meta-string">"-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"</span></span></span><br><span class="line"><span class="meta"> <span class="meta-string">"http://java.sun.com/dtd/web-app_2_3.dtd"</span> &gt;</span></span><br><span class="line"> </span><br><span class="line"><span class="tag">&lt;<span class="name">web-app</span>&gt;</span></span><br><span class="line">//...</span><br><span class="line"><span class="tag">&lt;/<span class="name">web-app</span>&gt;</span></span><br></pre></td></tr></table></figure>
-
-<p>EL是默认关闭的。。。必须<strong>手动打开</strong>，即添加&lt;%@ page isELIgnored=”false” %&gt;</p>
-</li>
-<li><p>将web.xml头部信息改为如下：</p>
-<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version="1.0" encoding="UTF-8"?&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">web-app</span> <span class="attr">xmlns</span>=<span class="string">"http://xmlns.jcp.org/xml/ns/javaee"</span></span></span><br><span class="line"><span class="tag">         <span class="attr">xmlns:xsi</span>=<span class="string">"http://www.w3.org/2001/XMLSchema-instance"</span></span></span><br><span class="line"><span class="tag">         <span class="attr">xsi:schemaLocation</span>=<span class="string">"http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"</span></span></span><br><span class="line"><span class="tag">         <span class="attr">version</span>=<span class="string">"3.1"</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">web-app</span>&gt;</span></span><br></pre></td></tr></table></figure>
-</li>
-</ol>
-</li>
-<li><h4 id="spring配置文件头需要在最后一个后面加一个空格，否则最后一个不会生效，如："><a href="#spring配置文件头需要在最后一个后面加一个空格，否则最后一个不会生效，如：" class="headerlink" title="spring配置文件头需要在最后一个后面加一个空格，否则最后一个不会生效，如："></a>spring配置文件头需要在最后一个后面加一个空格，否则最后一个不会生效，如：</h4><figure class="highlight java"><table><tr><td class="code"><pre><span class="line">xsi:schemaLocation=<span class="string">"http://www.springframework.org/schema/beans </span></span><br><span class="line"><span class="string">					    http://www.springframework.org/schema/beans/spring-beans-4.1.xsd</span></span><br><span class="line"><span class="string">					    http://www.springframework.org/schema/context </span></span><br><span class="line"><span class="string">					    http://www.springframework.org/schema/context/spring-context-4.1.xsd "</span>&gt;</span><br></pre></td></tr></table></figure>
-
-<p><a href="http://www.springframework.org/schema/context/spring-context-4.1.xsd后面加了个**空格**！！！" target="_blank" rel="external nofollow noopener noreferrer">http://www.springframework.org/schema/context/spring-context-4.1.xsd后面加了个**空格**！！！</a></p>
-</li>
-<li><h4 id="IDEA控制台莫名其妙乱码问题，然后莫名其妙的解决："><a href="#IDEA控制台莫名其妙乱码问题，然后莫名其妙的解决：" class="headerlink" title="IDEA控制台莫名其妙乱码问题，然后莫名其妙的解决："></a>IDEA控制台莫名其妙乱码问题，然后莫名其妙的解决：</h4><p>因为工程中添加了其他编码文件，当我把其他编码文件都去掉(或者都改为utf-8)后，乱码问题解决。。。。。</p>
-</li>
-<li><h4 id="ASCII须记住-’0’对应十进制48-’A’对应十进制65-’a’对应十进制97"><a href="#ASCII须记住-’0’对应十进制48-’A’对应十进制65-’a’对应十进制97" class="headerlink" title="ASCII须记住:’0’对应十进制48,’A’对应十进制65,’a’对应十进制97"></a>ASCII须记住:’0’对应十进制48,’A’对应十进制65,’a’对应十进制97</h4></li>
-<li><h4 id="jdk自带有个jvisualvm工具、该工具是用来监控java运行程序的cpu、内存、线程等的使用情况，在cmd中输入jvisualvm即可看到。"><a href="#jdk自带有个jvisualvm工具、该工具是用来监控java运行程序的cpu、内存、线程等的使用情况，在cmd中输入jvisualvm即可看到。" class="headerlink" title="jdk自带有个jvisualvm工具、该工具是用来监控java运行程序的cpu、内存、线程等的使用情况，在cmd中输入jvisualvm即可看到。"></a>jdk自带有个jvisualvm工具、该工具是用来监控java运行程序的cpu、内存、线程等的使用情况，在cmd中输入jvisualvm即可看到。</h4></li>
-<li><h4 id="ResourBundle读取资源包下的配置文件时要注意路径，注意下面这个最简单的读取配置文件实例："><a href="#ResourBundle读取资源包下的配置文件时要注意路径，注意下面这个最简单的读取配置文件实例：" class="headerlink" title="ResourBundle读取资源包下的配置文件时要注意路径，注意下面这个最简单的读取配置文件实例："></a>ResourBundle读取资源包下的配置文件时要注意路径，注意下面这个最简单的读取配置文件实例：</h4><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">RedProFile</span> </span>&#123;</span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] a)</span></span>&#123;</span><br><span class="line">	String resourceFile = <span class="string">"Forum.CNS"</span>;    </span><br><span class="line"><span class="comment">//	        创建一个默认的ResourceBundle对象   </span></span><br><span class="line"><span class="comment">//	        ResourceBundle会查找包Forum下的CNS.properties的文件   </span></span><br><span class="line"><span class="comment">//	        Forum是资源的包名，它跟普通java类的命名规则完全一样：   </span></span><br><span class="line"><span class="comment">//	        - 区分大小写   </span></span><br><span class="line"><span class="comment">//	        - 扩展名 .properties 省略。就像对于类可以省略掉 .class扩展名一样   </span></span><br><span class="line"><span class="comment">//	        - 资源文件必须位于指定包的路径之下（位于所指定的classpath中）   </span></span><br><span class="line"><span class="comment">//            假如你是在非Web项目中使用，则一定要写资源文件的路径，也就是包路径必须存在。</span></span><br><span class="line"><span class="comment">//            如果是Web项目，不写包路径可以，此时将资源文件放在WEB-INF\classes\目录下就可以。</span></span><br><span class="line">	ResourceBundle rb = ResourceBundle.getBundle(resourceFile);</span><br><span class="line">	System.out.println(rb.getString(<span class="string">"DRIVER"</span>));<span class="comment">//这里是分大小写的，嘿嘿输出值为jdbc:mysql://localhost:3306/cns</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-</li>
-<li><h4 id="redis错误：Caused-by-redis-clients-jedis-exceptions-JedisDataException"><a href="#redis错误：Caused-by-redis-clients-jedis-exceptions-JedisDataException" class="headerlink" title="redis错误：Caused by: redis.clients.jedis.exceptions.JedisDataException:"></a>redis错误：Caused by: redis.clients.jedis.exceptions.JedisDataException:</h4><p>官方解释：DENIED Redis is running in protected mode because protected mode is enabled, no bind address was specified,  no authentication password is requested to clients. In this mode connections are only accepted from the loopback interface.</p>
-<p>If you want to connect from external computers to Redis you may adopt one of the following solutions:</p>
-<ol>
-<li>Just disable protected mode sending the command ‘CONFIG SET protected-mode no’ from the loopback interface by connecting to Redis from the same host the server is running,however MAKE SURE Redis is not publicly accessible from internet if you do so. Use CONFIG REWRITE to make this change permanent.</li>
-<li>Alternatively you can just disable the protected mode by editing the Redis configuration file,and setting the protected mode option to ‘no’, and then restarting the server. </li>
-<li>If you started the server manually just for testing, restart it with the ‘–protected-mode no’ option.</li>
-<li><strong>Setup a bind address or an authentication password.</strong> </li>
-<li>NOTE: You only need to do one of the above things in order for the server to start accepting connections from the outside.</li>
-<li>一般就是没有设置密码，可以设置密码后认证登录，也就是方案4</li>
-</ol>
-</li>
-<li><h4 id="ubuntu18-04配置静态ip"><a href="#ubuntu18-04配置静态ip" class="headerlink" title="ubuntu18.04配置静态ip"></a>ubuntu18.04配置静态ip</h4><ol>
-<li><p>配置静态ip相关链接：</p>
-<p><a href="https://www.cnblogs.com/SH170706/p/10357676.html" target="_blank" rel="external nofollow noopener noreferrer">https://www.cnblogs.com/SH170706/p/10357676.html</a></p>
-<p><a href="https://blog.csdn.net/makenothing/article/details/9527149" target="_blank" rel="external nofollow noopener noreferrer">https://blog.csdn.net/makenothing/article/details/9527149</a></p>
-<p><a href="https://www.cnblogs.com/ermao0423/p/9954314.html" target="_blank" rel="external nofollow noopener noreferrer">https://www.cnblogs.com/ermao0423/p/9954314.html</a></p>
-</li>
-<li><p>ubuntu修改用户名和主机名<br><a href="https://www.cnblogs.com/zeusmyth/p/6231350.html" target="_blank" rel="external nofollow noopener noreferrer">https://www.cnblogs.com/zeusmyth/p/6231350.html</a></p>
-</li>
-<li><p>oracle官网(和标题无关)<br><a href="http://www.oracle.com/technetwork/java/javase/downloads/" target="_blank" rel="external nofollow noopener noreferrer">http://www.oracle.com/technetwork/java/javase/downloads/</a></p>
-</li>
-</ol>
-</li>
-<li><h4 id="idea从GitHub或码云中导入maven项目时pom-xml爆红："><a href="#idea从GitHub或码云中导入maven项目时pom-xml爆红：" class="headerlink" title="idea从GitHub或码云中导入maven项目时pom.xml爆红："></a>idea从GitHub或码云中导入maven项目时pom.xml爆红：</h4><p>首先将该项目弄为maven项目(因为可能一开始还不是)-&gt;找到右边的maven标签下的Lifecycle-&gt;clean-&gt;install-&gt;reimportant-&gt;重启</p>
-</li>
-<li><p><a href="https://source.unsplash.com/random/1600x900?wallpapers免费背景图地址" target="_blank" rel="external nofollow noopener noreferrer">https://source.unsplash.com/random/1600x900?wallpapers免费背景图地址</a></p>
-<ol>
-<li>next主题中一些东西失效解决办法：f12查看-&gt;找到失效链接-&gt;更新该链接</li>
-<li>next主题中不想首页显示全文方法：在写.md文件时在你想截断的地方加上&lt;!– more –&gt;</li>
-</ol>
-</li>
-</ol>
-]]></content>
-      <categories>
-        <category>总结</category>
-      </categories>
-      <tags>
-        <tag>记录</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>java集合总结</title>
-    <url>/2020/05/30/java%E9%9B%86%E5%90%88%E6%80%BB%E7%BB%93/</url>
-    <content><![CDATA[<ol>
-<li><h2 id="接口继承关系与实现"><a href="#接口继承关系与实现" class="headerlink" title="接口继承关系与实现"></a>接口继承关系与实现</h2><p><img src="https://s1.ax1x.com/2020/05/30/tQywS1.png" alt="tQywS1.png"></p>
-<p>注意：java容器分为Collection和Map两大类，Map接口不是Collection的子接口。区分上图中的依赖、实现、继承各个关系。</p>
-</li>
-<li><h2 id="java集合思维导图"><a href="#java集合思维导图" class="headerlink" title="java集合思维导图"></a>java集合思维导图</h2><p><img src="https://s1.ax1x.com/2020/05/30/tQR7Je.png" alt="tQR7Je.png"></p>
-<p>注意：上面只是展示了一个大概的集合思维导图。</p>
-</li>
-<li><h2 id="java集合—-Map-重点"><a href="#java集合—-Map-重点" class="headerlink" title="java集合—-Map(重点)"></a>java集合—-Map(重点)</h2><ol>
-<li><h3 id="Map家族关系图"><a href="#Map家族关系图" class="headerlink" title="Map家族关系图"></a>Map家族关系图</h3><p><img src="https://s1.ax1x.com/2020/05/30/tQWT00.png" alt="tQWT00.png"></p>
-</li>
-<li></li>
-</ol>
-</li>
-</ol>
-]]></content>
-      <categories>
-        <category>java后端基础</category>
-      </categories>
-      <tags>
-        <tag>offer</tag>
-        <tag>java集合</tag>
       </tags>
   </entry>
 </search>
