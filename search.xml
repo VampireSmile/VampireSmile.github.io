@@ -115,7 +115,7 @@
 </ol>
 </li>
 <li><h4 id="hashmap的多线程不安全问题"><a href="#hashmap的多线程不安全问题" class="headerlink" title="hashmap的多线程不安全问题"></a>hashmap的多线程不安全问题</h4><ol>
-<li>jdk 1.7使用头插法容易产生环链，<a href="#hashmap处理冲突方法(都是使用拉链法，但是有区别)">前面</a>已经说过</li>
+<li>jdk 1.7使用头插法容易产生环链，<a href="#hashmap处理冲突方法都是使用拉链法，但是有区别">前面</a>已经说过</li>
 <li>前后数据的不一致性，比如前一个put的数据与后来get该数据不一致</li>
 </ol>
 </li>
@@ -254,17 +254,17 @@
 <li><h4 id="基于红黑树实现"><a href="#基于红黑树实现" class="headerlink" title="基于红黑树实现"></a>基于红黑树实现</h4><p>支持有序性操作，例如根据一个范围查找元素的操作。但是查找效率不如 HashSet，<strong>HashSet 查找的时间复杂度为 O(1)，TreeSet 则为 O(logN)。</strong></p>
 </li>
 <li><h4 id="排序"><a href="#排序" class="headerlink" title="排序"></a>排序</h4><ol>
-<li>TreeSet()是使用二叉树的原理对新 add()的对象按照指定的顺序排序（升序、降序），每增<br>加一个对象都会进行排序，将对象插入的二叉树指定的位置。</li>
-<li>Integer 和 String 对象都可以进行默认的 TreeSet 排序，而<strong>自定义类的对象是不可以的，自<br>己定义的类必须实现 Comparable 接口，并且覆写相应的 compareTo()函数，才可以正常使<br>用。</strong></li>
+<li>TreeSet()是使用二叉树的原理对新 add()的对象按照指定的顺序排序（升序、降序），每增加一个对象都会进行排序，将对象插入的二叉树指定的位置。</li>
+<li>Integer 和 String 对象都可以进行默认的 TreeSet 排序，而<strong>自定义类的对象是不可以的，自己定义的类必须实现 Comparable 接口，并且覆写相应的 compareTo()函数，才可以正常使用。</strong></li>
 <li>在覆写 compare()函数时，要返回相应的值才能使 TreeSet 按照一定的规则来排序</li>
-<li>比较此对象与指定对象的顺序。<strong>如果该对象小于、等于或大于指定对象，则分别返回负整<br>数、零或正整数。</strong></li>
+<li>比较此对象与指定对象的顺序。<strong>如果该对象小于、等于或大于指定对象，则分别返回负整数、零或正整数。</strong></li>
 </ol>
 </li>
 </ol>
 </li>
 <li><h3 id="LinkedHashSet"><a href="#LinkedHashSet" class="headerlink" title="LinkedHashSet"></a>LinkedHashSet</h3><p>具有 HashSet 的查找效率，并且<strong>内部使用双向链表维护元素的插入顺序</strong>。</p>
 <ol>
-<li><h4 id="对于-LinkedHashSet-而言，它继承于-HashSet、又基于-LinkedHashMap-来实现的"><a href="#对于-LinkedHashSet-而言，它继承于-HashSet、又基于-LinkedHashMap-来实现的" class="headerlink" title="对于 LinkedHashSet 而言，它继承于 HashSet、又基于 LinkedHashMap 来实现的"></a>对于 LinkedHashSet 而言，它继承于 HashSet、又基于 LinkedHashMap 来实现的</h4><p>LinkedHashSet 底层使用 LinkedHashMap 来保存所有元素，它继承与 HashSet，其所有的方法<br>操作上又与 HashSet 相同，因此 LinkedHashSet 的实现上非常简单，只提供了四个构造方法，并<br>通过传递一个标识参数，调用父类的构造器，底层构造一个 LinkedHashMap 来实现，在相关操<br>作上与父类 HashSet 的操作相同，直接调用父类 HashSet 的方法即可。</p>
+<li><h4 id="对于-LinkedHashSet-而言，它继承于-HashSet、又基于-LinkedHashMap-来实现的"><a href="#对于-LinkedHashSet-而言，它继承于-HashSet、又基于-LinkedHashMap-来实现的" class="headerlink" title="对于 LinkedHashSet 而言，它继承于 HashSet、又基于 LinkedHashMap 来实现的"></a>对于 LinkedHashSet 而言，它继承于 HashSet、又基于 LinkedHashMap 来实现的</h4><p>LinkedHashSet 底层使用 LinkedHashMap 来保存所有元素，它继承与 HashSet，其所有的方法操作上又与HashSet 相同，因此 LinkedHashSet 的实现上非常简单，只提供了四个构造方法，并通过传递一个标识参数，调用父类的构造器，底层构造一个 LinkedHashMap 来实现，在相关操作上与父类 HashSet 的操作相同，直接调用父类 HashSet 的方法即可。</p>
 </li>
 </ol>
 </li>
@@ -826,12 +826,22 @@
 </li>
 </ol>
 </li>
-<li><h4 id="idea从GitHub或码云中导入maven项目时pom-xml爆红："><a href="#idea从GitHub或码云中导入maven项目时pom-xml爆红：" class="headerlink" title="idea从GitHub或码云中导入maven项目时pom.xml爆红："></a>idea从GitHub或码云中导入maven项目时pom.xml爆红：</h4><p>首先将该项目弄为maven项目(因为可能一开始还不是)-&gt;找到右边的maven标签下的Lifecycle-&gt;clean-&gt;install-&gt;reimportant-&gt;重启</p>
+<li><h4 id="idea从GitHub或码云中导入maven项目时pom-xml爆红"><a href="#idea从GitHub或码云中导入maven项目时pom-xml爆红" class="headerlink" title="idea从GitHub或码云中导入maven项目时pom.xml爆红"></a>idea从GitHub或码云中导入maven项目时pom.xml爆红</h4><p>首先将该项目弄为maven项目(因为可能一开始还不是)-&gt;找到右边的maven标签下的Lifecycle-&gt;clean-&gt;install-&gt;reimportant-&gt;重启</p>
 </li>
-<li><p><a href="https://source.unsplash.com/random/1600x900?wallpapers免费背景图地址" target="_blank" rel="external nofollow noopener noreferrer">https://source.unsplash.com/random/1600x900?wallpapers免费背景图地址</a></p>
-<ol>
+<li><h4 id="hexo的一点优化"><a href="#hexo的一点优化" class="headerlink" title="hexo的一点优化"></a>hexo的一点优化</h4><ol>
+<li><a href="https://source.unsplash.com/random/1600x900?wallpapers免费背景图地址" target="_blank" rel="external nofollow noopener noreferrer">https://source.unsplash.com/random/1600x900?wallpapers免费背景图地址</a></li>
 <li>next主题中一些东西失效解决办法：f12查看-&gt;找到失效链接-&gt;更新该链接</li>
 <li>next主题中不想首页显示全文方法：在写.md文件时在你想截断的地方加上&lt;!– more –&gt;</li>
+</ol>
+</li>
+<li><h4 id="hexo5-1-4修改next主题宽度"><a href="#hexo5-1-4修改next主题宽度" class="headerlink" title="hexo5.1.4修改next主题宽度"></a>hexo5.1.4修改next主题宽度</h4><ol>
+<li><p>进入目录：\hexo\themes\next\source\css_variables</p>
+</li>
+<li><p>打开base.styl文件，修改如下(这是我修改后的)：</p>
+<figure class="highlight"><table><tr><td class="code"><pre><span class="line">$main-desktop                   = 1060px</span><br><span class="line">$main-desktop-large             = 1500px</span><br><span class="line"></span><br><span class="line">$content-desktop                = 800px</span><br><span class="line">$content-desktop-large          = 1200px</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>注意保持main-desktop和content-desktop以及main-desktop-large和content-desktop-large的比例和之前一样，否则布局会乱</strong></p>
+</li>
 </ol>
 </li>
 </ol>
