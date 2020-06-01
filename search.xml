@@ -24,7 +24,7 @@
 <li>1.8：Table数组+Entry(Node)链表+红黑树</li>
 </ul>
 </li>
-<li><h4 id="hashmap处理冲突方法-都是使用拉链法，但是有区别"><a href="#hashmap处理冲突方法-都是使用拉链法，但是有区别" class="headerlink" title="hashmap处理冲突方法(都是使用拉链法，但是有区别)"></a>hashmap处理冲突方法(都是使用拉链法，但是有区别)</h4><ul>
+<li><h4 id="hashmap处理冲突方法-都是使用拉链法，但是有区别"><a href="#hashmap处理冲突方法-都是使用拉链法，但是有区别" class="headerlink" title="hashmap处理冲突方法-都是使用拉链法，但是有区别"></a>hashmap处理冲突方法-都是使用拉链法，但是有区别</h4><ul>
 <li><p>1.7：使用头插法</p>
 </li>
 <li><p>1.8：使用尾插法</p>
@@ -115,7 +115,7 @@
 </ol>
 </li>
 <li><h4 id="hashmap的多线程不安全问题"><a href="#hashmap的多线程不安全问题" class="headerlink" title="hashmap的多线程不安全问题"></a>hashmap的多线程不安全问题</h4><ol>
-<li>jdk 1.7使用头插法容易产生环链，<a href="#hashmap处理冲突方法都是使用拉链法，但是有区别">前面</a>已经说过</li>
+<li>jdk 1.7使用头插法容易产生环链，<a href="#hashmap处理冲突方法-都是使用拉链法，但是有区别">前面</a>已经说过</li>
 <li>前后数据的不一致性，比如前一个put的数据与后来get该数据不一致</li>
 </ol>
 </li>
