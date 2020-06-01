@@ -834,7 +834,7 @@
 <li>next主题中不想首页显示全文方法：在写.md文件时在你想截断的地方加上&lt;!– more –&gt;</li>
 </ol>
 </li>
-<li><h4 id="hexo5-1-4修改next主题宽度"><a href="#hexo5-1-4修改next主题宽度" class="headerlink" title="hexo5.1.4修改next主题宽度"></a>hexo5.1.4修改next主题宽度</h4><ol>
+<li><h4 id="hexo修改next-5-1-4主题宽度"><a href="#hexo修改next-5-1-4主题宽度" class="headerlink" title="hexo修改next 5.1.4主题宽度"></a>hexo修改next 5.1.4主题宽度</h4><ol>
 <li><p>进入目录：\hexo\themes\next\source\css_variables</p>
 </li>
 <li><p>打开base.styl文件，修改如下(这是我修改后的)：</p>
