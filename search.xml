@@ -853,4 +853,52 @@
         <tag>记录</tag>
       </tags>
   </entry>
+  <entry>
+    <title>JVM之运行时数据区域</title>
+    <url>/2020/06/06/JVM%E4%B9%8B%E8%BF%90%E8%A1%8C%E6%97%B6%E6%95%B0%E6%8D%AE%E5%8C%BA%E5%9F%9F/</url>
+    <content><![CDATA[<ol>
+<li><h3 id="先来看看运行时数据区域长啥样"><a href="#先来看看运行时数据区域长啥样" class="headerlink" title="先来看看运行时数据区域长啥样"></a>先来看看运行时数据区域长啥样</h3><p><img src="https://s1.ax1x.com/2020/06/06/tcK3Pf.png" alt="tcK3Pf.png"></p>
+<p>注意：</p>
+<ul>
+<li>线程私有数据区域生命周期与线程相同, 依赖用户线程的启动/结束而创建/销毁(在HotspotVM内, 每个线程都与操作系统的本地线程直接映射, 因此这部分内存区域的存/否跟随本地线程的生/死对应)。</li>
+<li>线程共享区域随虚拟机的启动/关闭而创建/销毁。</li>
+<li><strong>直接内存并不是JVM运行时数据区的一部分</strong>，但也会被频繁的使用：在JDK 1.4引入的NIO提供了基于Channel与Buffer的IO方式，它可以使用Native函数库直接分配堆外内存，然后使用DirectByteBuffer对象作为这块内存的引用进行操作(详见：Java I/O 扩展)，这样就避免了在Java堆和Native堆中来回复制数据，因此在一些场景中可以显著提高性能。</li>
+</ul>
+</li>
+<li><h3 id="再来看看各个区域的大概功能"><a href="#再来看看各个区域的大概功能" class="headerlink" title="再来看看各个区域的大概功能"></a>再来看看各个区域的大概功能</h3><p><img src="https://s1.ax1x.com/2020/06/06/tcMd6e.png" alt="tcMd6e.png"></p>
+<a id="more"></a>
+</li>
+<li><h3 id="接下来仔细分析一下各个区域"><a href="#接下来仔细分析一下各个区域" class="headerlink" title="接下来仔细分析一下各个区域"></a>接下来仔细分析一下各个区域</h3><ol>
+<li><h4 id="程序计数器-线程私有"><a href="#程序计数器-线程私有" class="headerlink" title="程序计数器(线程私有)"></a>程序计数器(线程私有)</h4><ul>
+<li>一块较小的内存空间, 是当前线程所执行的字节码的行号指示器，每条线程都要有一个独立的程序计数器，这类内存也称为“线程私有”的内存。</li>
+<li>正在执行java方法的话，<strong>计数器记录的是虚拟机字节码指令的地址(当前指令的地址)</strong>。如果还是Native方法，则为空。</li>
+<li>这个内存区域是唯一一个在虚拟机中<strong>没有规定任何OutOfMemoryError(OOM)情况的区域</strong>。</li>
+</ul>
+</li>
+<li><h4 id="java虚拟机栈-线程私有"><a href="#java虚拟机栈-线程私有" class="headerlink" title="java虚拟机栈(线程私有)"></a>java虚拟机栈(线程私有)</h4><p>是描述java方法执行的内存模型，每个方法在执行的同时都会<strong>创建一个栈帧(Stack Frame)用于存储局部变量表、操作数栈、动态链接、方法出口等信息</strong>。每一个方法从调用直至执行完成的过程，就对应着一个栈帧在虚拟机栈中入栈到出栈的过程，如图：</p>
+<p><img src="https://s1.ax1x.com/2020/06/06/tclSKg.png" alt="tclSKg.png"></p>
+</li>
+<li><h4 id="本地方法栈-线程私有"><a href="#本地方法栈-线程私有" class="headerlink" title="本地方法栈(线程私有)"></a>本地方法栈(线程私有)</h4><p>本地方法栈和java虚拟机栈作用类似，<strong>区别是虚拟机栈为执行Java方法服务, 而本地方法栈则为Native方法服务，</strong>如果一个VM实现使用C-linkage模型来支持Native调用，那么该栈将会是一个C栈，但HotSpot VM直接就把本地方法栈和虚拟机栈合二为一。</p>
+</li>
+<li><h4 id="堆-heap-线程共享"><a href="#堆-heap-线程共享" class="headerlink" title="堆(heap-线程共享)"></a>堆(heap-线程共享)</h4><p>是被线程共享的一块内存区域，创建的对象和数组都保存在Java堆内存中，也是垃圾收集器进行垃圾收集的最重要的内存区域。由于现代VM采用分代收集算法，因此Java堆从GC的角度还可以细分为：新生代(Eden区 、 FromSurvivor区和ToSurvivor区)和老年代。</p>
+</li>
+<li><h4 id="方法区-永久代-线程共享"><a href="#方法区-永久代-线程共享" class="headerlink" title="方法区/永久代(线程共享)"></a>方法区/永久代(线程共享)</h4><ul>
+<li>我们常说的永久代(Permanent Generation)，<strong>用于存储被 JVM 加载的类信息、常量、静态变量、即时编译器编译后的代码等数据</strong>。HotSpot VM把GC分代收集扩展至方法区，即使用Java堆的永久代来实现方法区，这样HotSpot 的垃圾收集器就可以像管理 Java 堆一样管理这部分内存,而不必为方法区开发专门的内存管理器(永久带的内存回收的主要目标是针对常量池的回收和类型的卸载，因此收益一般很小)。</li>
+<li><strong>方法区是一个 JVM 规范，永久代与元空间都是其一种实现方式</strong></li>
+<li>HotSpot 虚拟机把它当成永久代来进行垃圾回收。但很难确定永久代的大小，因为它受到很多因素影响，并且每次Full GC之后永久代的大小都会改变，所以经常会抛出OutOfMemoryError异常。为了更容易管理方法区，<strong>从JDK 1.8开始，移除永久代，并把方法区移至元空间，它位于本地内存中，而不是虚拟机内存中</strong>。因此，默认情况下，元空间的大小仅受本地内存限制。<strong>类的元数据放入native memory，字符串池和类的静态变量放入java堆中</strong>，这样可以加载多少类的元数据就不再由MaxPermSize控制，而由系统的实际可用空间来控制。</li>
+<li><strong>运行时常量池（Runtime Constant Pool）是方法区的一部分</strong>。Class文件中除了有类的版本、字段、方法、接口等描述等信息外，还有一项信息是常量池（Constant Pool Table），用于存放编译期生成的各种字面量和符号引用，这部分内容将在类加载后存放到方法区的运行时常量池中。Java虚拟机对Class文件的每一部分（自然也包括常量池）的格式都有严格的规定，每一个字节用于存储哪种数据都必须符合规范上的要求，这样才会被虚拟机认可、装载和执行。</li>
+</ul>
+</li>
+</ol>
+</li>
+</ol>
+]]></content>
+      <categories>
+        <category>java后端基础</category>
+      </categories>
+      <tags>
+        <tag>offer</tag>
+        <tag>JVM</tag>
+      </tags>
+  </entry>
 </search>
