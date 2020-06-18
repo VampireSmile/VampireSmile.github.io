@@ -1037,6 +1037,7 @@
 </li>
 <li><p>和springmvc中@ResponseBody注解配合使用</p>
 <p>springMVC中的@ResponseBody负责返回一个json字符串，这样直接可以通过ajax发送请求获取json数据，然后解析渲染</p>
+<a id="more"></a>
 </li>
 </ol>
 </li>
