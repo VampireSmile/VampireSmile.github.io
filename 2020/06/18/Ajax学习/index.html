@@ -83,7 +83,7 @@
 
 
 
-  <meta name="keywords" content="offer,JVM,GC,">
+  <meta name="keywords" content="前端,Ajax,">
 
 
 
@@ -96,24 +96,18 @@
 
 
 
-<meta name="description" content="垃圾回收及其算法如图：  垃圾收集主要是针对堆和方法区进行。程序计数器、虚拟机栈和本地方法栈这三个区域属于线程私有的，只存在于线程的生命周期内，线程结束之后就会消失，因此不需要对这三个区域进行垃圾回收。">
+<meta name="description" content="ajax介绍ajax是异步的javaScript和xml，是一种无需重新加载整个网页的情况下，能够更新部分网页数据的技术（比如我们常见的搜索引擎框中输入关键词，就利用到了ajax发送请求到服务器，服务器返回一个搜索列表）  ajax再介绍 相比传统网页（即不使用ajax的网页），想要更新内容或提交一个表单，都需要重新加载整个页面，而使用ajax的网页，通过在后台服务器进行少量的数据交换，就可以实">
 <meta property="og:type" content="article">
-<meta property="og:title" content="JVM之GC">
-<meta property="og:url" content="https://vampiresmile.github.io/2020/06/07/JVM%E4%B9%8BGC/index.html">
+<meta property="og:title" content="Ajax学习">
+<meta property="og:url" content="https://vampiresmile.github.io/2020/06/18/Ajax%E5%AD%A6%E4%B9%A0/index.html">
 <meta property="og:site_name" content="Zachary">
-<meta property="og:description" content="垃圾回收及其算法如图：  垃圾收集主要是针对堆和方法区进行。程序计数器、虚拟机栈和本地方法栈这三个区域属于线程私有的，只存在于线程的生命周期内，线程结束之后就会消失，因此不需要对这三个区域进行垃圾回收。">
-<meta property="og:image" content="https://s1.ax1x.com/2020/06/07/tRPIcn.png">
-<meta property="og:image" content="https://s1.ax1x.com/2020/06/07/tRKbHH.png">
-<meta property="og:image" content="https://s1.ax1x.com/2020/06/07/tRQpJ1.png">
-<meta property="og:image" content="https://s1.ax1x.com/2020/06/07/tRGkaF.png">
-<meta property="article:published_time" content="2020-06-07T12:02:42.000Z">
-<meta property="article:modified_time" content="2020-06-08T10:29:46.198Z">
+<meta property="og:description" content="ajax介绍ajax是异步的javaScript和xml，是一种无需重新加载整个网页的情况下，能够更新部分网页数据的技术（比如我们常见的搜索引擎框中输入关键词，就利用到了ajax发送请求到服务器，服务器返回一个搜索列表）  ajax再介绍 相比传统网页（即不使用ajax的网页），想要更新内容或提交一个表单，都需要重新加载整个页面，而使用ajax的网页，通过在后台服务器进行少量的数据交换，就可以实">
+<meta property="article:published_time" content="2020-06-18T12:18:05.000Z">
+<meta property="article:modified_time" content="2020-06-18T14:23:13.087Z">
 <meta property="article:author" content="yinjiawei">
-<meta property="article:tag" content="offer">
-<meta property="article:tag" content="JVM">
-<meta property="article:tag" content="GC">
+<meta property="article:tag" content="前端">
+<meta property="article:tag" content="Ajax">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://s1.ax1x.com/2020/06/07/tRPIcn.png">
 
 
 
@@ -143,7 +137,7 @@
 
 
 
-  <link rel="canonical" href="https://vampiresmile.github.io/2020/06/07/JVM之GC/">
+  <link rel="canonical" href="https://vampiresmile.github.io/2020/06/18/Ajax学习/">
 
 
 
@@ -153,7 +147,7 @@
 
 
 
-  <title>JVM之GC | Zachary</title>
+  <title>Ajax学习 | Zachary</title>
   
 
 
@@ -322,7 +316,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://vampiresmile.github.io/2020/06/07/JVM%E4%B9%8BGC/">
+    <link itemprop="mainEntityOfPage" href="https://vampiresmile.github.io/2020/06/18/Ajax%E5%AD%A6%E4%B9%A0/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="yinjiawei">
@@ -339,7 +333,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">JVM之GC</h1>
+          <h1 class="post-title" itemprop="name headline">Ajax学习</h1>
         
 
         <div class="post-meta">
@@ -351,8 +345,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-06-07T20:02:42+08:00">
-                2020-06-07
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-06-18T20:18:05+08:00">
+                2020-06-18
               </time>
             
 
@@ -367,8 +361,8 @@
               
                 <span class="post-meta-item-text">更新于&#58;</span>
               
-              <time title="更新于" itemprop="dateModified" datetime="2020-06-08T18:29:46+08:00">
-                2020-06-08
+              <time title="更新于" itemprop="dateModified" datetime="2020-06-18T22:23:13+08:00">
+                2020-06-18
               </time>
             
           </span>
@@ -388,6 +382,17 @@
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
                   <a href="/categories/java%E5%90%8E%E7%AB%AF%E5%9F%BA%E7%A1%80/" itemprop="url" rel="index">
                     <span itemprop="name">java后端基础</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/java%E5%90%8E%E7%AB%AF%E5%9F%BA%E7%A1%80/%E5%89%8D%E7%AB%AF/" itemprop="url" rel="index">
+                    <span itemprop="name">前端</span>
                   </a>
                 </span>
 
@@ -422,7 +427,7 @@
                   <span class="post-meta-item-text">字数统计&#58;</span>
                 
                 <span title="字数统计">
-                  1.8k 字
+                  1.1k 字
                 </span>
               
 
@@ -438,7 +443,7 @@
                   <span class="post-meta-item-text">阅读时长 &asymp;</span>
                 
                 <span title="阅读时长">
-                  6 分钟
+                  5 分钟
                 </span>
               
             </div>
@@ -460,86 +465,38 @@
 
       
         <ol>
-<li><h3 id="垃圾回收及其算法"><a href="#垃圾回收及其算法" class="headerlink" title="垃圾回收及其算法"></a>垃圾回收及其算法</h3><p>如图：</p>
-<p><img src="https://s1.ax1x.com/2020/06/07/tRPIcn.png" alt="tRPIcn.png"></p>
-<p><strong>垃圾收集主要是针对堆和方法区进行</strong>。程序计数器、虚拟机栈和本地方法栈这三个区域属于线程私有的，只存在于线程的生命周期内，线程结束之后就会消失，因此不需要对这三个区域进行垃圾回收。</p>
-<a id="more"></a>
+<li><h3 id="ajax介绍"><a href="#ajax介绍" class="headerlink" title="ajax介绍"></a>ajax介绍</h3><p>ajax是异步的javaScript和xml，是一种无需重新加载整个网页的情况下，能够更新部分网页数据的技术（比如我们常见的搜索引擎框中输入关键词，就利用到了ajax发送请求到服务器，服务器返回一个搜索列表）</p>
 </li>
-<li><h3 id="如何确定垃圾"><a href="#如何确定垃圾" class="headerlink" title="如何确定垃圾"></a>如何确定垃圾</h3><ol>
-<li><h4 id="引用计数法"><a href="#引用计数法" class="headerlink" title="引用计数法"></a>引用计数法</h4><p>为对象添加一个引用计数器，当对象增加一个引用时计数器加1，引用失效时计数器减1。引用计数为0的对象可被回收。</p>
-<p>在两个对象出现循环引用的情况下，此时引用计数器永远不为 0，导致无法对它们进行回收。正是因为循环引用的存在，因此 Java 虚拟机不使用引用计数算法。</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Test</span> </span>&#123;</span><br><span class="line">    <span class="keyword">public</span> Object instance = <span class="keyword">null</span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        Test a = <span class="keyword">new</span> Test();<span class="comment">//a的引用计数器为1</span></span><br><span class="line">        Test b = <span class="keyword">new</span> Test();<span class="comment">//b的引用计数器为1</span></span><br><span class="line">        a.instance = b;<span class="comment">//b的引用计数器为2</span></span><br><span class="line">        b.instance = a;<span class="comment">//a的引用计数器为2</span></span><br><span class="line">        a = <span class="keyword">null</span>;<span class="comment">//a的引用计数器为1</span></span><br><span class="line">        b = <span class="keyword">null</span>;<span class="comment">//b的引用计数器为1</span></span><br><span class="line">        doSomething();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>在上述代码中，a 与 b 引用的对象实例互相持有了对象的引用，因此当我们把对 a 对象与 b 对象的引用去除之后，由于两个对象还存在互相之间的引用，导致两个 Test 对象无法被回收。</p>
-<p><strong>注意对象与引用的区别</strong>，简单的说：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">User user;<span class="comment">//则是一个引用</span></span><br><span class="line">user = <span class="keyword">new</span> User();<span class="comment">//那么new User()就是一个对象</span></span><br></pre></td></tr></table></figure>
+<li><h3 id="ajax再介绍"><a href="#ajax再介绍" class="headerlink" title="ajax再介绍"></a>ajax再介绍</h3><ol>
+<li>相比传统网页（即不使用ajax的网页），想要更新内容或提交一个表单，都需要重新加载整个页面，而使用ajax的网页，通过在后台服务器进行少量的数据交换，就可以实现异步局部更新。增强B/S的体验</li>
+<li>Ajax的核心是XMLHttpRequest对象（XHR）。XHR为向服务器发送请求和解析服务器响应提供了接口。能够以异步方式从服务器获取新数据。</li>
+<li>通过Ajax方法，可以使用Http GET和Http Post从远程服务器上请求文本、HTML、XML或JSON数据—-同时可以将这些数据直接载入网页的被选元素中。</li>
+</ol>
 </li>
-<li><h4 id="可达性算法"><a href="#可达性算法" class="headerlink" title="可达性算法"></a>可达性算法</h4><p>通过一系列的<strong>“GC roots”</strong>对象作为起点搜索。如果在“GC roots”和一个对象之间没有可达路径，则称该对象是不可达的。<strong>要注意的是，不可达对象不等价于可回收对象，不可达对象变为可回收对象至少要经过两次标记</strong><br><strong>过程。两次标记后仍然是可回收对象，则将面临回收。</strong></p>
-<p><strong>可以作为GC roots的对象：</strong></p>
-<ul>
-<li>虚拟机栈中的局部变量所引用的对象</li>
-<li>JNI中的变量所引用的对象</li>
-<li>方法区中的静态变量与常量所引用的对象</li>
-</ul>
+<li><h3 id="ajax使用概览"><a href="#ajax使用概览" class="headerlink" title="ajax使用概览"></a>ajax使用概览</h3><ol>
+<li><p>肯定先要导入jQuery包</p>
+</li>
+<li><p>jQuery Ajax本质就是XMLHttpRequest，对他进行了封装，下面就是他的一些方法：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">1.</span>JQuery.get(...)</span><br><span class="line">           所有参数：</span><br><span class="line">           		url:待载入的页面URL地址</span><br><span class="line">           		data:待发送Key/Value参数</span><br><span class="line">           		success:载入成功时回调函数</span><br><span class="line">           		dataType:返回内容格式（xml，json，script，text，html）（一般不用）</span><br><span class="line">             </span><br><span class="line"><span class="number">2.</span>JQuery.post(...)</span><br><span class="line">		  所有参数：</span><br><span class="line">          		url:待载入的页面URL地址</span><br><span class="line">           		data:待发送Key/Value参数</span><br><span class="line">           		success:载入成功时回调函数</span><br><span class="line">           		dataType:返回内容格式（xml，json，script，text，html）（一般不用）</span><br><span class="line">            </span><br><span class="line"><span class="number">3.</span>jQuery.ajax(...)</span><br><span class="line">          所有参数见：https:<span class="comment">//www.runoob.com/jquery/ajax-ajax.html</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>和springmvc中@ResponseBody注解配合使用</p>
+<p>springMVC中的@ResponseBody负责返回一个json字符串，这样直接可以通过ajax发送请求获取json数据，然后解析渲染</p>
 </li>
 </ol>
 </li>
-<li><h3 id="方法区的回收"><a href="#方法区的回收" class="headerlink" title="方法区的回收"></a>方法区的回收</h3><p>因为方法区主要存放永久代对象，而永久代对象的回收率比新生代低很多，所以在方法区上进行回收性价比不高。</p>
-<p>主要是对常量池的回收和对类的卸载。为了避免内存溢出，在大量使用反射和动态代理的场景都需要虚拟机具备类卸载功能。类的卸载条件很多，需要满足以下三个条件，并且满足了条件也不一定会被卸载：</p>
-<ul>
-<li>该类所有的实例都已经被回收，此时堆中不存在该类的任何实例。</li>
-<li>加载该类的 ClassLoader 已经被回收。</li>
-<li>该类对应的 Class 对象没有在任何地方被引用，也就无法在任何地方通过反射访问该类方法。</li>
-</ul>
-</li>
-<li><h3 id="引用类型"><a href="#引用类型" class="headerlink" title="引用类型"></a>引用类型</h3><p>无论是通过引用计数算法判断对象的引用数量，还是通过可达性分析算法判断对象是否可达，判定对象是否可被回收都与引用有关。Java 提供了四种强度不同的引用类型：</p>
-<ol>
-<li><h4 id="强引用"><a href="#强引用" class="headerlink" title="强引用"></a>强引用</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Object obj = <span class="keyword">new</span> Object();</span><br></pre></td></tr></table></figure>
+<li><h3 id="使用ajax做一个登录小demo"><a href="#使用ajax做一个登录小demo" class="headerlink" title="使用ajax做一个登录小demo"></a>使用ajax做一个登录小demo</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//这些都是代码片段</span></span><br><span class="line"><span class="comment">//假设我们项目名logindemo，项目地址：http://localhost:8080/logindemo</span></span><br><span class="line"><span class="comment">//name和password都写死了的，分别为admin和123456</span></span><br><span class="line"><span class="comment">//后端代码</span></span><br><span class="line"><span class="meta">@RequestMapping</span>(<span class="string">"/selectName"</span>)</span><br><span class="line"><span class="meta">@ResponseBody</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> String <span class="title">selectName</span><span class="params">(String name)</span></span>&#123;</span><br><span class="line">    String msg = <span class="string">"name is null"</span>;</span><br><span class="line">    <span class="keyword">if</span>(name == <span class="keyword">null</span>) <span class="keyword">return</span> msg;</span><br><span class="line">    <span class="keyword">else</span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(!(<span class="string">"admin"</span>.equals(name))) msg = <span class="string">"name is inValid"</span>;</span><br><span class="line">        <span class="keyword">else</span> msg = <span class="string">"ok"</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> msg;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">@RequestMapping</span>(<span class="string">"/selectPass"</span>)</span><br><span class="line"><span class="meta">@ResponseBody</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> String <span class="title">selectPass</span><span class="params">(String password)</span></span>&#123;</span><br><span class="line">    String msg = <span class="string">"password is null"</span>;</span><br><span class="line">    <span class="keyword">if</span>(password == <span class="keyword">null</span>) <span class="keyword">return</span> msg;</span><br><span class="line">    <span class="keyword">else</span>&#123;</span><br><span class="line">       	<span class="keyword">if</span>(!(<span class="string">"123456"</span>.equals(password))) msg = <span class="string">"password is inValid"</span>;</span><br><span class="line">        <span class="keyword">else</span> msg = <span class="string">"ok"</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> msg;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">@RequestMapping</span>(<span class="string">"/login"</span>)</span><br><span class="line"><span class="meta">@ResponseBody</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> String <span class="title">login</span><span class="params">(String name,String password)</span></span>&#123;</span><br><span class="line">    String msg = <span class="string">"name or pass is null"</span>;</span><br><span class="line">    <span class="keyword">if</span>(name == <span class="keyword">null</span> || password == <span class="keyword">null</span>) <span class="keyword">return</span> msg;</span><br><span class="line">    <span class="keyword">else</span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(!(<span class="string">"admin"</span>.equals(name))) msg = <span class="string">"name is inValid"</span>;</span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span>(!(<span class="string">"123456"</span>.equals(password))) msg = <span class="string">"password is inValid"</span>;</span><br><span class="line">        <span class="keyword">else</span> msg = <span class="string">"name and password are both valid"</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> msg;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<p>如上，使用new一个新对象的方式来创建强引用<strong>，当一个对象被强引用变量引用时，它处于可达状态，它是不可能被垃圾回收机制回收的，即使该对象以后永远都不会被用到 JVM 也不会回收</strong>。因此强引用是造成 Java 内存泄漏的主要原因之一。</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br></pre></td><td class="code"><pre><span class="line">&lt;!--前端代码--&gt;</span><br><span class="line">&lt;%@ page contentType=<span class="string">"text/html;charset=UTF-8"</span> language=<span class="string">"java"</span></span><br><span class="line">         pageEncoding=<span class="string">"UTF-8"</span> %&gt;</span><br><span class="line">&lt;html&gt;</span><br><span class="line"></span><br><span class="line">&lt;head&gt;</span><br><span class="line">    &lt;meta http-equiv=<span class="string">"Content-Type"</span> content=<span class="string">"text/html;charset=utf-8"</span>&gt;</span><br><span class="line">    &lt;title&gt;登录界面&lt;/title&gt;</span><br><span class="line">    &lt;%</span><br><span class="line">        pageContext.setAttribute(<span class="string">"APP_PATH"</span>, request.getContextPath());</span><br><span class="line">    %&gt;</span><br><span class="line">    &lt;!--引入jQuery--&gt;</span><br><span class="line">    &lt;!--</span><br><span class="line">    web路径：</span><br><span class="line">        不以/开始的相对路径：找资源，以当前资源的路径为基准，经常容易出问题</span><br><span class="line">        以/开始的相对路径：找资源，以服务器的路径为标准(http:<span class="comment">//localhost:8080)</span></span><br><span class="line">        比如：$&#123;APP_PATH&#125;可以代表路径：http:<span class="comment">//localhost:8080/crud</span></span><br><span class="line">    --&gt;</span><br><span class="line">    &lt;script type="text/javascript" src="$&#123;APP_PATH&#125;/staticSources/jquery1.11.0/jquery-1.11.0.min.js"&gt;&lt;/script&gt;</span><br><span class="line">    </span><br><span class="line">    &lt;script&gt;</span><br><span class="line">    	<span class="function">function <span class="title">nameInfo</span><span class="params">()</span></span>&#123;</span><br><span class="line">            $.post(&#123;</span><br><span class="line">                url:<span class="string">"$&#123;APP_PATH&#125;/selectName"</span>,</span><br><span class="line">                data:&#123;<span class="string">"name"</span>:$(<span class="string">"#name"</span>).val()&#125;,</span><br><span class="line">                success:function(result)&#123;</span><br><span class="line">                    <span class="keyword">if</span>(result.toString() == <span class="string">'ok'</span>)&#123;</span><br><span class="line">                        $(<span class="string">"#infoName"</span>).css(<span class="string">"color"</span>,<span class="string">"green"</span>);</span><br><span class="line">				   &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">                       $(<span class="string">"#infoName"</span>).css(<span class="string">"color"</span>,<span class="string">"green"</span>);</span><br><span class="line">                   	&#125;</span><br><span class="line">                    $(<span class="string">"#infoName"</span>).html(result);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">//注意两种ajax的写法区别</span></span><br><span class="line">        <span class="function">function <span class="title">passInfo</span><span class="params">()</span></span>&#123;</span><br><span class="line">            $.post(<span class="string">"$&#123;APP_PATH&#125;/selectPass"</span>,&#123;<span class="string">"password"</span>:$(<span class="string">"#pass"</span>).val()&#125;,function(result)&#123;</span><br><span class="line">                <span class="keyword">if</span>(result.toString() == <span class="string">'ok'</span>)&#123;</span><br><span class="line">                        $(<span class="string">"#infoPass"</span>).css(<span class="string">"color"</span>,<span class="string">"green"</span>);</span><br><span class="line">				   &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">                       $(<span class="string">"#infoPass"</span>).css(<span class="string">"color"</span>,<span class="string">"green"</span>);</span><br><span class="line">                   	&#125;</span><br><span class="line">                    $(<span class="string">"#infoPass"</span>).html(result);</span><br><span class="line">            &#125;);</span><br><span class="line">        &#125;</span><br><span class="line">    &lt;/script&gt;</span><br><span class="line">    </span><br><span class="line">&lt;/head&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">    &lt;p&gt;</span><br><span class="line">        用户名：</span><br><span class="line">        &lt;input type = <span class="string">"text"</span> id = <span class="string">"name"</span> onblur = <span class="string">"nameInfo()"</span>/&gt;</span><br><span class="line">        &lt;!--span里面就是发送ajax请求后服务器返回name的情况并显示--&gt;</span><br><span class="line">        &lt;span id = "infoName"&gt;&lt;/span&gt;</span><br><span class="line">    &lt;/p&gt;</span><br><span class="line">    &lt;p&gt;</span><br><span class="line">        密码：</span><br><span class="line">        &lt;input type = <span class="string">"password"</span> id = <span class="string">"pass"</span> onblur = <span class="string">"passInfo()"</span>/&gt;</span><br><span class="line">        &lt;!--span里面就是发送ajax请求后服务器返回pass的情况并显示--&gt;</span><br><span class="line">        &lt;span id = "infoPass"&gt;&lt;/span&gt;</span><br><span class="line">    &lt;/p&gt;</span><br><span class="line">    &lt;p&gt;</span><br><span class="line">		&lt;!--doLogin()自己写的js函数--&gt;</span><br><span class="line">        &lt;input type = <span class="string">"button"</span> id = <span class="string">"login"</span> onclick = <span class="string">"doLogin()"</span>/&gt; </span><br><span class="line">    &lt;/p&gt;</span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></table></figure>
 </li>
-<li><h4 id="软引用"><a href="#软引用" class="headerlink" title="软引用"></a>软引用</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Object obj = <span class="keyword">new</span> Object();</span><br><span class="line">SoftReference&lt;Object&gt; sf = <span class="keyword">new</span> SoftReference&lt;Object&gt;(obj);</span><br><span class="line">obj = <span class="keyword">null</span>;  <span class="comment">// 使对象只被软引用关联</span></span><br></pre></td></tr></table></figure>
-
-<p>如上，使用SoftReference类来创建软引用，<strong>被软引用关联的对象只有在内存不足时才会被回收</strong>。</p>
-</li>
-<li><h4 id="弱引用"><a href="#弱引用" class="headerlink" title="弱引用"></a>弱引用</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Object obj = <span class="keyword">new</span> Object();</span><br><span class="line">WeakReference&lt;Object&gt; wf = <span class="keyword">new</span> WeakReference&lt;Object&gt;(obj);</span><br><span class="line">obj = <span class="keyword">null</span>; <span class="comment">// 使对象只被软引用关联</span></span><br></pre></td></tr></table></figure>
-
-<p>如上，使用WeakReference类来创建弱引用，<strong>被弱引用关联的对象一定会被回收，也就是说，被弱引用关联的对象只能活到下一次垃圾回收发生之前。</strong></p>
-</li>
-<li><h4 id="虚引用"><a href="#虚引用" class="headerlink" title="虚引用"></a>虚引用</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Object obj = <span class="keyword">new</span> Object();</span><br><span class="line">PhantomReference&lt;Object&gt; pf = <span class="keyword">new</span> PhantomReference&lt;Object&gt;(obj, <span class="keyword">null</span>);</span><br><span class="line">obj = <span class="keyword">null</span>; <span class="comment">// 使对象只被软引用关联</span></span><br></pre></td></tr></table></figure>
-
-<p>如上，使用PhantomReference类来创建虚引用，<strong>虚引用的主要作用是跟踪对象被垃圾回收的状态(为一个对象设置虚引用的唯一目的是能在这个对象被回收时收到一个系统通知)</strong></p>
-</li>
+<li><h3 id="ajax总结"><a href="#ajax总结" class="headerlink" title="ajax总结"></a>ajax总结</h3><ol>
+<li>编写对应处理的Controller，返回json格式或字符串格式数据；</li>
+<li>编写ajax请求（如上例两种方法），大致需要完成三个要求：<ol>
+<li>url请求地址</li>
+<li>data键值对</li>
+<li>success回调函数</li>
 </ol>
 </li>
-<li><h3 id="垃圾收集算法"><a href="#垃圾收集算法" class="headerlink" title="垃圾收集算法"></a>垃圾收集算法</h3><ol>
-<li><h4 id="标记-清除算法-mark-sweep"><a href="#标记-清除算法-mark-sweep" class="headerlink" title="标记-清除算法(mark-sweep)"></a>标记-清除算法(mark-sweep)</h4><p>最基础的垃圾回收算法，分为两个阶段，标记和清除。标记阶段标记出所有需要回收的对象，清除阶段回收被标记的对象所占用的空间。如图：</p>
-<p><img src="https://s1.ax1x.com/2020/06/07/tRKbHH.png" alt="tRKbHH.png"></p>
-<p>缺点：</p>
-<ul>
-<li>标记和清除过程效率都不高；</li>
-<li>会产生大量不连续的内存碎片，导致后续无法给大对象分配内存。</li>
-</ul>
-</li>
-<li><h4 id="标记-整理-mark-compact"><a href="#标记-整理-mark-compact" class="headerlink" title="标记-整理(mark-compact)"></a>标记-整理(mark-compact)</h4><p>标记阶段和 Mark-Sweep 算法相同，<strong>标记后不是清理对象，而是将存活对象移向内存的一端。然后清除端边界外的对象</strong>。如图：</p>
-<p><img src="https://s1.ax1x.com/2020/06/07/tRQpJ1.png" alt="tRQpJ1.png"></p>
-<p>优点：不会产生内存碎片</p>
-<p>缺点：需要移动大量对象，处理效率比较低</p>
-</li>
-<li><h4 id="复制算法-copying"><a href="#复制算法-copying" class="headerlink" title="复制算法(copying)"></a>复制算法(copying)</h4><p>将内存划分为大小相等的两块，每次只使用其中一块，当这一块内存用完了就将还存活的对象复制到另一块上面，然后再把使用过的内存空间进行一次清理。如图：</p>
-<p><img src="https://s1.ax1x.com/2020/06/07/tRGkaF.png" alt="tRGkaF.png"></p>
-<p>缺点：只使用了内存的一半，且存活对象增多的话，Copying 算法的效率会大大降低。</p>
-<p>优点：不会产生内存碎片</p>
-</li>
-<li><h4 id="分代收集算法"><a href="#分代收集算法" class="headerlink" title="分代收集算法"></a>分代收集算法</h4><p>分代收集法是目前大部分 JVM 所采用的方法，其核心思想是根据对象存活的不同生命周期将内存划分为不同的域，一般情况下将 GC 堆划分为老生代(Tenured/Old Generation)和新生代(YoungGeneration)。老生代的特点是每次垃圾回收时只有少量对象需要被回收，新生代的特点是每次垃圾回收时都有大量垃圾需要被回收，因此可以根据不同区域选择不同的算法。</p>
-<ul>
-<li><p>新生代：采用复制算法</p>
-<p>因为新生代中每次垃圾回收都要回收大部分对象，只有少量对象存活，所需要付出的时间代价比较小。但通常并不是按照1:1来划分新生代。一般将新生代划分为一块较大的Eden空间和两个较小的Survivor空间(FromSpace，ToSpace)(比例8:1:1)，每次使用Eden空间和其中的一块Survivor空间，当进行回收时，将该两块空间中还存活的对象复制到另一块Survivor空间中。</p>
-</li>
-<li><p>老年代：标记-清除算法或标记-整理算法</p>
-</li>
-</ul>
-</li>
+<li>给ajax绑定事件，如点击.click，失去焦点.onblur，键盘弹起.keyup。更多事件可查看：<a href="https://www.jquery123.com/category/attributes/" target="_blank" rel="external nofollow noopener noreferrer">https://www.jquery123.com/category/attributes/</a></li>
 </ol>
 </li>
 </ol>
@@ -563,7 +520,7 @@
   </li>
   <li class="post-copyright-link">
     <strong>本文链接：</strong>
-    <a href="https://vampiresmile.github.io/2020/06/07/JVM%E4%B9%8BGC/" title="JVM之GC">https://vampiresmile.github.io/2020/06/07/JVM%E4%B9%8BGC/</a>
+    <a href="https://vampiresmile.github.io/2020/06/18/Ajax%E5%AD%A6%E4%B9%A0/" title="Ajax学习">https://vampiresmile.github.io/2020/06/18/Ajax%E5%AD%A6%E4%B9%A0/</a>
   </li>
   <li class="post-copyright-license">
     <strong>版权声明： </strong>
@@ -578,11 +535,9 @@
       
         <div class="post-tags">
           
-            <a href="/tags/offer/" rel="tag"># offer</a>
+            <a href="/tags/%E5%89%8D%E7%AB%AF/" rel="tag"># 前端</a>
           
-            <a href="/tags/JVM/" rel="tag"># JVM</a>
-          
-            <a href="/tags/GC/" rel="tag"># GC</a>
+            <a href="/tags/Ajax/" rel="tag"># Ajax</a>
           
         </div>
       
@@ -610,8 +565,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2020/06/06/JVM%E4%B9%8B%E8%BF%90%E8%A1%8C%E6%97%B6%E6%95%B0%E6%8D%AE%E5%8C%BA%E5%9F%9F/" rel="next" title="JVM之运行时数据区域">
-                <i class="fa fa-chevron-left"></i> JVM之运行时数据区域
+              <a href="/2020/06/13/redis%E4%BA%8B%E5%8A%A1/" rel="next" title="redis事务">
+                <i class="fa fa-chevron-left"></i> redis事务
               </a>
             
           </div>
@@ -619,10 +574,6 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2020/06/13/redis%E4%BA%8B%E5%8A%A1/" rel="prev" title="redis事务">
-                redis事务 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -791,7 +742,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#垃圾回收及其算法"><span class="nav-number">1.</span> <span class="nav-text">垃圾回收及其算法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#如何确定垃圾"><span class="nav-number">2.</span> <span class="nav-text">如何确定垃圾</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#引用计数法"><span class="nav-number">2.1.</span> <span class="nav-text">引用计数法</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#可达性算法"><span class="nav-number">2.2.</span> <span class="nav-text">可达性算法</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#方法区的回收"><span class="nav-number">3.</span> <span class="nav-text">方法区的回收</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#引用类型"><span class="nav-number">4.</span> <span class="nav-text">引用类型</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#强引用"><span class="nav-number">4.1.</span> <span class="nav-text">强引用</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#软引用"><span class="nav-number">4.2.</span> <span class="nav-text">软引用</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#弱引用"><span class="nav-number">4.3.</span> <span class="nav-text">弱引用</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#虚引用"><span class="nav-number">4.4.</span> <span class="nav-text">虚引用</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#垃圾收集算法"><span class="nav-number">5.</span> <span class="nav-text">垃圾收集算法</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#标记-清除算法-mark-sweep"><span class="nav-number">5.1.</span> <span class="nav-text">标记-清除算法(mark-sweep)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#标记-整理-mark-compact"><span class="nav-number">5.2.</span> <span class="nav-text">标记-整理(mark-compact)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#复制算法-copying"><span class="nav-number">5.3.</span> <span class="nav-text">复制算法(copying)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#分代收集算法"><span class="nav-number">5.4.</span> <span class="nav-text">分代收集算法</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#ajax介绍"><span class="nav-number">1.</span> <span class="nav-text">ajax介绍</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ajax再介绍"><span class="nav-number">2.</span> <span class="nav-text">ajax再介绍</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ajax使用概览"><span class="nav-number">3.</span> <span class="nav-text">ajax使用概览</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#使用ajax做一个登录小demo"><span class="nav-number">4.</span> <span class="nav-text">使用ajax做一个登录小demo</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ajax总结"><span class="nav-number">5.</span> <span class="nav-text">ajax总结</span></a></li></ol></div>
             
 
           </div>

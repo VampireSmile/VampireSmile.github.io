@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
+    <loc>https://vampiresmile.github.io/2020/06/18/Ajax%E5%AD%A6%E4%B9%A0/</loc>
+    <lastmod>2020-06-18</lastmod>
+  </url>  <url>
+    <loc>https://vampiresmile.github.io/2020/06/13/redis%E4%BA%8B%E5%8A%A1/</loc>
+    <lastmod>2020-06-13</lastmod>
+  </url>  <url>
     <loc>https://vampiresmile.github.io/2020/06/07/JVM%E4%B9%8BGC/</loc>
     <lastmod>2020-06-08</lastmod>
   </url>  <url>
