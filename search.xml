@@ -1090,6 +1090,7 @@
 <li>注意：Demo是使用mybatis的逆向工程生成的bean实体类、dao接口类、以及mybatis的mapper文件。其次，如果有需要，首先根据resources目录下的sql文件建好表，同时需要更改dp.properties中的mysql所在服务器的地址</li>
 <li>Demo地址：<a href="https://github.com/VampireSmile/lazywork/tree/master/base_ssm_crud" target="_blank" rel="external nofollow noopener noreferrer">https://github.com/VampireSmile/lazywork/tree/master/base_ssm_crud</a></li>
 </ul>
+<a id="more"></a>
 </li>
 <li><h3 id="学生人脸识别考勤App"><a href="#学生人脸识别考勤App" class="headerlink" title="学生人脸识别考勤App"></a>学生人脸识别考勤App</h3><ul>
 <li>一个简单的app，后台使用简单的servlet，手机客户端调用的是虹软的人脸识别sdk和高德地图的定位sdk，通过手机客户端与web服务器端之间的人脸特征数据交互最终达到一个实现人脸一对一比对的效果。</li>
