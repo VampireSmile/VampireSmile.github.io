@@ -1,0 +1,1410 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+  
+  
+    
+      
+    
+    
+      
+    
+  <script src="//cdn.bootcss.com/pace/1.0.2/pace.min.js"></script>
+  <link href="//cdn.bootcss.com/pace/1.0.2/themes/blue/pace-theme-flash.min.css" rel="stylesheet">
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+  <link href="//cdn.jsdelivr.net/fancybox/2.1.5/jquery.fancybox.min.css" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+  
+
+<link href="//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/shuangyu.jpg?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/shuangyu.32px.ico?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/shuangyu.16px.ico?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/shuangyu.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="java基础,">
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Zachary" type="application/atom+xml">
+
+
+
+
+
+
+<meta name="description" content="背景java推出泛型以前，程序员可以构建一个元素类型为Object的集合，该集合能够存储任意的数据类型对象，而在使用该集合的过程中，需要程序员明确知道存储的每个元素的数据类型，否则很容易引发ClassCastException异常  概念java泛型是jdk5中引入的新特性。泛型提供了编译时类型安全监测机制，该机制允许我们在编译时检测到非法的类型数据  本质泛型的本质是参数化类型，也就是所操作的">
+<meta property="og:type" content="article">
+<meta property="og:title" content="java泛型">
+<meta property="og:url" content="https://vampiresmile.github.io/2020/07/17/java%E6%B3%9B%E5%9E%8B/index.html">
+<meta property="og:site_name" content="Zachary">
+<meta property="og:description" content="背景java推出泛型以前，程序员可以构建一个元素类型为Object的集合，该集合能够存储任意的数据类型对象，而在使用该集合的过程中，需要程序员明确知道存储的每个元素的数据类型，否则很容易引发ClassCastException异常  概念java泛型是jdk5中引入的新特性。泛型提供了编译时类型安全监测机制，该机制允许我们在编译时检测到非法的类型数据  本质泛型的本质是参数化类型，也就是所操作的">
+<meta property="article:published_time" content="2020-07-17T10:35:11.000Z">
+<meta property="article:modified_time" content="2020-07-17T13:56:26.157Z">
+<meta property="article:author" content="yinjiawei">
+<meta property="article:tag" content="java基础">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://vampiresmile.github.io/2020/07/17/java泛型/">
+
+
+
+
+
+
+
+
+
+  <title>java泛型 | Zachary</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Zachary</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">未来可期</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://vampiresmile.github.io/2020/07/17/java%E6%B3%9B%E5%9E%8B/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="yinjiawei">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/shuangyu.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Zachary">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">java泛型</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-07-17T18:35:11+08:00">
+                2020-07-17
+              </time>
+            
+
+            
+              <span class="post-meta-divider">|</span>
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-check-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">更新于&#58;</span>
+              
+              <time title="更新于" itemprop="dateModified" datetime="2020-07-17T21:56:26+08:00">
+                2020-07-17
+              </time>
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/java%E5%90%8E%E7%AB%AF%E5%9F%BA%E7%A1%80/" itemprop="url" rel="index">
+                    <span itemprop="name">java后端基础</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-file-o"></i>
+            <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+            </span>
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  3.2k 字
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">
+                  13 分钟
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <ol>
+<li><h3 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h3><p>java推出泛型以前，程序员可以构建一个元素类型为Object的集合，该集合能够存储任意的数据类型对象，而在使用该集合的过程中，需要程序员明确知道存储的每个元素的数据类型，否则很容易引发ClassCastException异常</p>
+</li>
+<li><h3 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h3><p>java泛型是jdk5中引入的新特性。泛型提供了编译时类型安全监测机制，该机制允许我们在编译时检测到非法的类型数据</p>
+</li>
+<li><h3 id="本质"><a href="#本质" class="headerlink" title="本质"></a>本质</h3><p>泛型的本质是参数化类型，也就是所操作的数据类型被指定为一个参数</p>
+</li>
+<li><h3 id="好处"><a href="#好处" class="headerlink" title="好处"></a>好处</h3><ol>
+<li>类型安全。</li>
+<li>避免了强制类型的转换。</li>
+</ol>
+</li>
+<li><h3 id="常用的泛型标识符：T，E，K，V"><a href="#常用的泛型标识符：T，E，K，V" class="headerlink" title="常用的泛型标识符：T，E，K，V"></a>常用的泛型标识符：T，E，K，V</h3></li>
+<li><h3 id="泛型类"><a href="#泛型类" class="headerlink" title="泛型类"></a>泛型类</h3><ol>
+<li><h4 id="泛型类的定义语法"><a href="#泛型类的定义语法" class="headerlink" title="泛型类的定义语法"></a>泛型类的定义语法</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> 类名称&lt;泛型标识,泛型标识...&gt;</span>&#123;</span><br><span class="line">	<span class="keyword">private</span> 泛型标识 变量名;</span><br><span class="line">	...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><h4 id="泛型类的使用语法"><a href="#泛型类的使用语法" class="headerlink" title="泛型类的使用语法"></a>泛型类的使用语法</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//jdk1.7之前</span></span><br><span class="line">类名&lt;具体的数据类型&gt; 对象名 = <span class="keyword">new</span> 类名&lt;具体的数据类型名&gt;();</span><br><span class="line"><span class="comment">//jdk1.7之后</span></span><br><span class="line">类名&lt;具体的数据类型&gt; 对象名 = <span class="keyword">new</span> 类名&lt;&gt;();</span><br></pre></td></tr></table></figure>
+
+<p>注意：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//假如我们有一个泛型类Animal</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Animal</span>&lt;<span class="title">T</span>&gt;</span>&#123;</span><br><span class="line">    <span class="keyword">private</span> T name;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setName</span><span class="params">(T name)</span></span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.name = name;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> T <span class="title">getName</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="keyword">return</span> name;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ol>
+<li><p>泛型类在创建对象的时候如果没有指定T的具体数据类型，将会按照Object类型来操作，比如：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//如果对Animal使用如下：</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span></span>&#123;</span><br><span class="line">    Animal an = <span class="keyword">new</span> Animal();<span class="comment">//没有指定Animal中T的具体数据类型</span></span><br><span class="line">    Object name = an.getName();<span class="comment">//那么这里得到的就是Object对象</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>泛型类不支持基本数据类型，即T不能指定为8个基本数据类型：byte，short，int，long，float，double，char，boolean</p>
+</li>
+<li><p>同一泛型类，根据不同的数据类型创建的对象，本质上是同一类型。即泛型类型在逻辑上可以看成是多个不同的类型，但实际上都是同一类型。比如：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//验证</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span></span>&#123;</span><br><span class="line">    Animal&lt;String&gt; sAn = <span class="keyword">new</span> Animal&lt;&gt;();<span class="comment">//指定Animal中T为String</span></span><br><span class="line">    Animal&lt;Integer&gt; iAn = <span class="keyword">new</span> Animal&lt;&gt;();<span class="comment">//指定Animal中T为Integer</span></span><br><span class="line">    System.out.println(sAn.getClass() == iAn.getClass());<span class="comment">//结果为true</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+</li>
+<li><h4 id="从泛型类派生子类"><a href="#从泛型类派生子类" class="headerlink" title="从泛型类派生子类"></a>从泛型类派生子类</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//情况1：子类也是泛型类，子类的泛型标识符需要包括父类的泛型标识符</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Child</span>&lt;<span class="title">T</span>&gt; <span class="keyword">extends</span> <span class="title">Parent</span>&lt;<span class="title">T</span>&gt;</span>&#123;...&#125;</span><br><span class="line"><span class="comment">//或者</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Child</span>&lt;<span class="title">T</span>,<span class="title">E</span>,...&gt; <span class="keyword">extends</span> <span class="title">Parent</span>&lt;<span class="title">T</span>&gt;</span>&#123;...&#125;</span><br><span class="line"><span class="comment">//情况2：子类不是泛型类，那么父类需要明确指出泛型的数据类型</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Child</span> <span class="keyword">extends</span> <span class="title">Parent</span>&lt;<span class="title">String</span>&gt;</span>&#123;...&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+</li>
+<li><h3 id="泛型接口"><a href="#泛型接口" class="headerlink" title="泛型接口"></a>泛型接口</h3><ol>
+<li><h4 id="泛型接口的定义语法"><a href="#泛型接口的定义语法" class="headerlink" title="泛型接口的定义语法"></a>泛型接口的定义语法</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">interface</span> 接口名称&lt;泛型标识符,泛型标识符...&gt;</span>&#123;</span><br><span class="line">    泛型标识符 方法名();</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><h4 id="泛型接口的实现类要求"><a href="#泛型接口的实现类要求" class="headerlink" title="泛型接口的实现类要求"></a>泛型接口的实现类要求</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//泛型接口</span></span><br><span class="line"><span class="class"><span class="keyword">interface</span> <span class="title">parent</span>&lt;<span class="title">T</span>&gt;</span>&#123;</span><br><span class="line">    <span class="function">T <span class="title">getName</span><span class="params">()</span></span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//情况1：实现类不是泛型类，接口要明确指定具体的数据类型</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">child</span> <span class="keyword">implements</span> <span class="title">parent</span>&lt;<span class="title">String</span>&gt;</span>&#123;<span class="comment">//parent指定具体数据类型为String</span></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getName</span><span class="params">()</span></span>&#123;...&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//情况2：实现类也是泛型类，那么实现类的泛型标识符要包括接口的泛型标识符</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">child</span>&lt;<span class="title">T</span>,<span class="title">E</span>&gt; <span class="keyword">implements</span> <span class="title">parent</span>&lt;<span class="title">T</span>&gt;</span>&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> T <span class="title">getName</span><span class="params">()</span> </span>&#123;...&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+</li>
+<li><h3 id="泛型方法"><a href="#泛型方法" class="headerlink" title="泛型方法"></a>泛型方法</h3><ol>
+<li><h4 id="泛型方法定义"><a href="#泛型方法定义" class="headerlink" title="泛型方法定义"></a>泛型方法定义</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">修饰符 &lt;泛型标识符,泛型标识符,...&gt; 返回值类型 方法名(形参列表)&#123;</span><br><span class="line">    方法体...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>注意：</p>
+<ol>
+<li><p>修饰符与返回值类型中间的&lt;泛型标识符…&gt;很重要，可以理解为声明此方法为泛型方法。同时，<strong>只有在该&lt;泛型标识符…&gt;中声明的泛型标识符，才可在方法中使用</strong>。</p>
+</li>
+<li><p>只有声明了&lt;泛型标识符…&gt;的方法才是泛型方法，泛型类中的使用了泛型的成员方法不是泛型方法。比如：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//泛型类</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Parent</span>&lt;<span class="title">T</span>&gt;</span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> T <span class="title">getName</span><span class="params">(T name)</span></span>&#123;...&#125;<span class="comment">//成员方法</span></span><br><span class="line">    </span><br><span class="line">    <span class="keyword">public</span> &lt;T&gt; <span class="function">T <span class="title">getName</span><span class="params">(T name)</span></span>&#123;...&#125;<span class="comment">//泛型方法</span></span><br><span class="line">    </span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> &lt;T&gt; <span class="function">T <span class="title">getName</span><span class="params">(T name)</span></span>&#123;...&#125;<span class="comment">//静态泛型方法</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>泛型类中泛型方法可以被声明为静态方法，成员方法不可以被声明为静态方法</strong></p>
+</li>
+<li><p>泛型类中的泛型方法是“独立的”。比如：对于泛型类使用的标识符T</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//泛型类</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">parent</span>&lt;<span class="title">T</span>&gt;</span>&#123;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">public</span> &lt;T&gt; <span class="function">T <span class="title">getName</span><span class="params">(T name)</span></span>&#123;...&#125;<span class="comment">//这个T和泛型类中声明的T是相互独立的</span></span><br><span class="line">    </span><br><span class="line">    <span class="comment">//也就是说，泛型类和它里面的泛型方法使用了相同的泛型标识符的话，</span></span><br><span class="line">    <span class="comment">//可以在指定泛型类为某一种具体的数据类型的同时，</span></span><br><span class="line">    <span class="comment">//可以给泛型类中的泛型方法指定另一种具体的数据类型</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//调用</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span></span>&#123;</span><br><span class="line">    parent&lt;Integer&gt; pa = <span class="keyword">new</span> parent&lt;&gt;();<span class="comment">//这里的T为Integer类型</span></span><br><span class="line">    pa.getName(<span class="string">"zhangsan"</span>);<span class="comment">//这里的T为String类型</span></span><br><span class="line">    <span class="comment">//上面语句是合法的</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+</li>
+<li><h4 id="泛型方法支持可变参数"><a href="#泛型方法支持可变参数" class="headerlink" title="泛型方法支持可变参数"></a>泛型方法支持可变参数</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> &lt;E&gt; <span class="function"><span class="keyword">void</span> <span class="title">print</span><span class="params">(E... es)</span></span>&#123;<span class="comment">//可变参数</span></span><br><span class="line">    <span class="keyword">for</span>(E e : es)&#123;</span><br><span class="line">        System.out.println(e);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+</li>
+<li><h3 id="类型通配符"><a href="#类型通配符" class="headerlink" title="类型通配符"></a>类型通配符</h3><ol>
+<li><h4 id="概念："><a href="#概念：" class="headerlink" title="概念："></a>概念：</h4><ol>
+<li>类型通配符一般是使用”?”代替具体的类型实参</li>
+<li>所以，类型通配符是类型实参，而不是类型形参</li>
+</ol>
+</li>
+<li><h4 id="类型通配符上限"><a href="#类型通配符上限" class="headerlink" title="类型通配符上限"></a>类型通配符上限</h4><p>类/接口&lt;? extends 实参类型&gt;，泛型方法同理。要求该泛型的类型只能是实参类型或实参类型的子类类型</p>
+</li>
+<li><h4 id="类型通配符下限"><a href="#类型通配符下限" class="headerlink" title="类型通配符下限"></a>类型通配符下限</h4><p>类/接口&lt;? super 实参类型&gt;，泛型方法同理。要求该泛型的类型只能是实参类型或实参类型的父类类型</p>
+</li>
+<li><h4 id="比较"><a href="#比较" class="headerlink" title="比较"></a>比较</h4><p>上限：&lt;? extends T&gt; ?是T和T的子类，下限：&lt;? super T&gt; ?是T和T的父类。怎么看待这个上限和下限呢？</p>
+<ul>
+<li>首先应该想，其实对于Java来说 &lt;? extends T&gt;，&lt;? super T&gt; 是两个确定的类型，因为它不可能由你的赋值完了再确定吧。所以，对于&lt;? extends T&gt; 来说，集合里的元素应该是什么类型呢？应该是T类型，因为你添加的是T或者T的子类，设置为T就可以激发多态了。由此，所以你也只能从这个集合中取出T类型，因为它里面的元素本来设置的就是T类型，你赋值进去只不过是将T的子类赋值给了T，多态。<strong>但是呢，你就不能给这个集合里添加元素了，因为这个集合里元素的类型是T，假如可以添加元素，你初始化的时候初始化成T的一个子类，然后添加值的时候，却添加的另一个子类，</strong>事实上是可以添加的，因为集合元素类型是T，但里面就有了多种T的子类，这样的话，你初始化的时候是这个子类，你取出元素的时候肯定也想着取出的是可以给这个子类赋值的类型，但很有可能取出来的是T的另一个子类，你没法赋值，因为你允许添加另一个子类。<strong>所以一开始就禁止添加元素是对的。</strong></li>
+<li>&lt;? super T&gt;里面的元素，应该设置为什么呢？显然应该是object，因为系统不知道你会把?当成什么，所以只能设置成object，所以你取出元素的时候，取出的是object类。<strong>可不可以添加元素呢？可以，因为下限有保证，所以可以添加T和T的子类</strong>。你初始化的时候，初始化的是T的某个父类，好了，你现在取元素，你希望取出的是你初始化的那个父类，因为你只能添加T和T的子类，所以你取出的元素，肯定可以赋值给那个父类。</li>
+<li><strong>综上，&lt;? extends T&gt; 不可以添加元素，但可以取出类型为T的元素。 &lt;? super T&gt; 可以添加T或者T的子类，取出的一定是object类。</strong></li>
+<li>比如方法参数为：ArrayList&lt;? extends topClass&gt; list，在方法体中list是无法add数据的。但如果方法参数是：ArrayList&lt;? super bottomClass&gt; list，那么是可以add数据的，并且可以添加bottomClass及其子类类型。</li>
+</ul>
+</li>
+</ol>
+</li>
+<li><h3 id="类型擦除"><a href="#类型擦除" class="headerlink" title="类型擦除"></a>类型擦除</h3><ol>
+<li><h4 id="概念-1"><a href="#概念-1" class="headerlink" title="概念"></a>概念</h4><p>泛型是jdk1.5才引进的概念，在这之前是没有泛型的，但是，泛型代码能够很好的的和之前版本的代码兼容，那是因为泛型信息只存在于代码编译阶段，在进入JVM之前，与泛型相关的信息会被擦除掉，我们称之为—-类型擦除。</p>
+</li>
+<li><h4 id="类型擦除的种类"><a href="#类型擦除的种类" class="headerlink" title="类型擦除的种类"></a>类型擦除的种类</h4><ol>
+<li><h5 id="无限制类型擦除"><a href="#无限制类型擦除" class="headerlink" title="无限制类型擦除"></a>无限制类型擦除</h5><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//泛型类</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Erasure</span>&lt;<span class="title">T</span>&gt;</span>&#123;</span><br><span class="line">    <span class="keyword">private</span> T key;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setKey</span><span class="params">(T key)</span></span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.key = key;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> T <span class="title">getKey</span><span class="params">()</span></span>&#123;</span><br><span class="line">	   <span class="keyword">return</span> <span class="keyword">this</span>.key;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//经过类型擦除之后</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Erasure</span></span>&#123;</span><br><span class="line">    <span class="keyword">private</span> Object key;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setKey</span><span class="params">(Object key)</span></span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.key = key;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> Object <span class="title">getKey</span><span class="params">()</span></span>&#123;</span><br><span class="line">	   <span class="keyword">return</span> <span class="keyword">this</span>.key;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//泛型方法</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Erasure</span></span>&#123;</span><br><span class="line">    <span class="keyword">public</span> &lt;T&gt; <span class="function">T <span class="title">getValue</span><span class="params">(T val)</span></span>&#123;</span><br><span class="line">        <span class="keyword">return</span> val;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//经过类型擦除之后</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Erasure</span></span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> Object <span class="title">getValue</span><span class="params">(Object val)</span></span>&#123;</span><br><span class="line">        <span class="keyword">return</span> val;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><h5 id="有限制类型擦除"><a href="#有限制类型擦除" class="headerlink" title="有限制类型擦除"></a>有限制类型擦除</h5><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//泛型类</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Erasure</span>&lt;<span class="title">T</span> <span class="keyword">extends</span> <span class="title">Number</span>&gt;</span>&#123;</span><br><span class="line">    <span class="keyword">private</span> T key;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setKey</span><span class="params">(T key)</span></span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.key = key;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> T <span class="title">getKey</span><span class="params">()</span></span>&#123;</span><br><span class="line">	   <span class="keyword">return</span> <span class="keyword">this</span>.key;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//经过类型擦除之后</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Erasure</span></span>&#123;</span><br><span class="line">    <span class="keyword">private</span> Number key;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setKey</span><span class="params">(Number key)</span></span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.key = key;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> Number <span class="title">getKey</span><span class="params">()</span></span>&#123;</span><br><span class="line">	   <span class="keyword">return</span> <span class="keyword">this</span>.key;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//泛型方法</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Erasure</span></span>&#123;</span><br><span class="line">    <span class="keyword">public</span> &lt;T extends Number&gt; <span class="function">T <span class="title">getValue</span><span class="params">(T val)</span></span>&#123;</span><br><span class="line">        <span class="keyword">return</span> val;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//经过类型擦除之后</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Erasure</span></span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> Number <span class="title">getValue</span><span class="params">(Number val)</span></span>&#123;</span><br><span class="line">        <span class="keyword">return</span> val;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+</li>
+<li><h4 id="类型擦除中的桥接方法"><a href="#类型擦除中的桥接方法" class="headerlink" title="类型擦除中的桥接方法"></a>类型擦除中的桥接方法</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//泛型接口</span></span><br><span class="line"><span class="class"><span class="keyword">interface</span> <span class="title">info</span>&lt;<span class="title">T</span>&gt;</span>&#123;</span><br><span class="line">    <span class="function">T <span class="title">info</span><span class="params">(T val)</span></span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//接口实现</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">infoImpl</span> <span class="keyword">implements</span> <span class="title">info</span>&lt;<span class="title">String</span>&gt;</span>&#123;<span class="comment">//注意这里实现类是非泛型类</span></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">info</span><span class="params">(String val)</span></span>&#123;</span><br><span class="line">        <span class="keyword">return</span> val;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//经过类型擦除之后</span></span><br><span class="line"><span class="class"><span class="keyword">interface</span> <span class="title">info</span></span>&#123;</span><br><span class="line">    <span class="function">Object <span class="title">info</span><span class="params">(Object val)</span></span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">infoImpl</span> <span class="keyword">implements</span> <span class="title">info</span></span>&#123;</span><br><span class="line">    <span class="comment">//需要我们显示的实现</span></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">info</span><span class="params">(String val)</span></span>&#123;</span><br><span class="line">        <span class="keyword">return</span> val;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">//桥接方法，用来保持接口和类之间的实现关系</span></span><br><span class="line">    <span class="comment">//因为接口类型擦除之后，其中的方法也就随之进行类型擦除，</span></span><br><span class="line">    <span class="comment">//根据接口实现的要求，需要将接口中的所有方法实现，也就是说</span></span><br><span class="line">    <span class="comment">//接口中有Object info(Object val)方法，那我们就需要去实现它</span></span><br><span class="line">    <span class="comment">//只不过这是编译器帮我们做的，所以我们看不到</span></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Object <span class="title">info</span><span class="params">(Object val)</span></span>&#123;</span><br><span class="line">        <span class="keyword">return</span> info((String)val);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+</li>
+<li><h3 id="泛型与数组"><a href="#泛型与数组" class="headerlink" title="泛型与数组"></a>泛型与数组</h3><ol>
+<li><h4 id="泛型数组的创建："><a href="#泛型数组的创建：" class="headerlink" title="泛型数组的创建："></a>泛型数组的创建：</h4><ol>
+<li><p>可以声明带泛型的数组引用，但是不能创建带泛型的数组对象。即：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">T[] arr;<span class="comment">//是允许的</span></span><br><span class="line">T[] arr = <span class="keyword">new</span> T[<span class="number">4</span>];<span class="comment">//是不允许的</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>可以通过java.lang.reflect.Array的newInstance(Class&lt;?&gt; clazz，int length)反射创建泛型数组</p>
+</li>
+</ol>
+</li>
+<li><h4 id="一个关于泛型数组的错误使用示例"><a href="#一个关于泛型数组的错误使用示例" class="headerlink" title="一个关于泛型数组的错误使用示例"></a>一个关于泛型数组的错误使用示例</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span></span>&#123;</span><br><span class="line">    ArrayList[] list = <span class="keyword">new</span> ArrayList[<span class="number">5</span>];<span class="comment">//创建ArrayList数组，长度为5</span></span><br><span class="line">    ArrayList&lt;String&gt;[] listArr = list;<span class="comment">//listArr引用指向list</span></span><br><span class="line">    </span><br><span class="line">    ArrayList&lt;Integer&gt; intList = <span class="keyword">new</span> ArrayList&lt;&gt;();<span class="comment">//创建一个整数类型的ArrayList</span></span><br><span class="line">    inList.add(<span class="number">100</span>);<span class="comment">//为它添加一个元素</span></span><br><span class="line">    </span><br><span class="line">    list[<span class="number">0</span>] = intList;<span class="comment">//将list[0]引用指向intList</span></span><br><span class="line">    String s = listArr[<span class="number">0</span>].get(<span class="number">0</span>);<span class="comment">//获取的时候通过listArr引用来获取</span></span><br><span class="line">    System.out.println(s);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>上面整个程序在运行之前一切正常，而当运行之后，会出现ClassCastException异常，即Integer无法转为String。主要就是给数组元素赋值时用的是list引用，而获取数组中元素时使用listArr引用，而两个引用的具体数据类型不同，导致出现ClassCastException。</p>
+</li>
+<li><h4 id="改造上面错误示例"><a href="#改造上面错误示例" class="headerlink" title="改造上面错误示例"></a>改造上面错误示例</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//可以运行示例：</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span></span>&#123;</span><br><span class="line">    <span class="comment">//ArrayList[] list = new ArrayList[5];//创建ArrayList数组，长度为5</span></span><br><span class="line">    <span class="comment">//ArrayList&lt;String&gt;[] listArr = list;//listArr引用指向list</span></span><br><span class="line">    ArrayList&lt;String&gt;[] listArr = <span class="keyword">new</span> ArrayList[<span class="number">5</span>];<span class="comment">//在创建的时候就指定数组中每个ArrayList中的具体数据类型</span></span><br><span class="line">    </span><br><span class="line">    ArrayList&lt;Integer&gt; intList = <span class="keyword">new</span> ArrayList&lt;&gt;();<span class="comment">//创建一个整数类型的ArrayList</span></span><br><span class="line">    inList.add(<span class="number">100</span>);<span class="comment">//为它添加一个元素</span></span><br><span class="line">    </span><br><span class="line">    ArrayList&lt;String&gt; strList = <span class="keyword">new</span> ArrayList&lt;&gt;();<span class="comment">//创建一个字符串类型的ArrayList</span></span><br><span class="line">    inList.add(<span class="string">"abc"</span>);<span class="comment">//为它添加一个元素</span></span><br><span class="line">    </span><br><span class="line">    <span class="comment">//list[0] = intList;//将list[0]引用指向intList</span></span><br><span class="line">    listArr[<span class="number">0</span>] = strList;<span class="comment">//成功</span></span><br><span class="line">    listArr[<span class="number">1</span>] = intList;<span class="comment">//在没运行之前就报错</span></span><br><span class="line">    </span><br><span class="line">    String s = listArr[<span class="number">0</span>].get(<span class="number">0</span>);<span class="comment">//获取的时候通过listArr引用来获取</span></span><br><span class="line">    System.out.println(s);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><h4 id="反射构建数组"><a href="#反射构建数组" class="headerlink" title="反射构建数组"></a>反射构建数组</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Fruit</span>&lt;<span class="title">T</span>&gt;</span>&#123;</span><br><span class="line">    <span class="keyword">private</span> T[] arr;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">Fruit</span><span class="params">(Class&lt;T&gt; clazz,<span class="keyword">int</span> len)</span></span>&#123;</span><br><span class="line">        <span class="comment">//通过Array.newInstance创建泛型数组</span></span><br><span class="line">        arr = (T[])Array.newInstance(clazz,len);</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">//给数组添加元素</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">put</span><span class="params">(<span class="keyword">int</span> index,T item)</span></span>&#123;</span><br><span class="line">        arr[index] = T;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">//获取数组中元素</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> T <span class="title">get</span><span class="params">(<span class="keyword">int</span> index)</span></span>&#123;</span><br><span class="line">        <span class="keyword">return</span> arr[index];</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">//获取整个数组</span></span><br><span class="line">    </span><br><span class="line">    <span class="keyword">public</span> T[] getArr()&#123;</span><br><span class="line">        <span class="keyword">return</span> arr;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+</li>
+</ol>
+</li>
+</ol>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者：</strong>
+    yinjiawei
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://vampiresmile.github.io/2020/07/17/java%E6%B3%9B%E5%9E%8B/" title="java泛型">https://vampiresmile.github.io/2020/07/17/java%E6%B3%9B%E5%9E%8B/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>
+    本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/" rel="external nofollow noopener noreferrer" target="_blank">CC BY-NC-SA 3.0</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/java%E5%9F%BA%E7%A1%80/" rel="tag"># java基础</a>
+          
+        </div>
+      
+
+      
+      
+        <div class="post-widgets">
+        
+
+        
+
+        
+          
+          <div id="needsharebutton-postbottom">
+            <span class="btn">
+              <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </span>
+          </div>
+        
+        </div>
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/06/25/%E6%87%92%E4%BA%BA%E7%9A%84%E9%A1%B9%E7%9B%AEDemo/" rel="next" title="懒人的项目Demo">
+                <i class="fa fa-chevron-left"></i> 懒人的项目Demo
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/shuangyu.jpg" alt="yinjiawei">
+            
+              <p class="site-author-name" itemprop="name">yinjiawei</p>
+              <p class="site-description motion-element" itemprop="description">java 技术 分享 博客 学习 总结</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">10</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">6</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/VampireSmile" target="_blank" title="GitHub" rel="external nofollow noopener noreferrer">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:brcmdb@gmail.com" target="_blank" title="E-Mail" rel="external nofollow noopener noreferrer">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://blog.csdn.net/qq_46126324" target="_blank" title="CSDN" rel="external nofollow noopener noreferrer">
+                      
+                        <i class="fa fa-fw fa-globe"></i>CSDN</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://leetcode-cn.com/u/sun_smile/" target="_blank" title="LeetCode" rel="external nofollow noopener noreferrer">
+                      
+                        <i class="fa fa-fw fa-free-code-camp"></i>LeetCode</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#背景"><span class="nav-number">1.</span> <span class="nav-text">背景</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#概念"><span class="nav-number">2.</span> <span class="nav-text">概念</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#本质"><span class="nav-number">3.</span> <span class="nav-text">本质</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#好处"><span class="nav-number">4.</span> <span class="nav-text">好处</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#常用的泛型标识符：T，E，K，V"><span class="nav-number">5.</span> <span class="nav-text">常用的泛型标识符：T，E，K，V</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#泛型类"><span class="nav-number">6.</span> <span class="nav-text">泛型类</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#泛型类的定义语法"><span class="nav-number">6.1.</span> <span class="nav-text">泛型类的定义语法</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#泛型类的使用语法"><span class="nav-number">6.2.</span> <span class="nav-text">泛型类的使用语法</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#从泛型类派生子类"><span class="nav-number">6.3.</span> <span class="nav-text">从泛型类派生子类</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#泛型接口"><span class="nav-number">7.</span> <span class="nav-text">泛型接口</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#泛型接口的定义语法"><span class="nav-number">7.1.</span> <span class="nav-text">泛型接口的定义语法</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#泛型接口的实现类要求"><span class="nav-number">7.2.</span> <span class="nav-text">泛型接口的实现类要求</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#泛型方法"><span class="nav-number">8.</span> <span class="nav-text">泛型方法</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#泛型方法定义"><span class="nav-number">8.1.</span> <span class="nav-text">泛型方法定义</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#泛型方法支持可变参数"><span class="nav-number">8.2.</span> <span class="nav-text">泛型方法支持可变参数</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#类型通配符"><span class="nav-number">9.</span> <span class="nav-text">类型通配符</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#概念："><span class="nav-number">9.1.</span> <span class="nav-text">概念：</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#类型通配符上限"><span class="nav-number">9.2.</span> <span class="nav-text">类型通配符上限</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#类型通配符下限"><span class="nav-number">9.3.</span> <span class="nav-text">类型通配符下限</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#比较"><span class="nav-number">9.4.</span> <span class="nav-text">比较</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#类型擦除"><span class="nav-number">10.</span> <span class="nav-text">类型擦除</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#概念-1"><span class="nav-number">10.1.</span> <span class="nav-text">概念</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#类型擦除的种类"><span class="nav-number">10.2.</span> <span class="nav-text">类型擦除的种类</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#无限制类型擦除"><span class="nav-number">10.2.1.</span> <span class="nav-text">无限制类型擦除</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#有限制类型擦除"><span class="nav-number">10.2.2.</span> <span class="nav-text">有限制类型擦除</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#类型擦除中的桥接方法"><span class="nav-number">10.3.</span> <span class="nav-text">类型擦除中的桥接方法</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#泛型与数组"><span class="nav-number">11.</span> <span class="nav-text">泛型与数组</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#泛型数组的创建："><span class="nav-number">11.1.</span> <span class="nav-text">泛型数组的创建：</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#一个关于泛型数组的错误使用示例"><span class="nav-number">11.2.</span> <span class="nav-text">一个关于泛型数组的错误使用示例</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#改造上面错误示例"><span class="nav-number">11.3.</span> <span class="nav-text">改造上面错误示例</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#反射构建数组"><span class="nav-number">11.4.</span> <span class="nav-text">反射构建数组</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-snowflake-o"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">yinjiawei</span>
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      <i class="fa fa-user"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      
+    </span>
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+      <div id="needsharebutton-float">
+        <span class="btn">
+          <i class="fa fa-share-alt" aria-hidden="true"></i>
+        </span>
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="//cdn.jsdelivr.net/jquery/2.1.3/jquery.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="//cdn.jsdelivr.net/fastclick/1.0.6/fastclick.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="//cdn.jsdelivr.net/jquery.lazyload/1.9.3/jquery.lazyload.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="//cdn.jsdelivr.net/velocity/1.2.3/velocity.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="//cdn.jsdelivr.net/velocity/1.2.3/velocity.ui.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="//cdn.jsdelivr.net/fancybox/2.1.5/jquery.fancybox.pack.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="//cdn.bootcss.com/canvas-nest.js/1.0.1/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('5');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+  
+  <link rel="stylesheet" href="/lib/needsharebutton/needsharebutton.css">
+
+  
+  
+  <script src="/lib/needsharebutton/needsharebutton.js"></script>
+
+  <script>
+    
+      pbOptions = {};
+      
+          pbOptions.iconStyle = "box";
+      
+          pbOptions.boxForm = "horizontal";
+      
+          pbOptions.position = "bottomCenter";
+      
+          pbOptions.networks = "Weibo,Wechat,QQZone,Douban,Mailto,Twitter,Facebook";
+      
+      new needShareButton('#needsharebutton-postbottom', pbOptions);
+    
+    
+      flOptions = {};
+      
+          flOptions.iconStyle = "box";
+      
+          flOptions.boxForm = "horizontal";
+      
+          flOptions.position = "middleRight";
+      
+          flOptions.networks = "Weibo,Wechat,QQZone,Douban,Mailto,Twitter,Facebook";
+      
+      new needShareButton('#needsharebutton-float', flOptions);
+    
+  </script>
+
+  
+
+  
+
+  
+
+  
+
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"model":{"jsonPath":"/live2dw/assets/assets/haruto.model.json"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":true},"log":false});</script></body>
+</html>
