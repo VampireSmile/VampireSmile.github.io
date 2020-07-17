@@ -1119,7 +1119,8 @@
 <li>避免了强制类型的转换。</li>
 </ol>
 </li>
-<li><h3 id="常用的泛型标识符：T，E，K，V"><a href="#常用的泛型标识符：T，E，K，V" class="headerlink" title="常用的泛型标识符：T，E，K，V"></a>常用的泛型标识符：T，E，K，V</h3></li>
+<li><h3 id="常用的泛型标识符：T，E，K，V"><a href="#常用的泛型标识符：T，E，K，V" class="headerlink" title="常用的泛型标识符：T，E，K，V"></a>常用的泛型标识符：T，E，K，V</h3><a id="more"></a>
+</li>
 <li><h3 id="泛型类"><a href="#泛型类" class="headerlink" title="泛型类"></a>泛型类</h3><ol>
 <li><h4 id="泛型类的定义语法"><a href="#泛型类的定义语法" class="headerlink" title="泛型类的定义语法"></a>泛型类的定义语法</h4><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> 类名称&lt;泛型标识,泛型标识...&gt;</span>&#123;</span><br><span class="line">	<span class="keyword">private</span> 泛型标识 变量名;</span><br><span class="line">	...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 </li>
