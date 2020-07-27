@@ -1239,6 +1239,10 @@
 <li>classpath*：不仅包含class路径，还会到引入的jar中(class路径)进行查找.</li>
 </ol>
 </li>
+<li><h4 id="hexo中分页显示问题（出现-lt-i-class-“fa-fa-angle-right”-gt-lt-i-gt"><a href="#hexo中分页显示问题（出现-lt-i-class-“fa-fa-angle-right”-gt-lt-i-gt" class="headerlink" title="hexo中分页显示问题（出现&lt;i class = “fa fa-angle-right”&gt;&lt;/i&gt;)"></a>hexo中分页显示问题（出现&lt;i class = “fa fa-angle-right”&gt;&lt;/i&gt;)</h4><p>修改：/themes/next/layout/_partials/pagination.swig</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">&#123;%- <span class="keyword">if</span> page.prev or page.next %&#125;</span><br><span class="line"> &lt;nav <span class="class"><span class="keyword">class</span></span>=<span class="string">"pagination"</span>&gt;</span><br><span class="line">   &#123;&#123;</span><br><span class="line">     paginator(&#123;</span><br><span class="line">       prev_text: <span class="string">'&lt;i class="fa fa-angle-left" aria-label="'</span>+__(<span class="string">'accessibility.prev_page'</span>)+<span class="string">'"&gt;&lt;/i&gt;'</span>,</span><br><span class="line">       next_text: <span class="string">'&lt;i class="fa fa-angle-right" aria-label="'</span>+__(<span class="string">'accessibility.next_page'</span>)+<span class="string">'"&gt;&lt;/i&gt;'</span>,</span><br><span class="line">       mid_size: <span class="number">1</span>,</span><br><span class="line">       <span class="built_in">escape</span>: <span class="literal">false</span></span><br><span class="line">     &#125;)</span><br><span class="line">   &#125;&#125;</span><br><span class="line"> &lt;<span class="regexp">/nav&gt;</span></span><br><span class="line"><span class="regexp">&#123;%- endif %&#125;</span></span><br></pre></td></tr></table></figure>
+
+</li>
 </ol>
 ]]></content>
       <categories>
