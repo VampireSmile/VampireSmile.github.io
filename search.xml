@@ -1047,8 +1047,7 @@
 <li>更改完成后就可以使用快捷键，迅速敲代码了。</li>
 </ol>
 </li>
-<li><p>在javaEE中设置自动提示：</p>
-<p>a. 设置html文件的自动代码提示：</p>
+<li><h2 id="在javaEE中设置自动提示："><a href="#在javaEE中设置自动提示：" class="headerlink" title="在javaEE中设置自动提示："></a>在javaEE中设置自动提示：</h2><p>a. 设置html文件的自动代码提示：</p>
 <ol>
 <li>在Preferences中找到Web–&gt;HTML Files–&gt;Editor–&gt;Content Assist</li>
 <li>然后将Prompt when these characters are inserted右边的输入框中的”&lt;=”改为你想输入后就会提示的内容</li>
