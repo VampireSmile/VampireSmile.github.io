@@ -1298,7 +1298,7 @@
 </li>
 </ol>
 <ol start="62">
-<li><h4 id="markdown文件通过hexo转为html文件后，锚点问题"><a href="#markdown文件通过hexo转为html文件后，锚点问题" class="headerlink" title="markdown文件通过hexo转为html文件后，锚点问题"></a>markdown文件通过hexo转为html文件后，锚点问题</h4><p>在Markdown标题里面如果含有特殊字符比如()、\、/等字符，转为HTML文件后，这些字符都被短线<code>&#39;-&#39;</code>替代。比如Markdown标题为：SHUTDOWN()/SHUTDOWNNOW()方法介绍，转为HTML后这个id被设为：SHUTDOWN-SHUTDOWNNOW-方法介绍，所以放到个人博客上的Markdown文件锚点时需要使用HTML的id，而不是Markdown标题形式。</p>
+<li><h4 id="markdown文件通过hexo转为html文件后的锚点问题"><a href="#markdown文件通过hexo转为html文件后的锚点问题" class="headerlink" title="markdown文件通过hexo转为html文件后的锚点问题"></a>markdown文件通过hexo转为html文件后的锚点问题</h4><p>在Markdown标题里面如果含有特殊字符比如()、\、/等字符，转为HTML文件后，这些字符都被短线<code>&#39;-&#39;</code>替代。比如Markdown标题为：SHUTDOWN()/SHUTDOWNNOW()方法介绍，转为HTML后这个id被设为：SHUTDOWN-SHUTDOWNNOW-方法介绍，所以放到个人博客上的Markdown文件锚点时需要使用HTML的id，而不是Markdown标题形式。</p>
 </li>
 </ol>
 ]]></content>
