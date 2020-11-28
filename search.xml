@@ -1696,7 +1696,7 @@
 <p>执行<code>processWorkerExit()</code>代表在<code>runWorker()</code>线程跳出了当前循环，一般有两种情况：</p>
 <ul>
 <li><code>task.run()</code>内部抛出异常，直接结束循环，然后执行<code>processWorkerExit()</code></li>
-<li>``getTask()<code>返回为空，代表线程数量大于核心数量且</code>workQueue<code>中没有任务，此时需要执行</code>processWorkerExit()<code>来清理多余的</code>Worker`对象</li>
+<li><code>getTask()</code>返回为空，代表线程数量大于核心数量且<code>workQueue</code>中没有任务，此时需要执行<code>processWorkerExit()</code>来清理多余的<code>Worker</code>对象</li>
 </ul>
 <p>代码如下：</p>
 </li>
