@@ -973,12 +973,14 @@
 <li><p>开发及测试环境：Windows(androidStudio_3.5（手机端） + eclipseJavaEE（web端） + Tomcat_9 ) +  CentOS_7（mysql_5.7.25） + Honor Play_COR-AL10_9</p>
 </li>
 <li><p>注意：</p>
-<ol start="0">
-<li>因为这是我只花了一周时间做的人脸识别考勤课设题目，后台只是使用了简单的Servlet，所以很多地方比较草率，比较僵硬，如果测试至少需要两台手机(一台模拟老师，一台模拟学生)</li>
-<li>因为我这是直接在虹软的官方demo上参照其官方文档进行修改，所以demo中SingleImageActivity和FaceAttrPreviewActivity已被修改，没带Activity后缀的是我添加的，如果要查看虹软官方原始的人脸识别demo请去官方查看下载</li>
-<li>项目中两个SDK(虹软和高德)的appid和sdkid分别是我在虹软平台和高德地图平台申请的，如有需要请自行申请，修改即可(虹软是在common.Constants下，高德是在清单文件中)<ol start="3">
-<li>如果服务器和数据库都已准备好，可以在自己构建一个“局域网”下通信(即将手机，服务器和mysql所在机器连接到同一wifi)进行测试</li>
-</ol>
+<ol>
+<li><p>因为这是我只花了一周时间做的人脸识别考勤课设题目，后台只是使用了简单的Servlet，所以很多地方比较草率，比较僵硬，如果测试至少需要两台手机(一台模拟老师，一台模拟学生)</p>
+</li>
+<li><p>因为我这是直接在虹软的官方demo上参照其官方文档进行修改，所以demo中SingleImageActivity和FaceAttrPreviewActivity已被修改，没带Activity后缀的是我添加的，如果要查看虹软官方原始的人脸识别demo请去官方查看下载</p>
+</li>
+<li><p>项目中两个SDK(虹软和高德)的appid和sdkid分别是我在虹软平台和高德地图平台申请的，如有需要请自行申请，修改即可(虹软是在common.Constants下，高德是在清单文件中)</p>
+</li>
+<li><p>如果服务器和数据库都已准备好，可以在自己构建一个“局域网”下通信(即将手机，服务器和mysql所在机器连接到同一wifi)进行测试</p>
 </li>
 </ol>
 </li>
