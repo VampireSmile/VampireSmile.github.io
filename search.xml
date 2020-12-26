@@ -988,8 +988,8 @@
 </li>
 </ul>
 </li>
-<li><h3 id="PixabayApp"><a href="#PixabayApp" class="headerlink" title="PixabayApp"></a>PixabayApp</h3><ul>
-<li><p>使用java实现对<a href="https://pixabay.com/" target="_blank" rel="external nofollow noopener noreferrer">Pixabay</a>网站图片的浏览 + 搜索 + 下载</p>
+<li><h3 id="PixabayApp-Java"><a href="#PixabayApp-Java" class="headerlink" title="PixabayApp-Java"></a>PixabayApp-Java</h3><ul>
+<li><p>实现对<a href="https://pixabay.com/" target="_blank" rel="external nofollow noopener noreferrer">Pixabay</a>网站图片的浏览 + 搜索 + 下载</p>
 </li>
 <li><p>开发及测试环境：window_10pro + AndroidStudio_4.0.1 + jdk_1.8 + Pixel 2 XL API 26</p>
 </li>
