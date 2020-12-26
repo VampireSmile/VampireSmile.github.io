@@ -989,9 +989,12 @@
 </ul>
 </li>
 <li><h3 id="PixabayApp"><a href="#PixabayApp" class="headerlink" title="PixabayApp"></a>PixabayApp</h3><ul>
-<li>开发及测试环境：window_10pro + AndroidStudio_4.0.1 + jdk_1.8 + Pixel 2 XL API 26</li>
-<li>将<a href="https://space.bilibili.com/137860026/video?tid=0&page=2&keyword=&order=pubdate" target="_blank" rel="external nofollow noopener noreferrer">阿婆主longway777</a>的<a href="https://www.bilibili.com/video/BV1ZJ411k7qA" target="_blank" rel="external nofollow noopener noreferrer">视频代码</a>用java实现</li>
-<li>传送门：<a href="https://github.com/VampireSmile/lazywork/tree/master/PixabayApp" target="_blank" rel="external nofollow noopener noreferrer">https://github.com/VampireSmile/lazywork/tree/master/PixabayApp</a></li>
+<li><p>使用java实现对<a href="https://pixabay.com/" target="_blank" rel="external nofollow noopener noreferrer">Pixabay</a>网站图片的浏览 + 搜索 + 下载</p>
+</li>
+<li><p>开发及测试环境：window_10pro + AndroidStudio_4.0.1 + jdk_1.8 + Pixel 2 XL API 26</p>
+</li>
+<li><p>传送门：<a href="https://github.com/VampireSmile/lazywork/tree/master/PixabayApp" target="_blank" rel="external nofollow noopener noreferrer">https://github.com/VampireSmile/lazywork/tree/master/PixabayApp</a></p>
+</li>
 </ul>
 </li>
 </ol>
