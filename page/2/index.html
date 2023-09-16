@@ -313,6 +313,815 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://vampiresmile.github.io/2020/06/06/JVM%E4%B9%8B%E8%BF%90%E8%A1%8C%E6%97%B6%E6%95%B0%E6%8D%AE%E5%8C%BA%E5%9F%9F/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="yinjiawei">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/shuangyu.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Zachary">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2020/06/06/JVM%E4%B9%8B%E8%BF%90%E8%A1%8C%E6%97%B6%E6%95%B0%E6%8D%AE%E5%8C%BA%E5%9F%9F/" itemprop="url">JVM之运行时数据区域</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-06-06T21:06:33+08:00">
+                2020-06-06
+              </time>
+            
+
+            
+              <span class="post-meta-divider">|</span>
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-check-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">更新于&#58;</span>
+              
+              <time title="更新于" itemprop="dateModified" datetime="2020-06-06T21:57:34+08:00">
+                2020-06-06
+              </time>
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/java%E5%90%8E%E7%AB%AF%E5%9F%BA%E7%A1%80/" itemprop="url" rel="index">
+                    <span itemprop="name">java后端基础</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  1.3k 字
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">
+                  4 分钟
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          <ol>
+<li><h3 id="先来看看运行时数据区域长啥样"><a href="#先来看看运行时数据区域长啥样" class="headerlink" title="先来看看运行时数据区域长啥样"></a>先来看看运行时数据区域长啥样</h3><p><img src="https://s1.ax1x.com/2020/06/06/tcK3Pf.png" alt="tcK3Pf.png"></p>
+<p>注意：</p>
+<ul>
+<li>线程私有数据区域生命周期与线程相同, 依赖用户线程的启动/结束而创建/销毁(在HotspotVM内, 每个线程都与操作系统的本地线程直接映射, 因此这部分内存区域的存/否跟随本地线程的生/死对应)。</li>
+<li>线程共享区域随虚拟机的启动/关闭而创建/销毁。</li>
+<li><strong>直接内存并不是JVM运行时数据区的一部分</strong>，但也会被频繁的使用：在JDK 1.4引入的NIO提供了基于Channel与Buffer的IO方式，它可以使用Native函数库直接分配堆外内存，然后使用DirectByteBuffer对象作为这块内存的引用进行操作(详见：Java I/O 扩展)，这样就避免了在Java堆和Native堆中来回复制数据，因此在一些场景中可以显著提高性能。</li>
+</ul>
+</li>
+<li><h3 id="再来看看各个区域的大概功能"><a href="#再来看看各个区域的大概功能" class="headerlink" title="再来看看各个区域的大概功能"></a>再来看看各个区域的大概功能</h3><p><img src="https://s1.ax1x.com/2020/06/06/tcMd6e.png" alt="tcMd6e.png"></p>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2020/06/06/JVM%E4%B9%8B%E8%BF%90%E8%A1%8C%E6%97%B6%E6%95%B0%E6%8D%AE%E5%8C%BA%E5%9F%9F/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </li></ol></div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://vampiresmile.github.io/2020/05/31/%E6%97%A5%E5%B8%B8%E9%97%AE%E9%A2%98%E8%AE%B0%E5%BD%95/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="yinjiawei">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/shuangyu.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Zachary">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2020/05/31/%E6%97%A5%E5%B8%B8%E9%97%AE%E9%A2%98%E8%AE%B0%E5%BD%95/" itemprop="url">日常问题记录</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-05-31T20:12:46+08:00">
+                2020-05-31
+              </time>
+            
+
+            
+              <span class="post-meta-divider">|</span>
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-check-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">更新于&#58;</span>
+              
+              <time title="更新于" itemprop="dateModified" datetime="2020-11-28T00:06:22+08:00">
+                2020-11-28
+              </time>
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%80%BB%E7%BB%93/" itemprop="url" rel="index">
+                    <span itemprop="name">总结</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  7.2k 字
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">
+                  29 分钟
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          <ol>
+<li><h4 id="解决VMware网络问题的方法："><a href="#解决VMware网络问题的方法：" class="headerlink" title="解决VMware网络问题的方法："></a>解决VMware网络问题的方法：</h4><p>管理员身份运行cmd -&gt; 输入 netsh winsock reset -&gt; 重启电脑 同时也是windows修复网络问题的一种方法</p>
+</li>
+<li><h4 id="解决spring中tx报错问题："><a href="#解决spring中tx报错问题：" class="headerlink" title="解决spring中tx报错问题："></a>解决spring中tx报错问题：</h4><p>在设置xml catalog 时要把key改成<a href="http://www.springframework.org/schema/tx/spring-tx.xsd" target="_blank" rel="external nofollow noopener noreferrer">http://www.springframework.org/schema/tx/spring-tx.xsd</a></p>
+</li>
+<li><h4 id="解决jsp链接数据库中文乱码问题："><a href="#解决jsp链接数据库中文乱码问题：" class="headerlink" title="解决jsp链接数据库中文乱码问题："></a>解决jsp链接数据库中文乱码问题：</h4><ul>
+<li>首先在mysql端使用show variables like ‘%char%；然后把所有都设置为utf-8（反正要一致)，修改/etc/my.cnf(centOS7)中设置default为utf-8；</li>
+<li>然后jsp也面中如果是post传输参数，则需要先设置request.setCharacterEncoding=utf-8,如果是get传输就在链接mysql的url后面加useUnicode=true&amp;characterEncoding(“utf-8”);</li>
+</ul>
+</li>
+<li><h4 id="html中的一个布局问题："><a href="#html中的一个布局问题：" class="headerlink" title="html中的一个布局问题："></a>html中的一个布局问题：</h4><p>div:overflow属性：设置div滚动条；z-index属性：值越大表示显示在上面，在div覆盖时（如二级导航）有用，但要设置position：relative</p>
+</li>
+<li><h4 id="在学校用android-studio下载sdk时问题："><a href="#在学校用android-studio下载sdk时问题：" class="headerlink" title="在学校用android studio下载sdk时问题："></a>在学校用android studio下载sdk时问题：</h4><p>只能用手机热点，无法用校园网（原因未知）,或者修改host文件C:/windows/system32/drivers/etc/hosts<br>如：203.208.41.174   dl.google.com</p>
+</li>
+<li><h4 id="android-studio-5037端口被占用-Unable-to-connect-to-adb-daemon-on-port-5037-："><a href="#android-studio-5037端口被占用-Unable-to-connect-to-adb-daemon-on-port-5037-：" class="headerlink" title="android studio 5037端口被占用(Unable to connect to adb daemon on port: 5037)："></a>android studio 5037端口被占用(Unable to connect to adb daemon on port: 5037)：</h4><p>修改5037端口：环境变量-&gt;新建-&gt;变量名：ANDRIOD_ADB_SERVER_PORT-&gt;变量值：设置在65535之内的有效没被占用的端口号</p>
+</li>
+<li><h4 id="今日升级为win10后，之前安装的VMware不兼容："><a href="#今日升级为win10后，之前安装的VMware不兼容：" class="headerlink" title="今日升级为win10后，之前安装的VMware不兼容："></a>今日升级为win10后，之前安装的VMware不兼容：</h4><p>把之前创建的虚拟机文件备份，重新安装Vmware，再导入这些文件。但之后需要重置虚拟网络适配器：还原默认设置，如果不还原的话会产生诸如ping不通的问题，个人认为可能是电脑升级连带着虚拟网络适配器的ip和DHCP改变了，所以如果不还原手改的话需要改很多地方，最简单的就是直接点还原默认设置，虚拟机会给我们自动搞定之后的一切。重置也可以解决物理机ping不通虚拟机的问题</p>
+</li>
+<li><h4 id="删除Xftp和Xshell之后总是弹出Windows-installar："><a href="#删除Xftp和Xshell之后总是弹出Windows-installar：" class="headerlink" title="删除Xftp和Xshell之后总是弹出Windows installar："></a>删除Xftp和Xshell之后总是弹出Windows installar：</h4><ul>
+<li>原因：注册表没删干净</li>
+<li>解决办法：cmd-&gt;regedit-&gt;搜索注册表-&gt;Xftp，XShell，Xshell，netSarang，Netsarang，NetSarang将搜到的所有关于Xftp，Xshell的注册表项都删除才算删干净-&gt;重启</li>
+</ul>
+</li>
+<li><h4 id="android地图软件打包之后获取不到地图信息"><a href="#android地图软件打包之后获取不到地图信息" class="headerlink" title="android地图软件打包之后获取不到地图信息"></a>android地图软件打包之后获取不到地图信息</h4><p>原因：发布SHA1和调试SHA1设置不一致<br>   方式一 ：</p>
+<pre><code>打开你Android studio底部的terminal 执行keytool -v -list -keystore +签名文件路径+签名文件.jks 。然后回车会提示你输入你的签名密码，输入后回车-&gt;你会看你签名打包后的apk的sha1 </code></pre><p>   方式二 ：</p>
+<pre><code>cmd 打开dos-&gt; cd+keytool路径（keytool 在你jdk bin包下）+keytool -v -list -keystore +签名文件路径+签名文件.jks -&gt;然后回车会提示你输入你的签名密码，输入后回车-&gt;你也会看你签名打包后的apk的sha1 </code></pre><p>然后在相应的平台（比如我的是高德地图API平台）在发布SHA1那一栏输入上面获得的SHA1，调试SHA1那一栏就是之前那个SHA1<br>注意:这个SHA1和你创建key相关，即每一个新的key所生成的SHA1都不一样</p>
+</li>
+<li><h4 id="当某个文件拒绝访问时："><a href="#当某个文件拒绝访问时：" class="headerlink" title="当某个文件拒绝访问时："></a>当某个文件拒绝访问时：</h4><p>我们可以修改该文件的权限：右击该文件-&gt;属性-&gt;修改文件所有者或者权限</p>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2020/05/31/%E6%97%A5%E5%B8%B8%E9%97%AE%E9%A2%98%E8%AE%B0%E5%BD%95/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </li></ol></div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://vampiresmile.github.io/2020/05/30/java%E9%9B%86%E5%90%88%E6%80%BB%E7%BB%93/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="yinjiawei">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/shuangyu.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Zachary">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2020/05/30/java%E9%9B%86%E5%90%88%E6%80%BB%E7%BB%93/" itemprop="url">java集合总结</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-05-30T21:20:04+08:00">
+                2020-05-30
+              </time>
+            
+
+            
+              <span class="post-meta-divider">|</span>
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-check-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">更新于&#58;</span>
+              
+              <time title="更新于" itemprop="dateModified" datetime="2020-06-01T21:08:07+08:00">
+                2020-06-01
+              </time>
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/java%E5%90%8E%E7%AB%AF%E5%9F%BA%E7%A1%80/" itemprop="url" rel="index">
+                    <span itemprop="name">java后端基础</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  6.8k 字
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">
+                  27 分钟
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          <ol>
+<li><h2 id="接口继承关系与实现"><a href="#接口继承关系与实现" class="headerlink" title="接口继承关系与实现"></a>接口继承关系与实现</h2><p><img src="https://s1.ax1x.com/2020/05/30/tQywS1.png" alt="tQywS1.png"></p>
+<p>注意：java容器分为Collection和Map两大类，Map接口不是Collection的子接口。区分上图中的依赖、实现、继承各个关系。</p>
+</li>
+<li><h2 id="java集合思维导图"><a href="#java集合思维导图" class="headerlink" title="java集合思维导图"></a>java集合思维导图</h2><p><img src="https://s1.ax1x.com/2020/05/30/tQR7Je.png" alt="tQR7Je.png"></p>
+<p>注意：上面只是展示了一个大概的集合思维导图。
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2020/05/30/java%E9%9B%86%E5%90%88%E6%80%BB%E7%BB%93/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </p></li></ol></div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://vampiresmile.github.io/2020/05/28/mysql%E7%B4%A2%E5%BC%95%E6%80%BB%E7%BB%93-%E4%BC%98%E5%8C%96%E7%AF%87/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="yinjiawei">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/shuangyu.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Zachary">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2020/05/28/mysql%E7%B4%A2%E5%BC%95%E6%80%BB%E7%BB%93-%E4%BC%98%E5%8C%96%E7%AF%87/" itemprop="url">mysql索引总结-优化篇</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-05-28T13:12:30+08:00">
+                2020-05-28
+              </time>
+            
+
+            
+              <span class="post-meta-divider">|</span>
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-check-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">更新于&#58;</span>
+              
+              <time title="更新于" itemprop="dateModified" datetime="2020-05-28T20:25:00+08:00">
+                2020-05-28
+              </time>
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/" itemprop="url" rel="index">
+                    <span itemprop="name">数据库</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  2.7k 字
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">
+                  10 分钟
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          <ol>
+<li><h3 id="MySQL优化的一般步骤"><a href="#MySQL优化的一般步骤" class="headerlink" title="MySQL优化的一般步骤"></a>MySQL优化的一般步骤</h3><ol>
+<li><h4 id="通过show-status-命令了解各种sql的执行效率"><a href="#通过show-status-命令了解各种sql的执行效率" class="headerlink" title="通过show status 命令了解各种sql的执行效率"></a>通过show status 命令了解各种sql的执行效率</h4><ul>
+<li>SHOW STATUS提供msyql服务器的状态信息，一般情况下，我们只需要了解以”Com”开头的指令</li>
+<li>show session status like ‘Com%’；显示当前的连接的统计结果</li>
+<li>show global status like ‘Com%’ ；显示自数据库上次启动至今的统计结果</li>
+<li>show status like ‘Connections’；// 试图连接MySQL服务器的次数</li>
+<li>show status like ‘Uptime’；//服务器工作的时间（单位秒）</li>
+<li>show status like ‘Slow_queries’；//慢查询的次数 (默认是10秒中就当做是慢查询)</li>
+<li>Show variables like ‘long_query_time’；//查询mysql的慢查询时间：</li>
+<li>set long_query_time=2；//修改mysql 慢查询时间：如果查询时间超过2秒就算作是慢查询</li>
+</ul>
+<p>注：默认是session级别的，其中Com_XXX表示XXX语句所执行的次数。Com_select，Com_insert，Com_update，Com_delete通过这几个参数，可以容易地了解到当前数据库的应用是以插入更新为主还是以查询操作为主，以及各类的SQL大致的执行比例是多少。</p>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2020/05/28/mysql%E7%B4%A2%E5%BC%95%E6%80%BB%E7%BB%93-%E4%BC%98%E5%8C%96%E7%AF%87/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </li></ol></li></ol></div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="https://vampiresmile.github.io/2020/05/26/mysql%E7%B4%A2%E5%BC%95%E6%80%BB%E7%BB%93-%E5%9F%BA%E7%A1%80%E5%8E%9F%E7%90%86%E7%AF%87/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -713,7 +1522,7 @@
               
                 <a href="/archives/%7C%7C%20archive">
               
-                  <span class="site-state-item-count">12</span>
+                  <span class="site-state-item-count">16</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -724,7 +1533,7 @@
               
               <div class="site-state-item site-state-categories">
                 <a href="/categories/index.html">
-                  <span class="site-state-item-count">8</span>
+                  <span class="site-state-item-count">10</span>
                   <span class="site-state-item-name">分类</span>
                 </a>
               </div>
@@ -735,7 +1544,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">13</span>
+                  <span class="site-state-item-count">19</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>
@@ -807,7 +1616,7 @@
 
     <footer id="footer" class="footer">
       <div class="footer-inner">
-        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+        <div class="copyright">&copy; 2020 &mdash; <span itemprop="copyrightYear">2023</span>
   <span class="with-love">
     <i class="fa fa-snowflake-o"></i>
   </span>
