@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://vampiresmile.github.io/"/>
-  <updated>2023-09-16T07:34:47.704Z</updated>
+  <updated>2023-09-16T09:04:56.561Z</updated>
   <id>https://vampiresmile.github.io/</id>
   
   <author>
@@ -21,7 +21,7 @@
     <link href="https://vampiresmile.github.io/2023/09/16/vscode%E5%AE%89%E8%A3%85python%E7%8E%AF%E5%A2%83/"/>
     <id>https://vampiresmile.github.io/2023/09/16/vscode%E5%AE%89%E8%A3%85python%E7%8E%AF%E5%A2%83/</id>
     <published>2023-09-16T06:23:29.000Z</published>
-    <updated>2023-09-16T07:34:47.704Z</updated>
+    <updated>2023-09-16T09:04:56.561Z</updated>
     
     <content type="html"><![CDATA[<h2 id="1-下载并安装vscode"><a href="#1-下载并安装vscode" class="headerlink" title="1 下载并安装vscode"></a>1 下载并安装vscode</h2><h3 id="1-1-下载地址"><a href="#1-1-下载地址" class="headerlink" title="1.1 下载地址"></a>1.1 下载地址</h3><p><a href="https://code.visualstudio.com/Download" target="_blank" rel="external nofollow noopener noreferrer">https://code.visualstudio.com/Download</a></p><h3 id="1-2-安装vscode（其他系统安装方式这里不再赘述，这里推荐使用-zip方式安装）"><a href="#1-2-安装vscode（其他系统安装方式这里不再赘述，这里推荐使用-zip方式安装）" class="headerlink" title="1.2 安装vscode（其他系统安装方式这里不再赘述，这里推荐使用.zip方式安装）"></a>1.2 安装vscode（其他系统安装方式这里不再赘述，这里推荐使用<strong>.zip</strong>方式安装）</h3><ul><li>选择对应机器以及版本下载zip包</li><li>解压之后在和Code.exe同级的目录下创建<strong>data</strong>文件夹(如果没有按照这步来，vscode可能就会在一些你无法预知的目录输出数据，比如在系统盘下的Appdata或program files目录下)</li><li>这样相关插件&amp;用户数据就都会在data文件夹下(这也是推荐使用.zip安装vscode的理由)</li></ul><h2 id="2-下载python解释器"><a href="#2-下载python解释器" class="headerlink" title="2 下载python解释器"></a>2 下载python解释器</h2><h3 id="2-1-下载地址-官网有个时候打不开，多刷几次"><a href="#2-1-下载地址-官网有个时候打不开，多刷几次" class="headerlink" title="2.1 下载地址(官网有个时候打不开，多刷几次)"></a>2.1 下载地址(官网有个时候打不开，多刷几次)</h3><p><a href="https://www.python.org/downloads/" target="_blank" rel="external nofollow noopener noreferrer">https://www.python.org/downloads/</a></p><h3 id="2-2-安装python解释器-以python-3-10-0-amd64-exe为例"><a href="#2-2-安装python解释器-以python-3-10-0-amd64-exe为例" class="headerlink" title="2.2 安装python解释器(以python-3.10.0-amd64.exe为例)"></a>2.2 安装python解释器(以python-3.10.0-amd64.exe为例)</h3><ul><li>双击<strong>python-3.10.0-amd64.exe</strong>进入安装界面</li><li>务必勾选最下面<strong>Add Python 3.10  to PATH</strong>（这里是自动帮你将python路径加到环境变量中去，如果这里不勾选，后面需要自己手动去添加python环境变量：计算机-&gt;属性-&gt;更改配置-&gt;高级-&gt;环境变量-&gt;将python安装路径以及python下的Scripts路径加到用户变量的path中或者系统变量的PATH中)</li><li>选择customize installation</li><li>建议：Optional Features使用默认勾选 -&gt; Advanced Options除了download debug相关不勾选，其他都勾选，安装路径自定义选择</li><li>点击安装</li></ul><h2 id="3-vscode配置python环境"><a href="#3-vscode配置python环境" class="headerlink" title="3 vscode配置python环境"></a>3 vscode配置python环境</h2><p>vscode配置python环境主要就是插件安装以及vscode用户配置</p><h3 id="3-1-插件安装（注意插件全部安装完之后重启vscode）"><a href="#3-1-插件安装（注意插件全部安装完之后重启vscode）" class="headerlink" title="3.1 插件安装（注意插件全部安装完之后重启vscode）"></a>3.1 插件安装（注意插件全部安装完之后重启vscode）</h3><ul><li>搜索插件”中文”然后选择安装(汉化vscode)</li><li>搜索插件”Python”并点击安装(配置vscode python环境最主要的插件)</li><li>搜索插件”intellicode”并点击安装(代码提示&amp;补全)</li><li>搜索插件”pylance”并点击安装(intellicode插件针对python只支持pylance语言服务器)</li><li>搜索插件”AREPL”并点击安装(实时执行python代码，类似预览效果，非必须安装)</li></ul><h3 id="3-2-用户配置"><a href="#3-2-用户配置" class="headerlink" title="3.2 用户配置"></a>3.2 用户配置</h3><ul><li>检查python环境是否生效：新建一个.py文件，正常是可以在vscode左下角看到安装的python版本，并且点击左下角可以切换python版本</li><li>代码提示与自动补全配置：选择：文件-&gt;首选项-&gt;设置，然后搜索”language server”，选择出现的Python那一栏，最下面那个，如果是”Jedi”或者其他服务器，则需要替换成”Pylance”，否则<strong>没有代码提示和自动补全</strong></li><li>指定默认python版本：如果有多个python解释器版本，并且想要设置默认的python解释器，那么可以在用户的”settings.json”文件中添加需要指定的python版本路径：比如：<code>&quot;python.pythonPath&quot;: &quot;D:\\Pythonpkg\\python3.11.5&quot;</code></li><li>静态检查配置：vscode配置完python环境后，右下角可能会报找不到pylint或者报pylint不存在，这主要是python静态检查需要用到的配置，<strong>注意这里要选择prospector进行安装(耗时可能会有点久)，不要选择其他的</strong></li></ul>]]></content>
     
@@ -35,7 +35,7 @@
     </summary>
     
     
-      <category term="java后端须知" scheme="https://vampiresmile.github.io/categories/java%E5%90%8E%E7%AB%AF%E9%A1%BB%E7%9F%A5/"/>
+      <category term="python" scheme="https://vampiresmile.github.io/categories/python/"/>
     
     
       <category term="python基础" scheme="https://vampiresmile.github.io/tags/python%E5%9F%BA%E7%A1%80/"/>
