@@ -1,11 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
-    <title>Hello World</title>
-    <url>/2020/05/24/hello-world/</url>
-    <content><![CDATA[<h1 id="Welcome-to-yinjiawei’s-blog"><a href="#Welcome-to-yinjiawei’s-blog" class="headerlink" title="Welcome to yinjiawei’s blog!"></a>Welcome to <a href="https://vampiresmile.github.io/">yinjiawei’s blog</a>!</h1>]]></content>
-  </entry>
-  <entry>
     <title>JVM之GC</title>
     <url>/2020/06/07/JVM%E4%B9%8BGC/</url>
     <content><![CDATA[<ol>
@@ -103,126 +98,40 @@
       </tags>
   </entry>
   <entry>
-    <title>java泛型</title>
-    <url>/2020/07/17/java%E6%B3%9B%E5%9E%8B/</url>
+    <title>JVM之运行时数据区域</title>
+    <url>/2020/06/06/JVM%E4%B9%8B%E8%BF%90%E8%A1%8C%E6%97%B6%E6%95%B0%E6%8D%AE%E5%8C%BA%E5%9F%9F/</url>
     <content><![CDATA[<ol>
-<li><h3 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h3><p>java推出泛型以前，程序员可以构建一个元素类型为Object的集合，该集合能够存储任意的数据类型对象，而在使用该集合的过程中，需要程序员明确知道存储的每个元素的数据类型，否则很容易引发ClassCastException异常</p>
-</li>
-<li><h3 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h3><p>java泛型是jdk5中引入的新特性。泛型提供了编译时类型安全监测机制，该机制允许我们在编译时检测到非法的类型数据</p>
-</li>
-<li><h3 id="本质"><a href="#本质" class="headerlink" title="本质"></a>本质</h3><p>泛型的本质是参数化类型，也就是所操作的数据类型被指定为一个参数</p>
-</li>
-<li><h3 id="好处"><a href="#好处" class="headerlink" title="好处"></a>好处</h3><ol>
-<li>类型安全。</li>
-<li>避免了强制类型的转换。</li>
-</ol>
-</li>
-<li><h3 id="常用的泛型标识符：T，E，K，V"><a href="#常用的泛型标识符：T，E，K，V" class="headerlink" title="常用的泛型标识符：T，E，K，V"></a>常用的泛型标识符：T，E，K，V</h3><a id="more"></a>
-</li>
-<li><h3 id="泛型类"><a href="#泛型类" class="headerlink" title="泛型类"></a>泛型类</h3><ol>
-<li><h4 id="泛型类的定义语法"><a href="#泛型类的定义语法" class="headerlink" title="泛型类的定义语法"></a>泛型类的定义语法</h4><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> 类名称&lt;泛型标识,泛型标识...&gt;</span>&#123;</span><br><span class="line">	<span class="keyword">private</span> 泛型标识 变量名;</span><br><span class="line">	...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-</li>
-<li><h4 id="泛型类的使用语法"><a href="#泛型类的使用语法" class="headerlink" title="泛型类的使用语法"></a>泛型类的使用语法</h4><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">//jdk1.7之前</span></span><br><span class="line">类名&lt;具体的数据类型&gt; 对象名 = <span class="keyword">new</span> 类名&lt;具体的数据类型名&gt;();</span><br><span class="line"><span class="comment">//jdk1.7之后</span></span><br><span class="line">类名&lt;具体的数据类型&gt; 对象名 = <span class="keyword">new</span> 类名&lt;&gt;();</span><br></pre></td></tr></table></figure>
-
+<li><h3 id="先来看看运行时数据区域长啥样"><a href="#先来看看运行时数据区域长啥样" class="headerlink" title="先来看看运行时数据区域长啥样"></a>先来看看运行时数据区域长啥样</h3><p><img src="https://s1.ax1x.com/2020/06/06/tcK3Pf.png" alt="tcK3Pf.png"></p>
 <p>注意：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">//假如我们有一个泛型类Animal</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Animal</span>&lt;<span class="title">T</span>&gt;</span>&#123;</span><br><span class="line">    <span class="keyword">private</span> T name;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setName</span><span class="params">(T name)</span></span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.name = name;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> T <span class="title">getName</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="keyword">return</span> name;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<ol>
-<li><p>泛型类在创建对象的时候如果没有指定T的具体数据类型，将会按照Object类型来操作，比如：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">//如果对Animal使用如下：</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span></span>&#123;</span><br><span class="line">    Animal an = <span class="keyword">new</span> Animal();<span class="comment">//没有指定Animal中T的具体数据类型</span></span><br><span class="line">    Object name = an.getName();<span class="comment">//那么这里得到的就是Object对象</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>泛型类不支持基本数据类型，即T不能指定为8个基本数据类型：byte，short，int，long，float，double，char，boolean</p>
-</li>
-<li><p>同一泛型类，根据不同的数据类型创建的对象，本质上是同一类型。即泛型类型在逻辑上可以看成是多个不同的类型，但实际上都是同一类型。比如：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">//验证</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span></span>&#123;</span><br><span class="line">    Animal&lt;String&gt; sAn = <span class="keyword">new</span> Animal&lt;&gt;();<span class="comment">//指定Animal中T为String</span></span><br><span class="line">    Animal&lt;Integer&gt; iAn = <span class="keyword">new</span> Animal&lt;&gt;();<span class="comment">//指定Animal中T为Integer</span></span><br><span class="line">    System.out.println(sAn.getClass() == iAn.getClass());<span class="comment">//结果为true</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-</li>
-</ol>
-</li>
-<li><h4 id="从泛型类派生子类"><a href="#从泛型类派生子类" class="headerlink" title="从泛型类派生子类"></a>从泛型类派生子类</h4><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">//情况1：子类也是泛型类，子类的泛型标识符需要包括父类的泛型标识符</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Child</span>&lt;<span class="title">T</span>&gt; <span class="keyword">extends</span> <span class="title">Parent</span>&lt;<span class="title">T</span>&gt;</span>&#123;...&#125;</span><br><span class="line"><span class="comment">//或者</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Child</span>&lt;<span class="title">T</span>,<span class="title">E</span>,...&gt; <span class="keyword">extends</span> <span class="title">Parent</span>&lt;<span class="title">T</span>&gt;</span>&#123;...&#125;</span><br><span class="line"><span class="comment">//情况2：子类不是泛型类，那么父类需要明确指出泛型的数据类型</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Child</span> <span class="keyword">extends</span> <span class="title">Parent</span>&lt;<span class="title">String</span>&gt;</span>&#123;...&#125;</span><br></pre></td></tr></table></figure>
-</li>
-</ol>
-</li>
-<li><h3 id="泛型接口"><a href="#泛型接口" class="headerlink" title="泛型接口"></a>泛型接口</h3><ol>
-<li><h4 id="泛型接口的定义语法"><a href="#泛型接口的定义语法" class="headerlink" title="泛型接口的定义语法"></a>泛型接口的定义语法</h4><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">interface</span> 接口名称&lt;泛型标识符,泛型标识符...&gt;</span>&#123;</span><br><span class="line">    泛型标识符 方法名();</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-</li>
-<li><h4 id="泛型接口的实现类要求"><a href="#泛型接口的实现类要求" class="headerlink" title="泛型接口的实现类要求"></a>泛型接口的实现类要求</h4><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">//泛型接口</span></span><br><span class="line"><span class="class"><span class="keyword">interface</span> <span class="title">parent</span>&lt;<span class="title">T</span>&gt;</span>&#123;</span><br><span class="line">    <span class="function">T <span class="title">getName</span><span class="params">()</span></span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//情况1：实现类不是泛型类，接口要明确指定具体的数据类型</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">child</span> <span class="keyword">implements</span> <span class="title">parent</span>&lt;<span class="title">String</span>&gt;</span>&#123;<span class="comment">//parent指定具体数据类型为String</span></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getName</span><span class="params">()</span></span>&#123;...&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//情况2：实现类也是泛型类，那么实现类的泛型标识符要包括接口的泛型标识符</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">child</span>&lt;<span class="title">T</span>,<span class="title">E</span>&gt; <span class="keyword">implements</span> <span class="title">parent</span>&lt;<span class="title">T</span>&gt;</span>&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> T <span class="title">getName</span><span class="params">()</span> </span>&#123;...&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-</li>
-</ol>
-</li>
-<li><h3 id="泛型方法"><a href="#泛型方法" class="headerlink" title="泛型方法"></a>泛型方法</h3><ol>
-<li><h4 id="泛型方法定义"><a href="#泛型方法定义" class="headerlink" title="泛型方法定义"></a>泛型方法定义</h4><figure class="highlight java"><table><tr><td class="code"><pre><span class="line">修饰符 &lt;泛型标识符,泛型标识符,...&gt; 返回值类型 方法名(形参列表)&#123;</span><br><span class="line">    方法体...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>注意：</p>
-<ol>
-<li><p>修饰符与返回值类型中间的&lt;泛型标识符…&gt;很重要，可以理解为声明此方法为泛型方法。同时，<strong>只有在该&lt;泛型标识符…&gt;中声明的泛型标识符，才可在方法中使用</strong>。</p>
-</li>
-<li><p>只有声明了&lt;泛型标识符…&gt;的方法才是泛型方法，泛型类中的使用了泛型的成员方法不是泛型方法。比如：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">//泛型类</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Parent</span>&lt;<span class="title">T</span>&gt;</span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> T <span class="title">getName</span><span class="params">(T name)</span></span>&#123;...&#125;<span class="comment">//成员方法</span></span><br><span class="line">    </span><br><span class="line">    <span class="keyword">public</span> &lt;T&gt; <span class="function">T <span class="title">getName</span><span class="params">(T name)</span></span>&#123;...&#125;<span class="comment">//泛型方法</span></span><br><span class="line">    </span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> &lt;T&gt; <span class="function">T <span class="title">getName</span><span class="params">(T name)</span></span>&#123;...&#125;<span class="comment">//静态泛型方法</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-</li>
-<li><p><strong>泛型类中泛型方法可以被声明为静态方法，成员方法不可以被声明为静态方法</strong></p>
-</li>
-<li><p>泛型类中的泛型方法是“独立的”。比如：对于泛型类使用的标识符T</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">//泛型类</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">parent</span>&lt;<span class="title">T</span>&gt;</span>&#123;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">public</span> &lt;T&gt; <span class="function">T <span class="title">getName</span><span class="params">(T name)</span></span>&#123;...&#125;<span class="comment">//这个T和泛型类中声明的T是相互独立的</span></span><br><span class="line">    </span><br><span class="line">    <span class="comment">//也就是说，泛型类和它里面的泛型方法使用了相同的泛型标识符的话，</span></span><br><span class="line">    <span class="comment">//可以在指定泛型类为某一种具体的数据类型的同时，</span></span><br><span class="line">    <span class="comment">//可以给泛型类中的泛型方法指定另一种具体的数据类型</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//调用</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span></span>&#123;</span><br><span class="line">    parent&lt;Integer&gt; pa = <span class="keyword">new</span> parent&lt;&gt;();<span class="comment">//这里的T为Integer类型</span></span><br><span class="line">    pa.getName(<span class="string">"zhangsan"</span>);<span class="comment">//这里的T为String类型</span></span><br><span class="line">    <span class="comment">//上面语句是合法的</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-</li>
-</ol>
-</li>
-<li><h4 id="泛型方法支持可变参数"><a href="#泛型方法支持可变参数" class="headerlink" title="泛型方法支持可变参数"></a>泛型方法支持可变参数</h4><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> &lt;E&gt; <span class="function"><span class="keyword">void</span> <span class="title">print</span><span class="params">(E... es)</span></span>&#123;<span class="comment">//可变参数</span></span><br><span class="line">    <span class="keyword">for</span>(E e : es)&#123;</span><br><span class="line">        System.out.println(e);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-</li>
-</ol>
-</li>
-<li><h3 id="类型通配符"><a href="#类型通配符" class="headerlink" title="类型通配符"></a>类型通配符</h3><ol>
-<li><h4 id="概念："><a href="#概念：" class="headerlink" title="概念："></a>概念：</h4><ol>
-<li>类型通配符一般是使用”?”代替具体的类型实参</li>
-<li>所以，类型通配符是类型实参，而不是类型形参</li>
-</ol>
-</li>
-<li><h4 id="类型通配符上限"><a href="#类型通配符上限" class="headerlink" title="类型通配符上限"></a>类型通配符上限</h4><p>类/接口&lt;? extends 实参类型&gt;，泛型方法同理。要求该泛型的类型只能是实参类型或实参类型的子类类型</p>
-</li>
-<li><h4 id="类型通配符下限"><a href="#类型通配符下限" class="headerlink" title="类型通配符下限"></a>类型通配符下限</h4><p>类/接口&lt;? super 实参类型&gt;，泛型方法同理。要求该泛型的类型只能是实参类型或实参类型的父类类型</p>
-</li>
-<li><h4 id="比较"><a href="#比较" class="headerlink" title="比较"></a>比较</h4><p>上限：&lt;? extends T&gt; ?是T和T的子类，下限：&lt;? super T&gt; ?是T和T的父类。怎么看待这个上限和下限呢？</p>
 <ul>
-<li>首先应该想，其实对于Java来说 &lt;? extends T&gt;，&lt;? super T&gt; 是两个确定的类型，因为它不可能由你的赋值完了再确定吧。所以，对于&lt;? extends T&gt; 来说，集合里的元素应该是什么类型呢？应该是T类型，因为你添加的是T或者T的子类，设置为T就可以激发多态了。由此，所以你也只能从这个集合中取出T类型，因为它里面的元素本来设置的就是T类型，你赋值进去只不过是将T的子类赋值给了T，多态。<strong>但是呢，你就不能给这个集合里添加元素了，因为这个集合里元素的类型是T，假如可以添加元素，你初始化的时候初始化成T的一个子类，然后添加值的时候，却添加的另一个子类，</strong>事实上是可以添加的，因为集合元素类型是T，但里面就有了多种T的子类，这样的话，你初始化的时候是这个子类，你取出元素的时候肯定也想着取出的是可以给这个子类赋值的类型，但很有可能取出来的是T的另一个子类，你没法赋值，因为你允许添加另一个子类。<strong>所以一开始就禁止添加元素是对的。</strong></li>
-<li>&lt;? super T&gt;里面的元素，应该设置为什么呢？显然应该是object，因为系统不知道你会把?当成什么，所以只能设置成object，所以你取出元素的时候，取出的是object类。<strong>可不可以添加元素呢？可以，因为下限有保证，所以可以添加T和T的子类</strong>。你初始化的时候，初始化的是T的某个父类，好了，你现在取元素，你希望取出的是你初始化的那个父类，因为你只能添加T和T的子类，所以你取出的元素，肯定可以赋值给那个父类。</li>
-<li><strong>综上，&lt;? extends T&gt; 不可以添加元素，但可以取出类型为T的元素。 &lt;? super T&gt; 可以添加T或者T的子类，取出的一定是object类。</strong></li>
-<li>比如方法参数为：ArrayList&lt;? extends topClass&gt; list，在方法体中list是无法add数据的。但如果方法参数是：ArrayList&lt;? super bottomClass&gt; list，那么是可以add数据的，并且可以添加bottomClass及其子类类型。</li>
+<li>线程私有数据区域生命周期与线程相同, 依赖用户线程的启动/结束而创建/销毁(在HotspotVM内, 每个线程都与操作系统的本地线程直接映射, 因此这部分内存区域的存/否跟随本地线程的生/死对应)。</li>
+<li>线程共享区域随虚拟机的启动/关闭而创建/销毁。</li>
+<li><strong>直接内存并不是JVM运行时数据区的一部分</strong>，但也会被频繁的使用：在JDK 1.4引入的NIO提供了基于Channel与Buffer的IO方式，它可以使用Native函数库直接分配堆外内存，然后使用DirectByteBuffer对象作为这块内存的引用进行操作(详见：Java I/O 扩展)，这样就避免了在Java堆和Native堆中来回复制数据，因此在一些场景中可以显著提高性能。</li>
 </ul>
 </li>
-</ol>
+<li><h3 id="再来看看各个区域的大概功能"><a href="#再来看看各个区域的大概功能" class="headerlink" title="再来看看各个区域的大概功能"></a>再来看看各个区域的大概功能</h3><p><img src="https://s1.ax1x.com/2020/06/06/tcMd6e.png" alt="tcMd6e.png"></p>
+<a id="more"></a>
 </li>
-<li><h3 id="类型擦除"><a href="#类型擦除" class="headerlink" title="类型擦除"></a>类型擦除</h3><ol>
-<li><h4 id="概念-1"><a href="#概念-1" class="headerlink" title="概念"></a>概念</h4><p>泛型是jdk1.5才引进的概念，在这之前是没有泛型的，但是，泛型代码能够很好的的和之前版本的代码兼容，那是因为泛型信息只存在于代码编译阶段，在进入JVM之前，与泛型相关的信息会被擦除掉，我们称之为—-类型擦除。</p>
+<li><h3 id="接下来仔细分析一下各个区域"><a href="#接下来仔细分析一下各个区域" class="headerlink" title="接下来仔细分析一下各个区域"></a>接下来仔细分析一下各个区域</h3><ol>
+<li><h4 id="程序计数器-线程私有"><a href="#程序计数器-线程私有" class="headerlink" title="程序计数器(线程私有)"></a>程序计数器(线程私有)</h4><ul>
+<li>一块较小的内存空间, 是当前线程所执行的字节码的行号指示器，每条线程都要有一个独立的程序计数器，这类内存也称为“线程私有”的内存。</li>
+<li>正在执行java方法的话，<strong>计数器记录的是虚拟机字节码指令的地址(当前指令的地址)</strong>。如果还是Native方法，则为空。</li>
+<li>这个内存区域是唯一一个在虚拟机中<strong>没有规定任何OutOfMemoryError(OOM)情况的区域</strong>。</li>
+</ul>
 </li>
-<li><h4 id="类型擦除的种类"><a href="#类型擦除的种类" class="headerlink" title="类型擦除的种类"></a>类型擦除的种类</h4><ol>
-<li><h5 id="无限制类型擦除"><a href="#无限制类型擦除" class="headerlink" title="无限制类型擦除"></a>无限制类型擦除</h5><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">//泛型类</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Erasure</span>&lt;<span class="title">T</span>&gt;</span>&#123;</span><br><span class="line">    <span class="keyword">private</span> T key;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setKey</span><span class="params">(T key)</span></span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.key = key;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> T <span class="title">getKey</span><span class="params">()</span></span>&#123;</span><br><span class="line">	   <span class="keyword">return</span> <span class="keyword">this</span>.key;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//经过类型擦除之后</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Erasure</span></span>&#123;</span><br><span class="line">    <span class="keyword">private</span> Object key;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setKey</span><span class="params">(Object key)</span></span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.key = key;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> Object <span class="title">getKey</span><span class="params">()</span></span>&#123;</span><br><span class="line">	   <span class="keyword">return</span> <span class="keyword">this</span>.key;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//泛型方法</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Erasure</span></span>&#123;</span><br><span class="line">    <span class="keyword">public</span> &lt;T&gt; <span class="function">T <span class="title">getValue</span><span class="params">(T val)</span></span>&#123;</span><br><span class="line">        <span class="keyword">return</span> val;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//经过类型擦除之后</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Erasure</span></span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> Object <span class="title">getValue</span><span class="params">(Object val)</span></span>&#123;</span><br><span class="line">        <span class="keyword">return</span> val;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<li><h4 id="java虚拟机栈-线程私有"><a href="#java虚拟机栈-线程私有" class="headerlink" title="java虚拟机栈(线程私有)"></a>java虚拟机栈(线程私有)</h4><p>是描述java方法执行的内存模型，每个方法在执行的同时都会<strong>创建一个栈帧(Stack Frame)用于存储局部变量表、操作数栈、动态链接、方法出口等信息</strong>。每一个方法从调用直至执行完成的过程，就对应着一个栈帧在虚拟机栈中入栈到出栈的过程，如图：</p>
+<p><img src="https://s1.ax1x.com/2020/06/06/tclSKg.png" alt="tclSKg.png"></p>
 </li>
-<li><h5 id="有限制类型擦除"><a href="#有限制类型擦除" class="headerlink" title="有限制类型擦除"></a>有限制类型擦除</h5><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">//泛型类</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Erasure</span>&lt;<span class="title">T</span> <span class="keyword">extends</span> <span class="title">Number</span>&gt;</span>&#123;</span><br><span class="line">    <span class="keyword">private</span> T key;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setKey</span><span class="params">(T key)</span></span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.key = key;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> T <span class="title">getKey</span><span class="params">()</span></span>&#123;</span><br><span class="line">	   <span class="keyword">return</span> <span class="keyword">this</span>.key;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//经过类型擦除之后</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Erasure</span></span>&#123;</span><br><span class="line">    <span class="keyword">private</span> Number key;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setKey</span><span class="params">(Number key)</span></span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.key = key;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> Number <span class="title">getKey</span><span class="params">()</span></span>&#123;</span><br><span class="line">	   <span class="keyword">return</span> <span class="keyword">this</span>.key;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//泛型方法</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Erasure</span></span>&#123;</span><br><span class="line">    <span class="keyword">public</span> &lt;T extends Number&gt; <span class="function">T <span class="title">getValue</span><span class="params">(T val)</span></span>&#123;</span><br><span class="line">        <span class="keyword">return</span> val;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//经过类型擦除之后</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Erasure</span></span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> Number <span class="title">getValue</span><span class="params">(Number val)</span></span>&#123;</span><br><span class="line">        <span class="keyword">return</span> val;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<li><h4 id="本地方法栈-线程私有"><a href="#本地方法栈-线程私有" class="headerlink" title="本地方法栈(线程私有)"></a>本地方法栈(线程私有)</h4><p>本地方法栈和java虚拟机栈作用类似，<strong>区别是虚拟机栈为执行Java方法服务, 而本地方法栈则为Native方法服务，</strong>如果一个VM实现使用C-linkage模型来支持Native调用，那么该栈将会是一个C栈，但HotSpot VM直接就把本地方法栈和虚拟机栈合二为一。</p>
 </li>
-</ol>
+<li><h4 id="堆-heap-线程共享"><a href="#堆-heap-线程共享" class="headerlink" title="堆(heap-线程共享)"></a>堆(heap-线程共享)</h4><p>是被线程共享的一块内存区域，创建的对象和数组都保存在Java堆内存中，也是垃圾收集器进行垃圾收集的最重要的内存区域。由于现代VM采用分代收集算法，因此Java堆从GC的角度还可以细分为：新生代(Eden区 、 FromSurvivor区和ToSurvivor区)和老年代。</p>
 </li>
-<li><h4 id="类型擦除中的桥接方法"><a href="#类型擦除中的桥接方法" class="headerlink" title="类型擦除中的桥接方法"></a>类型擦除中的桥接方法</h4><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">//泛型接口</span></span><br><span class="line"><span class="class"><span class="keyword">interface</span> <span class="title">info</span>&lt;<span class="title">T</span>&gt;</span>&#123;</span><br><span class="line">    <span class="function">T <span class="title">info</span><span class="params">(T val)</span></span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//接口实现</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">infoImpl</span> <span class="keyword">implements</span> <span class="title">info</span>&lt;<span class="title">String</span>&gt;</span>&#123;<span class="comment">//注意这里实现类是非泛型类</span></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">info</span><span class="params">(String val)</span></span>&#123;</span><br><span class="line">        <span class="keyword">return</span> val;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//经过类型擦除之后</span></span><br><span class="line"><span class="class"><span class="keyword">interface</span> <span class="title">info</span></span>&#123;</span><br><span class="line">    <span class="function">Object <span class="title">info</span><span class="params">(Object val)</span></span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">infoImpl</span> <span class="keyword">implements</span> <span class="title">info</span></span>&#123;</span><br><span class="line">    <span class="comment">//需要我们显示的实现</span></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">info</span><span class="params">(String val)</span></span>&#123;</span><br><span class="line">        <span class="keyword">return</span> val;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">//桥接方法，用来保持接口和类之间的实现关系</span></span><br><span class="line">    <span class="comment">//因为接口类型擦除之后，其中的方法也就随之进行类型擦除，</span></span><br><span class="line">    <span class="comment">//根据接口实现的要求，需要将接口中的所有方法实现，也就是说</span></span><br><span class="line">    <span class="comment">//接口中有Object info(Object val)方法，那我们就需要去实现它</span></span><br><span class="line">    <span class="comment">//只不过这是编译器帮我们做的，所以我们看不到</span></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Object <span class="title">info</span><span class="params">(Object val)</span></span>&#123;</span><br><span class="line">        <span class="keyword">return</span> info((String)val);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-</li>
-</ol>
-</li>
-<li><h3 id="泛型与数组"><a href="#泛型与数组" class="headerlink" title="泛型与数组"></a>泛型与数组</h3><ol>
-<li><h4 id="泛型数组的创建："><a href="#泛型数组的创建：" class="headerlink" title="泛型数组的创建："></a>泛型数组的创建：</h4><ol>
-<li><p>可以声明带泛型的数组引用，但是不能创建带泛型的数组对象。即：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">T[] arr;<span class="comment">//是允许的</span></span><br><span class="line">T[] arr = <span class="keyword">new</span> T[<span class="number">4</span>];<span class="comment">//是不允许的</span></span><br></pre></td></tr></table></figure>
-</li>
-<li><p>可以通过java.lang.reflect.Array的newInstance(Class&lt;?&gt; clazz，int length)反射创建泛型数组</p>
-</li>
-</ol>
-</li>
-<li><h4 id="一个关于泛型数组的错误使用示例"><a href="#一个关于泛型数组的错误使用示例" class="headerlink" title="一个关于泛型数组的错误使用示例"></a>一个关于泛型数组的错误使用示例</h4><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span></span>&#123;</span><br><span class="line">    ArrayList[] list = <span class="keyword">new</span> ArrayList[<span class="number">5</span>];<span class="comment">//创建ArrayList数组，长度为5</span></span><br><span class="line">    ArrayList&lt;String&gt;[] listArr = list;<span class="comment">//listArr引用指向list</span></span><br><span class="line">    </span><br><span class="line">    ArrayList&lt;Integer&gt; intList = <span class="keyword">new</span> ArrayList&lt;&gt;();<span class="comment">//创建一个整数类型的ArrayList</span></span><br><span class="line">    inList.add(<span class="number">100</span>);<span class="comment">//为它添加一个元素</span></span><br><span class="line">    </span><br><span class="line">    list[<span class="number">0</span>] = intList;<span class="comment">//将list[0]引用指向intList</span></span><br><span class="line">    String s = listArr[<span class="number">0</span>].get(<span class="number">0</span>);<span class="comment">//获取的时候通过listArr引用来获取</span></span><br><span class="line">    System.out.println(s);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>上面整个程序在运行之前一切正常，而当运行之后，会出现ClassCastException异常，即Integer无法转为String。主要就是给数组元素赋值时用的是list引用，而获取数组中元素时使用listArr引用，而两个引用的具体数据类型不同，导致出现ClassCastException。</p>
-</li>
-<li><h4 id="改造上面错误示例"><a href="#改造上面错误示例" class="headerlink" title="改造上面错误示例"></a>改造上面错误示例</h4><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">//可以运行示例：</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span></span>&#123;</span><br><span class="line">    <span class="comment">//ArrayList[] list = new ArrayList[5];//创建ArrayList数组，长度为5</span></span><br><span class="line">    <span class="comment">//ArrayList&lt;String&gt;[] listArr = list;//listArr引用指向list</span></span><br><span class="line">    ArrayList&lt;String&gt;[] listArr = <span class="keyword">new</span> ArrayList[<span class="number">5</span>];<span class="comment">//在创建的时候就指定数组中每个ArrayList中的具体数据类型</span></span><br><span class="line">    </span><br><span class="line">    ArrayList&lt;Integer&gt; intList = <span class="keyword">new</span> ArrayList&lt;&gt;();<span class="comment">//创建一个整数类型的ArrayList</span></span><br><span class="line">    inList.add(<span class="number">100</span>);<span class="comment">//为它添加一个元素</span></span><br><span class="line">    </span><br><span class="line">    ArrayList&lt;String&gt; strList = <span class="keyword">new</span> ArrayList&lt;&gt;();<span class="comment">//创建一个字符串类型的ArrayList</span></span><br><span class="line">    inList.add(<span class="string">"abc"</span>);<span class="comment">//为它添加一个元素</span></span><br><span class="line">    </span><br><span class="line">    <span class="comment">//list[0] = intList;//将list[0]引用指向intList</span></span><br><span class="line">    listArr[<span class="number">0</span>] = strList;<span class="comment">//成功</span></span><br><span class="line">    listArr[<span class="number">1</span>] = intList;<span class="comment">//在没运行之前就报错</span></span><br><span class="line">    </span><br><span class="line">    String s = listArr[<span class="number">0</span>].get(<span class="number">0</span>);<span class="comment">//获取的时候通过listArr引用来获取</span></span><br><span class="line">    System.out.println(s);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-</li>
-<li><h4 id="反射构建数组"><a href="#反射构建数组" class="headerlink" title="反射构建数组"></a>反射构建数组</h4><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Fruit</span>&lt;<span class="title">T</span>&gt;</span>&#123;</span><br><span class="line">    <span class="keyword">private</span> T[] arr;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">Fruit</span><span class="params">(Class&lt;T&gt; clazz,<span class="keyword">int</span> len)</span></span>&#123;</span><br><span class="line">        <span class="comment">//通过Array.newInstance创建泛型数组</span></span><br><span class="line">        arr = (T[])Array.newInstance(clazz,len);</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">//给数组添加元素</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">put</span><span class="params">(<span class="keyword">int</span> index,T item)</span></span>&#123;</span><br><span class="line">        arr[index] = T;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">//获取数组中元素</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> T <span class="title">get</span><span class="params">(<span class="keyword">int</span> index)</span></span>&#123;</span><br><span class="line">        <span class="keyword">return</span> arr[index];</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">//获取整个数组</span></span><br><span class="line">    </span><br><span class="line">    <span class="keyword">public</span> T[] getArr()&#123;</span><br><span class="line">        <span class="keyword">return</span> arr;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-
-
+<li><h4 id="方法区-永久代-线程共享"><a href="#方法区-永久代-线程共享" class="headerlink" title="方法区/永久代(线程共享)"></a>方法区/永久代(线程共享)</h4><ul>
+<li>我们常说的永久代(Permanent Generation)，<strong>用于存储被 JVM 加载的类信息、常量、静态变量、即时编译器编译后的代码等数据</strong>。HotSpot VM把GC分代收集扩展至方法区，即使用Java堆的永久代来实现方法区，这样HotSpot 的垃圾收集器就可以像管理 Java 堆一样管理这部分内存,而不必为方法区开发专门的内存管理器(永久带的内存回收的主要目标是针对常量池的回收和类型的卸载，因此收益一般很小)。</li>
+<li><strong>方法区是一个 JVM 规范，永久代与元空间都是其一种实现方式</strong></li>
+<li>HotSpot 虚拟机把它当成永久代来进行垃圾回收。但很难确定永久代的大小，因为它受到很多因素影响，并且每次Full GC之后永久代的大小都会改变，所以经常会抛出OutOfMemoryError异常。为了更容易管理方法区，<strong>从JDK 1.8开始，移除永久代，并把方法区移至元空间，它位于本地内存中，而不是虚拟机内存中</strong>。因此，默认情况下，元空间的大小仅受本地内存限制。<strong>类的元数据放入native memory，字符串池和类的静态变量放入java堆中</strong>，这样可以加载多少类的元数据就不再由MaxPermSize控制，而由系统的实际可用空间来控制。</li>
+<li><strong>运行时常量池（Runtime Constant Pool）是方法区的一部分</strong>。Class文件中除了有类的版本、字段、方法、接口等描述等信息外，还有一项信息是常量池（Constant Pool Table），用于存放编译期生成的各种字面量和符号引用，这部分内容将在类加载后存放到方法区的运行时常量池中。Java虚拟机对Class文件的每一部分（自然也包括常量池）的格式都有严格的规定，每一个字节用于存储哪种数据都必须符合规范上的要求，这样才会被虚拟机认可、装载和执行。</li>
+</ul>
 </li>
 </ol>
 </li>
@@ -232,8 +141,14 @@
         <category>java后端基础</category>
       </categories>
       <tags>
-        <tag>java基础</tag>
+        <tag>JVM</tag>
+        <tag>offer</tag>
       </tags>
+  </entry>
+  <entry>
+    <title>Hello World</title>
+    <url>/2020/05/24/hello-world/</url>
+    <content><![CDATA[<h1 id="Welcome-to-yinjiawei’s-blog"><a href="#Welcome-to-yinjiawei’s-blog" class="headerlink" title="Welcome to yinjiawei’s blog!"></a>Welcome to <a href="https://vampiresmile.github.io/">yinjiawei’s blog</a>!</h1>]]></content>
   </entry>
   <entry>
     <title>java线程池</title>
@@ -586,54 +501,10 @@
       </tags>
   </entry>
   <entry>
-    <title>Ajax学习</title>
-    <url>/2020/06/18/Ajax%E5%AD%A6%E4%B9%A0/</url>
-    <content><![CDATA[<ol>
-<li><h3 id="ajax介绍"><a href="#ajax介绍" class="headerlink" title="ajax介绍"></a>ajax介绍</h3><p>ajax是异步的javaScript和xml，是一种无需重新加载整个网页的情况下，能够更新部分网页数据的技术（比如我们常见的搜索引擎框中输入关键词，就利用到了ajax发送请求到服务器，服务器返回一个搜索列表）</p>
-</li>
-<li><h3 id="ajax再介绍"><a href="#ajax再介绍" class="headerlink" title="ajax再介绍"></a>ajax再介绍</h3><ol>
-<li>相比传统网页（即不使用ajax的网页），想要更新内容或提交一个表单，都需要重新加载整个页面，而使用ajax的网页，通过在后台服务器进行少量的数据交换，就可以实现异步局部更新。增强B/S的体验</li>
-<li>Ajax的核心是XMLHttpRequest对象（XHR）。XHR为向服务器发送请求和解析服务器响应提供了接口。能够以异步方式从服务器获取新数据。</li>
-<li>通过Ajax方法，可以使用Http GET和Http Post从远程服务器上请求文本、HTML、XML或JSON数据—-同时可以将这些数据直接载入网页的被选元素中。</li>
-</ol>
-</li>
-<li><h3 id="ajax使用概览"><a href="#ajax使用概览" class="headerlink" title="ajax使用概览"></a>ajax使用概览</h3><ol>
-<li><p>肯定先要导入jQuery包</p>
-</li>
-<li><p>jQuery Ajax本质就是XMLHttpRequest，对他进行了封装，下面就是他的一些方法：</p>
-<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="number">1.</span>JQuery.get(...)</span><br><span class="line">           所有参数：</span><br><span class="line">           		url:待载入的页面URL地址</span><br><span class="line">           		data:待发送Key/Value参数</span><br><span class="line">           		success:载入成功时回调函数</span><br><span class="line">           		dataType:返回内容格式（xml，json，script，text，html）（一般不用）</span><br><span class="line">             </span><br><span class="line"><span class="number">2.</span>JQuery.post(...)</span><br><span class="line">		  所有参数：</span><br><span class="line">          		url:待载入的页面URL地址</span><br><span class="line">           		data:待发送Key/Value参数</span><br><span class="line">           		success:载入成功时回调函数</span><br><span class="line">           		dataType:返回内容格式（xml，json，script，text，html）（一般不用）</span><br><span class="line">            </span><br><span class="line"><span class="number">3.</span>jQuery.ajax(...)</span><br><span class="line">          所有参数见：https:<span class="comment">//www.runoob.com/jquery/ajax-ajax.html</span></span><br></pre></td></tr></table></figure>
-</li>
-<li><p>和springmvc中@ResponseBody注解配合使用</p>
-<p>springMVC中的@ResponseBody负责返回一个json字符串，这样直接可以通过ajax发送请求获取json数据，然后解析渲染</p>
-<a id="more"></a>
-</li>
-</ol>
-</li>
-<li><h3 id="使用ajax做一个登录小demo"><a href="#使用ajax做一个登录小demo" class="headerlink" title="使用ajax做一个登录小demo"></a>使用ajax做一个登录小demo</h3><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">//这些都是代码片段</span></span><br><span class="line"><span class="comment">//假设我们项目名logindemo，项目地址：http://localhost:8080/logindemo</span></span><br><span class="line"><span class="comment">//name和password都写死了的，分别为admin和123456</span></span><br><span class="line"><span class="comment">//后端代码</span></span><br><span class="line"><span class="meta">@RequestMapping</span>(<span class="string">"/selectName"</span>)</span><br><span class="line"><span class="meta">@ResponseBody</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> String <span class="title">selectName</span><span class="params">(String name)</span></span>&#123;</span><br><span class="line">    String msg = <span class="string">"name is null"</span>;</span><br><span class="line">    <span class="keyword">if</span>(name == <span class="keyword">null</span>) <span class="keyword">return</span> msg;</span><br><span class="line">    <span class="keyword">else</span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(!(<span class="string">"admin"</span>.equals(name))) msg = <span class="string">"name is inValid"</span>;</span><br><span class="line">        <span class="keyword">else</span> msg = <span class="string">"ok"</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> msg;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">@RequestMapping</span>(<span class="string">"/selectPass"</span>)</span><br><span class="line"><span class="meta">@ResponseBody</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> String <span class="title">selectPass</span><span class="params">(String password)</span></span>&#123;</span><br><span class="line">    String msg = <span class="string">"password is null"</span>;</span><br><span class="line">    <span class="keyword">if</span>(password == <span class="keyword">null</span>) <span class="keyword">return</span> msg;</span><br><span class="line">    <span class="keyword">else</span>&#123;</span><br><span class="line">       	<span class="keyword">if</span>(!(<span class="string">"123456"</span>.equals(password))) msg = <span class="string">"password is inValid"</span>;</span><br><span class="line">        <span class="keyword">else</span> msg = <span class="string">"ok"</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> msg;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">@RequestMapping</span>(<span class="string">"/login"</span>)</span><br><span class="line"><span class="meta">@ResponseBody</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> String <span class="title">login</span><span class="params">(String name,String password)</span></span>&#123;</span><br><span class="line">    String msg = <span class="string">"name or pass is null"</span>;</span><br><span class="line">    <span class="keyword">if</span>(name == <span class="keyword">null</span> || password == <span class="keyword">null</span>) <span class="keyword">return</span> msg;</span><br><span class="line">    <span class="keyword">else</span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(!(<span class="string">"admin"</span>.equals(name))) msg = <span class="string">"name is inValid"</span>;</span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span>(!(<span class="string">"123456"</span>.equals(password))) msg = <span class="string">"password is inValid"</span>;</span><br><span class="line">        <span class="keyword">else</span> msg = <span class="string">"name and password are both valid"</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> msg;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight"><table><tr><td class="code"><pre><span class="line">&lt;!--前端代码--&gt;</span><br><span class="line">&lt;%@ page contentType=<span class="string">"text/html;charset=UTF-8"</span> language=<span class="string">"java"</span></span><br><span class="line">         pageEncoding=<span class="string">"UTF-8"</span> %&gt;</span><br><span class="line">&lt;html&gt;</span><br><span class="line"></span><br><span class="line">&lt;head&gt;</span><br><span class="line">    &lt;meta http-equiv=<span class="string">"Content-Type"</span> content=<span class="string">"text/html;charset=utf-8"</span>&gt;</span><br><span class="line">    &lt;title&gt;登录界面&lt;/title&gt;</span><br><span class="line">    &lt;%</span><br><span class="line">        pageContext.setAttribute(<span class="string">"APP_PATH"</span>, request.getContextPath());</span><br><span class="line">    %&gt;</span><br><span class="line">    &lt;!--引入jQuery--&gt;</span><br><span class="line">    &lt;!--</span><br><span class="line">    web路径：</span><br><span class="line">        不以/开始的相对路径：找资源，以当前资源的路径为基准，经常容易出问题</span><br><span class="line">        以/开始的相对路径：找资源，以服务器的路径为标准(http:<span class="comment">//localhost:8080)</span></span><br><span class="line">        比如：$&#123;APP_PATH&#125;可以代表路径：http:<span class="comment">//localhost:8080/crud</span></span><br><span class="line">    --&gt;</span><br><span class="line">    &lt;script type="text/javascript" src="$&#123;APP_PATH&#125;/staticSources/jquery1.11.0/jquery-1.11.0.min.js"&gt;&lt;/script&gt;</span><br><span class="line">    </span><br><span class="line">    &lt;script&gt;</span><br><span class="line">    	<span class="function">function <span class="title">nameInfo</span><span class="params">()</span></span>&#123;</span><br><span class="line">            $.post(&#123;</span><br><span class="line">                url:<span class="string">"$&#123;APP_PATH&#125;/selectName"</span>,</span><br><span class="line">                data:&#123;<span class="string">"name"</span>:$(<span class="string">"#name"</span>).val()&#125;,</span><br><span class="line">                success:function(result)&#123;</span><br><span class="line">                    <span class="keyword">if</span>(result.toString() == <span class="string">'ok'</span>)&#123;</span><br><span class="line">                        $(<span class="string">"#infoName"</span>).css(<span class="string">"color"</span>,<span class="string">"green"</span>);</span><br><span class="line">				   &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">                       $(<span class="string">"#infoName"</span>).css(<span class="string">"color"</span>,<span class="string">"green"</span>);</span><br><span class="line">                   	&#125;</span><br><span class="line">                    $(<span class="string">"#infoName"</span>).html(result);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">//注意两种ajax的写法区别</span></span><br><span class="line">        <span class="function">function <span class="title">passInfo</span><span class="params">()</span></span>&#123;</span><br><span class="line">            $.post(<span class="string">"$&#123;APP_PATH&#125;/selectPass"</span>,&#123;<span class="string">"password"</span>:$(<span class="string">"#pass"</span>).val()&#125;,function(result)&#123;</span><br><span class="line">                <span class="keyword">if</span>(result.toString() == <span class="string">'ok'</span>)&#123;</span><br><span class="line">                        $(<span class="string">"#infoPass"</span>).css(<span class="string">"color"</span>,<span class="string">"green"</span>);</span><br><span class="line">				   &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">                       $(<span class="string">"#infoPass"</span>).css(<span class="string">"color"</span>,<span class="string">"green"</span>);</span><br><span class="line">                   	&#125;</span><br><span class="line">                    $(<span class="string">"#infoPass"</span>).html(result);</span><br><span class="line">            &#125;);</span><br><span class="line">        &#125;</span><br><span class="line">    &lt;/script&gt;</span><br><span class="line">    </span><br><span class="line">&lt;/head&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">    &lt;p&gt;</span><br><span class="line">        用户名：</span><br><span class="line">        &lt;input type = <span class="string">"text"</span> id = <span class="string">"name"</span> onblur = <span class="string">"nameInfo()"</span>/&gt;</span><br><span class="line">        &lt;!--span里面就是发送ajax请求后服务器返回name的情况并显示--&gt;</span><br><span class="line">        &lt;span id = "infoName"&gt;&lt;/span&gt;</span><br><span class="line">    &lt;/p&gt;</span><br><span class="line">    &lt;p&gt;</span><br><span class="line">        密码：</span><br><span class="line">        &lt;input type = <span class="string">"password"</span> id = <span class="string">"pass"</span> onblur = <span class="string">"passInfo()"</span>/&gt;</span><br><span class="line">        &lt;!--span里面就是发送ajax请求后服务器返回pass的情况并显示--&gt;</span><br><span class="line">        &lt;span id = "infoPass"&gt;&lt;/span&gt;</span><br><span class="line">    &lt;/p&gt;</span><br><span class="line">    &lt;p&gt;</span><br><span class="line">		&lt;!--doLogin()自己写的js函数--&gt;</span><br><span class="line">        &lt;input type = <span class="string">"button"</span> id = <span class="string">"login"</span> onclick = <span class="string">"doLogin()"</span>/&gt; </span><br><span class="line">    &lt;/p&gt;</span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></table></figure>
-</li>
-<li><h3 id="ajax总结"><a href="#ajax总结" class="headerlink" title="ajax总结"></a>ajax总结</h3><ol>
-<li>编写对应处理的Controller，返回json格式或字符串格式数据；</li>
-<li>编写ajax请求（如上例两种方法），大致需要完成三个要求：<ol>
-<li>url请求地址</li>
-<li>data键值对</li>
-<li>success回调函数</li>
-</ol>
-</li>
-<li>给ajax绑定事件，如点击.click，失去焦点.onblur，键盘弹起.keyup。更多事件可查看：<a href="https://www.jquery123.com/category/attributes/" target="_blank" rel="external nofollow noopener noreferrer">https://www.jquery123.com/category/attributes/</a></li>
-</ol>
-</li>
-</ol>
+    <title>kafka事务</title>
+    <url>/2024/11/12/kafka%E4%BA%8B%E5%8A%A1/</url>
+    <content><![CDATA[<h1 id="插入图片测试"><a href="#插入图片测试" class="headerlink" title="插入图片测试"></a>插入图片测试</h1><p><img src="kafka%E4%BA%8B%E5%8A%A1/tom%E5%9B%B0.jpg" alt="test"></p>
 ]]></content>
-      <categories>
-        <category>java后端基础</category>
-        <category>前端</category>
-      </categories>
-      <tags>
-        <tag>前端</tag>
-        <tag>Ajax</tag>
-      </tags>
   </entry>
   <entry>
     <title>jwt学习</title>
@@ -716,43 +587,349 @@
       </tags>
   </entry>
   <entry>
-    <title>vscode配置python环境</title>
-    <url>/2023/09/16/vscode%E5%AE%89%E8%A3%85python%E7%8E%AF%E5%A2%83/</url>
-    <content><![CDATA[<h2 id="1-下载并安装vscode"><a href="#1-下载并安装vscode" class="headerlink" title="1 下载并安装vscode"></a>1 下载并安装vscode</h2><h3 id="1-1-下载地址"><a href="#1-1-下载地址" class="headerlink" title="1.1 下载地址"></a>1.1 下载地址</h3><p><a href="https://code.visualstudio.com/Download" target="_blank" rel="external nofollow noopener noreferrer">https://code.visualstudio.com/Download</a></p>
-<h3 id="1-2-安装vscode（其他系统安装方式这里不再赘述，这里推荐使用-zip方式安装）"><a href="#1-2-安装vscode（其他系统安装方式这里不再赘述，这里推荐使用-zip方式安装）" class="headerlink" title="1.2 安装vscode（其他系统安装方式这里不再赘述，这里推荐使用.zip方式安装）"></a>1.2 安装vscode（其他系统安装方式这里不再赘述，这里推荐使用<strong>.zip</strong>方式安装）</h3><ul>
-<li>选择对应机器以及版本下载zip包</li>
-<li>解压之后在和Code.exe同级的目录下创建<strong>data</strong>文件夹(如果没有按照这步来，vscode可能就会在一些你无法预知的目录输出数据，比如在系统盘下的Appdata或program files目录下)</li>
-<li>这样相关插件&amp;用户数据就都会在data文件夹下(这也是推荐使用.zip安装vscode的理由)</li>
+    <title>mysql索引总结-优化篇</title>
+    <url>/2020/05/28/mysql%E7%B4%A2%E5%BC%95%E6%80%BB%E7%BB%93-%E4%BC%98%E5%8C%96%E7%AF%87/</url>
+    <content><![CDATA[<ol>
+<li><h3 id="MySQL优化的一般步骤"><a href="#MySQL优化的一般步骤" class="headerlink" title="MySQL优化的一般步骤"></a>MySQL优化的一般步骤</h3><ol>
+<li><h4 id="通过show-status-命令了解各种sql的执行效率"><a href="#通过show-status-命令了解各种sql的执行效率" class="headerlink" title="通过show status 命令了解各种sql的执行效率"></a>通过show status 命令了解各种sql的执行效率</h4><ul>
+<li>SHOW STATUS提供msyql服务器的状态信息，一般情况下，我们只需要了解以”Com”开头的指令</li>
+<li>show session status like ‘Com%’；显示当前的连接的统计结果</li>
+<li>show global status like ‘Com%’ ；显示自数据库上次启动至今的统计结果</li>
+<li>show status like ‘Connections’；// 试图连接MySQL服务器的次数</li>
+<li>show status like ‘Uptime’；//服务器工作的时间（单位秒）</li>
+<li>show status like ‘Slow_queries’；//慢查询的次数 (默认是10秒中就当做是慢查询)</li>
+<li>Show variables like ‘long_query_time’；//查询mysql的慢查询时间：</li>
+<li>set long_query_time=2；//修改mysql 慢查询时间：如果查询时间超过2秒就算作是慢查询</li>
 </ul>
-<h2 id="2-下载python解释器"><a href="#2-下载python解释器" class="headerlink" title="2 下载python解释器"></a>2 下载python解释器</h2><h3 id="2-1-下载地址-官网有个时候打不开，多刷几次"><a href="#2-1-下载地址-官网有个时候打不开，多刷几次" class="headerlink" title="2.1 下载地址(官网有个时候打不开，多刷几次)"></a>2.1 下载地址(官网有个时候打不开，多刷几次)</h3><p><a href="https://www.python.org/downloads/" target="_blank" rel="external nofollow noopener noreferrer">https://www.python.org/downloads/</a></p>
-<h3 id="2-2-安装python解释器-以python-3-10-0-amd64-exe为例"><a href="#2-2-安装python解释器-以python-3-10-0-amd64-exe为例" class="headerlink" title="2.2 安装python解释器(以python-3.10.0-amd64.exe为例)"></a>2.2 安装python解释器(以python-3.10.0-amd64.exe为例)</h3><ul>
-<li>双击<strong>python-3.10.0-amd64.exe</strong>进入安装界面</li>
-<li>务必勾选最下面<strong>Add Python 3.10  to PATH</strong>（这里是自动帮你将python路径加到环境变量中去，如果这里不勾选，后面需要自己手动去添加python环境变量：计算机-&gt;属性-&gt;更改配置-&gt;高级-&gt;环境变量-&gt;将python安装路径以及python下的Scripts路径加到用户变量的path中或者系统变量的PATH中)</li>
-<li>选择customize installation</li>
-<li>建议：Optional Features使用默认勾选 -&gt; Advanced Options除了download debug相关不勾选，其他都勾选，安装路径自定义选择</li>
-<li>点击安装</li>
+<p>注：默认是session级别的，其中Com_XXX表示XXX语句所执行的次数。Com_select，Com_insert，Com_update，Com_delete通过这几个参数，可以容易地了解到当前数据库的应用是以插入更新为主还是以查询操作为主，以及各类的SQL大致的执行比例是多少。</p>
+<a id="more"></a>
+</li>
+<li><h4 id="定位执行效率较低的SQL语句（dql出现问题的概率较dml的大）"><a href="#定位执行效率较低的SQL语句（dql出现问题的概率较dml的大）" class="headerlink" title="定位执行效率较低的SQL语句（dql出现问题的概率较dml的大）"></a>定位执行效率较低的SQL语句（dql出现问题的概率较dml的大）</h4><p>在一个项目中，找到慢查询的select语句：mysql支持把慢查询语句记录到日志文件中。程序员需要修改php.ini的配置文件，默认情况下，慢查询记录是不开启的。开启慢查询记录的方法：打开 my.ini，找到 [mysqld] 在其下面添加：long_query_time = 2和log-slow-queries = D:/mysql/logs/slow.log     #设置把日志写在那里，可以为空，系统会给一个缺省的文件，例子：我们数据表中有1千万条的数据量，DQL语句：SELECT * FROM order_copy WHERE id=12345; 查询耗时：19s &gt; 2s，所以mysql会将该条select语句记录到慢查询日志中，SELECT * FROM order_copy WHERE id=12345的执行时间：<strong>添加索引前：19s</strong>，<strong>添加索引后：0.08s</strong></p>
+</li>
+<li><h4 id="通过explain分析低效率的SQL语句的执行情况"><a href="#通过explain分析低效率的SQL语句的执行情况" class="headerlink" title="通过explain分析低效率的SQL语句的执行情况"></a>通过explain分析低效率的SQL语句的执行情况</h4><p>使用explain分析该dql语句：</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">EXPLAIN</span> <span class="keyword">SELECT</span> * <span class="keyword">FROM</span> order_copy <span class="keyword">WHERE</span> <span class="keyword">id</span> = <span class="number">12345</span>;</span><br></pre></td></tr></table></figure>
+
+<p>会产生如下信息：</p>
+<ul>
+<li>select_type:表示查询的类型。</li>
+<li>table:输出结果集的表</li>
+<li>type:表示表的连接类型(system和const为佳)</li>
+<li>possible_keys:表示查询时，可能使用的索引</li>
+<li>key:表示实际使用的索引</li>
+<li>key_len:索引字段的长度</li>
+<li>rows:扫描的行数</li>
+<li>Extra:执行情况的描述和说明</li>
 </ul>
-<h2 id="3-vscode配置python环境"><a href="#3-vscode配置python环境" class="headerlink" title="3 vscode配置python环境"></a>3 vscode配置python环境</h2><p>vscode配置python环境主要就是插件安装以及vscode用户配置</p>
-<h3 id="3-1-插件安装（注意插件全部安装完之后重启vscode）"><a href="#3-1-插件安装（注意插件全部安装完之后重启vscode）" class="headerlink" title="3.1 插件安装（注意插件全部安装完之后重启vscode）"></a>3.1 插件安装（注意插件全部安装完之后重启vscode）</h3><ul>
-<li>搜索插件”中文”然后选择安装(汉化vscode)</li>
-<li>搜索插件”Python”并点击安装(配置vscode python环境最主要的插件)</li>
-<li>搜索插件”intellicode”并点击安装(代码提示&amp;补全)</li>
-<li>搜索插件”pylance”并点击安装(intellicode插件针对python只支持pylance语言服务器)</li>
-<li>搜索插件”AREPL”并点击安装(实时执行python代码，类似预览效果，非必须安装)</li>
+<p><strong>注意：要尽量避免让type的结果为all，extra的结果为：using filesort</strong></p>
+</li>
+<li><h4 id="确定问题并采取相应的优化措施"><a href="#确定问题并采取相应的优化措施" class="headerlink" title="确定问题并采取相应的优化措施"></a>确定问题并采取相应的优化措施</h4><p>常用的优化措施是添加索引。添加索引，我们不用加内存，不用改程序，不用调sql，只要执行个正确的’create index’，查询速度就可能提高百倍千倍。但是天下没有免费的午餐，查询速度的提高是以插入、更新、删除的速度为代价的，这些写操作，增加了大量的I/O。例如：给字段id添加索引：</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">ALTER</span> <span class="keyword">TABLE</span> order_copy <span class="keyword">ADD</span> PRIMARY <span class="keyword">KEY</span>(<span class="keyword">id</span>);</span><br></pre></td></tr></table></figure>
+
+<p>给1千万的数据添加primary key 需要耗时： 428秒（7分钟）</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">EXPLAIN</span> <span class="keyword">SELECT</span> * <span class="keyword">FROM</span> order_copy <span class="keyword">WHERE</span> <span class="keyword">id</span> = <span class="number">12345</span>;</span><br></pre></td></tr></table></figure>
+
+<p>正是因为给id添加了索引，才使得rows的结果为1，<strong>但是索引并不是可以随便添加的，以下几种情况需牢记在心：</strong></p>
+<ul>
+<li>较频繁的作为查询条件字段应该创建索引</li>
 </ul>
-<h3 id="3-2-用户配置"><a href="#3-2-用户配置" class="headerlink" title="3.2 用户配置"></a>3.2 用户配置</h3><ul>
-<li>检查python环境是否生效：新建一个.py文件，正常是可以在vscode左下角看到安装的python版本，并且点击左下角可以切换python版本</li>
-<li>代码提示与自动补全配置：选择：文件-&gt;首选项-&gt;设置，然后搜索”language server”，选择出现的Python那一栏，最下面那个，如果是”Jedi”或者其他服务器，则需要替换成”Pylance”，否则<strong>没有代码提示和自动补全</strong></li>
-<li>指定默认python版本：如果有多个python解释器版本，并且想要设置默认的python解释器，那么可以在用户的”settings.json”文件中添加需要指定的python版本路径：比如：<code>&quot;python.pythonPath&quot;: &quot;D:\\Pythonpkg\\python3.11.5&quot;</code></li>
-<li>静态检查配置：vscode配置完python环境后，右下角可能会报找不到pylint或者报pylint不存在，这主要是python静态检查需要用到的配置，<strong>注意这里要选择prospector进行安装(耗时可能会有点久)，不要选择其他的</strong></li>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> * <span class="keyword">FROM</span> order_copy <span class="keyword">WHERE</span> <span class="keyword">id</span> = $<span class="keyword">id</span>;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>唯一性太差的字段不适合单独创建索引，即使频繁作为查询条件</li>
 </ul>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> * <span class="keyword">FROM</span> order_copy <span class="keyword">WHERE</span> sex = <span class="string">'女'</span>;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>更新非常频繁的字段不适合创建索引</li>
+</ul>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> * <span class="keyword">FROM</span> order_copy <span class="keyword">WHERE</span> order_state = <span class="string">'未付款'</span>;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>不会出现在WHERE子句中的字段不该创建索引</li>
+</ul>
+<p><strong>索引的使用</strong></p>
+<ul>
+<li><p>建立索引</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> [<span class="keyword">UNIQUE</span>|FULLTEXT] <span class="keyword">index</span> index_name <span class="keyword">ON</span> tbl_name (col_name [(<span class="keyword">length</span>)] [<span class="keyword">ASC</span> | <span class="keyword">DESC</span>],...);</span><br><span class="line"><span class="keyword">ALTER</span> <span class="keyword">TABLE</span> table_name <span class="keyword">ADD</span> <span class="keyword">INDEX</span> index_name (column_list);</span><br><span class="line"><span class="keyword">ALTER</span> <span class="keyword">TABLE</span> table_name <span class="keyword">ADD</span> <span class="keyword">UNIQUE</span> (column_list);</span><br><span class="line"><span class="keyword">ALTER</span> <span class="keyword">TABLE</span> table_name <span class="keyword">ADD</span> PRIMARY <span class="keyword">KEY</span> (column_list);</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>删除索引</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">DROP</span> <span class="keyword">INDEX</span> index_name <span class="keyword">ON</span> talbe_name;</span><br><span class="line"><span class="keyword">ALTER</span> <span class="keyword">TABLE</span> table_name <span class="keyword">DROP</span> <span class="keyword">INDEX</span> index_name;//等价于第一条</span><br><span class="line"><span class="keyword">ALTER</span> <span class="keyword">TABLE</span> table_name <span class="keyword">DROP</span> PRIMARY <span class="keyword">KEY</span>;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>查询索引(均可) </p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SHOW</span> <span class="keyword">keys</span> <span class="keyword">FROM</span> table_name;</span><br><span class="line"><span class="keyword">SHOW</span> <span class="keyword">index</span> <span class="keyword">FROM</span> table_name;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+</li>
+</ol>
+</li>
+<li><h3 id="MySQL优化实践，其实就是要将前篇文章中的创建索引的注意点给用上"><a href="#MySQL优化实践，其实就是要将前篇文章中的创建索引的注意点给用上" class="headerlink" title="MySQL优化实践，其实就是要将前篇文章中的创建索引的注意点给用上"></a>MySQL优化实践，其实就是要将前篇文章中的创建索引的注意点给用上</h3><p><strong>一个小提示：返回表中 30% 内的数据会走索引，返回超过 30% 数据就使用全表扫描。当然这个结论太绝对了，也并不是绝对的30%，只是一个大概的范围，这个有时很重要。</strong></p>
+<p>现在我们有一张user表：</p>
+<ol>
+<li><h4 id="如果MySQL估计使用索引比全表扫描还慢，则不会使用索引"><a href="#如果MySQL估计使用索引比全表扫描还慢，则不会使用索引" class="headerlink" title="如果MySQL估计使用索引比全表扫描还慢，则不会使用索引"></a>如果MySQL估计使用索引比全表扫描还慢，则不会使用索引</h4><p>返回数据的比例是重要的指标，比例越低越容易命中索引。记住这个范围值——30%，后面所讲的内容都是建立在返回数据的比例在30%以内的基础上。</p>
+</li>
+<li><h4 id="前导模糊查询查询不能命中索引"><a href="#前导模糊查询查询不能命中索引" class="headerlink" title="前导模糊查询查询不能命中索引"></a>前导模糊查询查询不能命中索引</h4><p>比如我们给user表中name字段加索引，然后执行：</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">EXPLAIN</span> <span class="keyword">SELECT</span> * <span class="keyword">FROM</span> <span class="keyword">user</span> <span class="keyword">WHERE</span> <span class="keyword">name</span> <span class="keyword">LIKE</span> <span class="string">'%s%'</span>;</span><br></pre></td></tr></table></figure>
+
+<p>通过explain解释器发现并没有走索引，此时我们可以优化成非前导模糊查询就会走索引：</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">EXPLAIN</span> <span class="keyword">SELECT</span> * <span class="keyword">FROM</span> <span class="keyword">user</span> <span class="keyword">WHERE</span> <span class="keyword">name</span> <span class="keyword">LIKE</span> <span class="string">'s%'</span>;</span><br></pre></td></tr></table></figure>
+</li>
+<li><h4 id="数据类型出现隐式转换的时候不会命中索引，特别是当列类型是字符串，一定要将字符常量值用引号引起来"><a href="#数据类型出现隐式转换的时候不会命中索引，特别是当列类型是字符串，一定要将字符常量值用引号引起来" class="headerlink" title="数据类型出现隐式转换的时候不会命中索引，特别是当列类型是字符串，一定要将字符常量值用引号引起来"></a>数据类型出现隐式转换的时候不会命中索引，特别是当列类型是字符串，一定要将字符常量值用引号引起来</h4><p>还是name字段加索引，name为varchar类型，那么下面这个语句不会走索引：</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">EXPLAIN</span> <span class="keyword">SELECT</span> * <span class="keyword">FROM</span> <span class="keyword">user</span> <span class="keyword">WHERE</span> <span class="keyword">name</span> = <span class="number">1</span>;</span><br></pre></td></tr></table></figure>
+
+<p>但优化成如下这个语句会走索引：</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">EXPLAIN</span> <span class="keyword">SELECT</span> * <span class="keyword">FROM</span> <span class="keyword">user</span> <span class="keyword">WHERE</span> <span class="keyword">name</span> = <span class="string">'1'</span>;</span><br></pre></td></tr></table></figure>
+</li>
+<li><h4 id="复合索引的情况下，查询条件不包含索引列最左边部分（不满足最左原则），不会命中复合索引"><a href="#复合索引的情况下，查询条件不包含索引列最左边部分（不满足最左原则），不会命中复合索引" class="headerlink" title="复合索引的情况下，查询条件不包含索引列最左边部分（不满足最左原则），不会命中复合索引"></a>复合索引的情况下，查询条件不包含索引列最左边部分（不满足最左原则），不会命中复合索引</h4><p>比如给name、age、status加复合索引，执行下面语句：</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">ALTER</span> <span class="keyword">TABLE</span> <span class="string">'user'</span> <span class="keyword">ADD</span> <span class="keyword">INDEX</span>  index_name (<span class="keyword">name</span>,age,<span class="keyword">status</span>);</span><br></pre></td></tr></table></figure>
+
+<p>下面两条语句都能命中索引：</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">EXPLAIN</span> <span class="keyword">SELECT</span> * <span class="keyword">FROM</span> <span class="keyword">user</span> <span class="keyword">WHERE</span> <span class="keyword">name</span> = <span class="string">'yjw'</span> <span class="keyword">AND</span> <span class="keyword">status</span> = <span class="number">1</span>;</span><br><span class="line"><span class="keyword">EXPLAIN</span> <span class="keyword">SELECT</span> * <span class="keyword">FROM</span> <span class="keyword">user</span> <span class="keyword">WHERE</span> <span class="keyword">status</span> = <span class="number">1</span> <span class="keyword">AND</span> <span class="keyword">name</span> = <span class="string">'yjw'</span>;</span><br></pre></td></tr></table></figure>
+
+<p><strong>注意：最左原则不是说查询的条件的顺序，而是查询条件中是否包含索引最左列字段</strong></p>
+</li>
+<li><h4 id="union、in和or都可以命中索引，推荐in"><a href="#union、in和or都可以命中索引，推荐in" class="headerlink" title="union、in和or都可以命中索引，推荐in"></a>union、in和or都可以命中索引，推荐in</h4><p>比如对status加索引后，union：</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">EXPLAIN</span> <span class="keyword">SELECT</span> * <span class="keyword">FROM</span> <span class="keyword">user</span> <span class="keyword">WHERE</span> <span class="keyword">status</span> = <span class="number">1</span></span><br><span class="line"><span class="keyword">UNION</span> <span class="keyword">ALL</span></span><br><span class="line"><span class="keyword">SELECT</span> * <span class="keyword">FROM</span> <span class="keyword">user</span> <span class="keyword">WHERE</span> <span class="keyword">status</span> = <span class="number">2</span>;</span><br></pre></td></tr></table></figure>
+
+<p>in：</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">EXPLAIN</span> <span class="keyword">SELECT</span> * <span class="keyword">FROM</span> <span class="keyword">user</span> <span class="keyword">WHERE</span> <span class="keyword">status</span> <span class="keyword">IN</span> (<span class="number">1</span>,<span class="number">2</span>);</span><br></pre></td></tr></table></figure>
+
+<p>or：</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">EXPLAIN</span> <span class="keyword">SELECT</span> * <span class="keyword">FROM</span> <span class="keyword">user</span> <span class="keyword">WHERE</span> <span class="keyword">status</span> = <span class="number">1</span> <span class="keyword">OR</span> <span class="keyword">status</span> = <span class="number">2</span>;</span><br></pre></td></tr></table></figure>
+
+<p>注意：查询的CPU消耗：or &gt; in &gt; union</p>
+</li>
+<li><h4 id="用or分割开的条件，如果or前的条件中列有索引，而后面的列中没有索引，那么涉及到的索引都不会被用到"><a href="#用or分割开的条件，如果or前的条件中列有索引，而后面的列中没有索引，那么涉及到的索引都不会被用到" class="headerlink" title="用or分割开的条件，如果or前的条件中列有索引，而后面的列中没有索引，那么涉及到的索引都不会被用到"></a>用or分割开的条件，如果or前的条件中列有索引，而后面的列中没有索引，那么涉及到的索引都不会被用到</h4><p>假如我们给name加索引，age不加索引，然后执行下面语句：</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">EXPLAIN</span> <span class="keyword">SELECT</span> * <span class="keyword">FROM</span> <span class="keyword">user</span> <span class="keyword">WHERE</span> <span class="keyword">name</span> = <span class="string">'yjw'</span> <span class="keyword">OR</span> age = <span class="number">19</span>;</span><br></pre></td></tr></table></figure>
+
+<p>因为or后面的条件列中没有索引，那么后面的查询肯定要走全表扫描，在存在全表扫描的情况下，就没有必要多一次索引扫描增加IO访问。</p>
+</li>
+<li><h4 id="负向条件查询不能使用索引，可以优化为-in-查询"><a href="#负向条件查询不能使用索引，可以优化为-in-查询" class="headerlink" title="负向条件查询不能使用索引，可以优化为 in 查询"></a>负向条件查询不能使用索引，可以优化为 in 查询</h4><p>负向条件有：!=、&lt;&gt;、not in、not exists、not like等。</p>
+<p>比如我们给status加索引，然后执行：</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">EXPLAIN</span> <span class="keyword">SELECT</span> * <span class="keyword">FROM</span> <span class="keyword">user</span> <span class="keyword">WHERE</span> <span class="keyword">status</span> != <span class="number">1</span> <span class="keyword">AND</span> <span class="keyword">status</span> != <span class="number">2</span>;</span><br></pre></td></tr></table></figure>
+
+<p>会发现并没有命中索引，但是我们可以优化为in查询，但是前提区分度要高，返回的数据的比例在30%以内。</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">EXPLAIN</span> <span class="keyword">SELECT</span> * <span class="keyword">FROM</span> <span class="keyword">user</span> <span class="keyword">WHERE</span> <span class="keyword">status</span> <span class="keyword">in</span> (<span class="number">0</span>,<span class="number">3</span>,<span class="number">4</span>,<span class="number">5</span>,<span class="number">6</span>);</span><br></pre></td></tr></table></figure>
+</li>
+<li><h4 id="范围查询可以命中缓存"><a href="#范围查询可以命中缓存" class="headerlink" title="范围查询可以命中缓存"></a>范围查询可以命中缓存</h4><p>范围列可以用到索引（联合索引必须是最左前缀），但是范围列后面的列无法用到索引，索引最多用于一个范围列，如果查询条件中有两个范围列则无法全用到索引。</p>
+<p>如果是范围查询和等值查询同时存在，优先匹配等值查询列的索引</p>
+</li>
+<li><h4 id="索引列参与计算-包括函数运算-的法则无法命中索引"><a href="#索引列参与计算-包括函数运算-的法则无法命中索引" class="headerlink" title="索引列参与计算(包括函数运算)的法则无法命中索引"></a>索引列参与计算(包括函数运算)的法则无法命中索引</h4></li>
+<li><h4 id="利用覆盖索引进行查询，避免回表"><a href="#利用覆盖索引进行查询，避免回表" class="headerlink" title="利用覆盖索引进行查询，避免回表"></a>利用覆盖索引进行查询，避免回表</h4></li>
+<li><h4 id="建立索引的列，不允许为-null"><a href="#建立索引的列，不允许为-null" class="headerlink" title="建立索引的列，不允许为 null"></a>建立索引的列，不允许为 null</h4><p>单列索引不存 null 值，复合索引不存全为 null 的值，如果列允许为 null，可能会得到“不符合预期”的结果集，所以，请使用 not null 约束以及默认值。</p>
+<p>比如我们给一个remark字段(允许为null)加索引，执行如下语句：</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">EXPLAIN</span> <span class="keyword">SELECT</span> * <span class="keyword">FROM</span> <span class="keyword">user</span> <span class="keyword">WHERE</span> remark <span class="keyword">IS</span> <span class="literal">NULL</span>;</span><br></pre></td></tr></table></figure>
+
+<p>发现命中索引，而执行下面这条语句：</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">EXPLAIN</span> <span class="keyword">SELECT</span> * <span class="keyword">FROM</span> <span class="keyword">user</span> <span class="keyword">WHERE</span> remark <span class="keyword">IS</span> <span class="keyword">NOT</span> <span class="literal">NULL</span>;</span><br></pre></td></tr></table></figure>
+
+<p>发现没有命中索引。<strong>虽然IS NULL可以命中索引，但是NULL本身就不是一种好的数据库设计，应该使用NOT NULL 约束以及默认值</strong></p>
+</li>
+<li><h4 id="更新十分频繁的字段上不宜建立索引"><a href="#更新十分频繁的字段上不宜建立索引" class="headerlink" title="更新十分频繁的字段上不宜建立索引"></a>更新十分频繁的字段上不宜建立索引</h4><p>因为更新操作会变更B+树，重建索引。这个过程是十分消耗数据库性能的。</p>
+</li>
+<li><h4 id="区分度不大的字段上不宜建立索引"><a href="#区分度不大的字段上不宜建立索引" class="headerlink" title="区分度不大的字段上不宜建立索引"></a>区分度不大的字段上不宜建立索引</h4><p>类似于性别这种区分度不大的字段，建立索引的意义不大。因为不能有效过滤数据，性能和全表扫描相当。另外返回数据的比例在30%以外的情况下，优化器不会选择使用索引。</p>
+</li>
+<li><h4 id="多表关联时，要保证关联字段上一定有索引"><a href="#多表关联时，要保证关联字段上一定有索引" class="headerlink" title="多表关联时，要保证关联字段上一定有索引"></a>多表关联时，要保证关联字段上一定有索引</h4></li>
+<li><h4 id="SQL语句中IN包含的值不应过多"><a href="#SQL语句中IN包含的值不应过多" class="headerlink" title="SQL语句中IN包含的值不应过多"></a>SQL语句中IN包含的值不应过多</h4><p>MySQL对于IN做了相应的优化，即将IN中的常量全部存储在一个数组里面，而且这个数组是排好序的。但是如果数值较多，产生的消耗也是比较大的。再例如：<code>select id from table_name where num in(1,2,3)</code> 对于连续的数值，能用 between 就不要用 in 了；再或者使用连接来替换。</p>
+</li>
+<li><h4 id="SELECT语句务必指明字段名称"><a href="#SELECT语句务必指明字段名称" class="headerlink" title="SELECT语句务必指明字段名称"></a>SELECT语句务必指明字段名称</h4><p>SELECT * 增加很多不必要的消耗（cpu、io、内存、网络带宽）；增加了使用覆盖索引的可能性；当表结构发生改变时，前端也需要更新。所以要求直接在select后面接上字段名。</p>
+</li>
+<li><h4 id="区分in和exists，-not-in和not-exists"><a href="#区分in和exists，-not-in和not-exists" class="headerlink" title="区分in和exists， not in和not exists"></a>区分in和exists， not in和not exists</h4><p>区分in和exists主要是造成了驱动顺序的改变（这是性能变化的关键），如果是exists，那么以外层表为驱动表，先被访问，如果是IN，那么先执行子查询。所以<strong>IN适合于外表大而内表小的情况；EXISTS适合于外表小而内表大的情况。</strong></p>
+<p>关于not in和not exists，推荐使用not exists，不仅仅是效率问题，not in可能存在逻辑问题。<strong>如何高效的写出一个替代not exists的sql语句？</strong></p>
+<p>如下语句：</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">EXPLAIN</span> <span class="keyword">SELECT</span> colname... <span class="keyword">FROM</span> A表 a <span class="keyword">WHERE</span> <span class="keyword">id</span> <span class="keyword">NOT</span> <span class="keyword">IN</span> (<span class="keyword">SELECT</span> b.id <span class="keyword">FROM</span> B表 b);</span><br></pre></td></tr></table></figure>
+
+<p>可以优化成：</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">EXPLAIN</span> <span class="keyword">SELECT</span> colname... <span class="keyword">FROM</span> A表 a <span class="keyword">LEFT</span> <span class="keyword">JOIN</span> B表 b <span class="keyword">WHERE</span> a.id = b.id;</span><br></pre></td></tr></table></figure>
+</li>
+<li><h4 id="创建索引时避免以下错误观念"><a href="#创建索引时避免以下错误观念" class="headerlink" title="创建索引时避免以下错误观念"></a>创建索引时避免以下错误观念</h4><ul>
+<li>索引越多越好，认为一个查询就需要建一个索引。</li>
+<li>宁缺勿滥，认为索引会消耗空间、严重拖慢更新和新增速度。</li>
+<li>抵制唯一索引，认为业务的唯一性一律需要在应用层通过“先查后插”方式解决。</li>
+<li>过早优化，在不了解系统的情况下就开始优化。</li>
+</ul>
+</li>
+</ol>
+</li>
+</ol>
 ]]></content>
       <categories>
-        <category>python</category>
+        <category>数据库</category>
       </categories>
       <tags>
-        <tag>python基础</tag>
-        <tag>vscode</tag>
+        <tag>offer</tag>
+        <tag>mysql索引</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>mysql索引总结-基础原理篇</title>
+    <url>/2020/05/26/mysql%E7%B4%A2%E5%BC%95%E6%80%BB%E7%BB%93-%E5%9F%BA%E7%A1%80%E5%8E%9F%E7%90%86%E7%AF%87/</url>
+    <content><![CDATA[<ol>
+<li><h3 id="MySQL索引本质"><a href="#MySQL索引本质" class="headerlink" title="MySQL索引本质"></a>MySQL索引本质</h3><p>是一种用来帮助mysql高速获取排好序的数据的<strong>数据结构</strong>。</p>
+</li>
+</ol>
+<ol start="2">
+<li><h3 id="MySQL索引原理"><a href="#MySQL索引原理" class="headerlink" title="MySQL索引原理"></a>MySQL索引原理</h3><ol>
+<li><h4 id="索引分类"><a href="#索引分类" class="headerlink" title="索引分类"></a>索引分类</h4><ol>
+<li>从存储结构上来划分：BTree索引(B-Tree或B+Tree索引)，Hash索引，full-index全文索引，R-Tree索引。</li>
+<li>从应用层次来分：普通索引，唯一索引，复合索引，主键索引</li>
+<li>根据数据的物理顺序与键值的逻辑(索引)顺序关系：聚集索引，非聚集索引。</li>
+</ol>
+<a id="more"></a>
+
+<blockquote>
+<p>注意：</p>
+<p>普通索引：基本的索引类型，没有唯一性的限制，允许为NULL值，即一个索引只包含单个列，一个表可以有多个单列索引，叶节点包含了主键(注意不是记录所在硬盘的地址)，因此有个回表的概念：即普通索引中先找到我们需要的数据的主键，然后再在表中进行一次查询，myISAM是典型的一种需要”回表查询”的引擎。</p>
+<p><strong>回表：</strong>当对一个列创建索引之后，索引会包含该列的键值及键值对应行所在的 rowid。通过索引中记录的 rowid 访问表中的数据就叫回表。回表次数太多会严重影响 SQL 性能，如果回表次数太多，就不应该走索引扫描，应该直接走全表扫描。</p>
+<p><strong>EXPLAIN命令结果中的<code>Using Index</code>意味着不会回表，通过索引就可以获得主要的数据。<code>Using Where</code>则意味着需要回表取数据。</strong></p>
+<p>额外说一句mysql中主要文件结构，我们主要比较myISAM和InnoDB(后文还会提到)：</p>
+<p>mysql中所有的表存储在mysql目录/data目录下</p>
+<p>对于使用myISAM引擎的表：.frm是表结构文件，.MYD是表记录文件，.MYI是表索引记录文件</p>
+<p>而对于使用innoDB引擎的表：.frm是表结构文件，.ibd是表记录和索引文件</p>
+<p>由上可知，myISAM索引文件和数据文件是分离的（非聚集），所以查询是先从.MYI文件中查找索引(如果有的话),然后根据索引查询表记录所在磁盘地址。innoDB索引文件和数据文件是在一起的（聚集），所以查询是直接在.ibd文件中查询索引(如果有的话)，而叶子节点存储着表记录，所以查询到索引即查询到表记录</p>
+<p>然后，再由上我们可以知道：InnoDB一定要有主键，因为InnoDB是默认用B+tree数据结构来组织数据记录的，所以如果不设置主键的话，数据就无法进行组织存储。当然InnoDB会自动选一个可以用来唯一标识一张表中所有记录的字段（简单说就是该字段所有记录不重复）来做主键索引字段，如果找不到这样的字段，就会自动生成一个这样的字段用作唯一索引字段row_id</p>
+<p>唯一索引：索引列的值必须唯一，但允许有空值，一个表允许多个列创建唯一索引。</p>
+<p>主键索引：数据列不允许重复，不允许为NULL，一个表只能有一个主键。</p>
+<p>复合索引：即一个索引包含多一个列</p>
+<p>聚集索引：并不是一种单独的索引类型，而是一种数据存储方式，也可以说叶节点包含了完整的数据记录。具体细节取决于不同的实现，InnoDB的聚簇索引其实就是在同一个结构中保存了B-Tree索引(技术上来说是B+Tree)和数据行</p>
+<p>非聚集索引：不是聚集索引就是非聚集索引(^_^)，当然了，前面有说过，数据和索引不是在一起存储的可以看做非聚集索引。</p>
+<p><strong>注意区分主键和索引的区别：</strong></p>
+<p>​    定义：</p>
+<p>​    主键：唯一标识一条记录，不能有重复的，不允许为空</p>
+<p>​    外键：表的外键是另一表的主键, 外键可以有重复的, 可以是空值</p>
+<p>​    索引：是对数据库表中一列或多列的值进行排序的一种结构</p>
+<p>​    作用：</p>
+<p>​    主键：用来保证数据完整性</p>
+<p>​    外键：用来和其他表建立联系用的</p>
+<p>​    索引：是提高查询排序的速度</p>
+<p>​    个数：</p>
+<p>​    主键：主键只能有一个</p>
+<p>​    外键：一个表可以有多个外键</p>
+<p>​    索引：一个表可以有多个唯一索引</p>
+<p>​    添加：</p>
+<p>​    主键：ALTER TABLE “表名” ADD PRIMARY KEY (字段名)</p>
+<p>​    外键：ALTER TABLE “表名” ADD FOREIGN KEY (字段名) REFERENCES “另一张表名”( 字段名)</p>
+<p>​    索引：ALTER TABLE “表名” ADD INDEX (字段名)</p>
+</blockquote>
+</li>
+</ol>
+</li>
+</ol>
+<ol start="2">
+<li><h4 id="各个索引比较"><a href="#各个索引比较" class="headerlink" title="各个索引比较"></a>各个索引比较</h4><p>​    0x01. 默认不使用二叉查找树的原因:比如给col列加索引，而col列分别为1，2，3，4，5，6，根据二叉查找树的特点，最终索引将会变成只有右子树形状的二叉树，而这时进行查询的效果就和链表一样了，所以不适用</p>
+<p>​    0x02. 默认不使用红黑树的原因:当数据很大(上百万上千万)时树的高度就比较高，假如我们需要的数值位于叶子节点，那么需要进行的磁盘i/o就比较多(比如树高5，则至少要进行5次磁盘i/o)，而进行磁盘i/o会让效率降低，因为其需要很多的时间</p>
+<p>​    0x03. 默认不使用hash表的原因:1.不支持范围查询。2.不支持排序，也不支持模糊查询以及多列索引的最左前缀匹配。3.当数据量上去了之后，hash冲突的概率也会变大，效率将会明细降低。4.hash索引任何时候都避免不了回表查询数据，而B+树在符合某些条件(聚簇索引，覆盖索引等)的时候可以只通过索引完成查询。5.hash索引虽然在等值查询上较快，但是不稳定。性能不可预测，当某个键值存在大量重复的时候，发生hash碰撞，此时效率可能极差。而B+树的查询效率比较稳定，对于所有的查询都是从根节点到叶子节点，且树的高度较低。</p>
+<p>​    0x04. b+tree是btree的变种：1.非叶子节点不存储data，只存储索引(冗余)，可以放更多的索引。2.叶子节点包含所有索引字段与data。3.叶子节点用双向指针相连，提高区间访问的性能。很明显非叶子节点不存data之后就可以存储更多的索引，从而可以让树的高度更小，同时叶子节点加了指针相连之后，可以很好的支持范围查找</p>
+<p>​    0x05. b树也有好处：B树可以在内部节点同时存储键和值，因此，把频繁访问的数据放在靠近根节点的地方将会大大提高热点数据的查询效率。这种特性使得B树在特定数据重复多次查询的场景中更加高效。</p>
+<blockquote>
+<p>注意：</p>
+<p>通过上面的比较我们可以知道：</p>
+<ol>
+<li>节点中(数据)索引占用空间越小，那么该节点中数据(索引)的数量就越多，从而数的高度越低，从而IO次数更少。所以一般推荐整型主键做索引，因为这样不仅比较更快，同时占用的空间也小。同时这也是为什么b+tree要求把真正的数据记录放到叶子节点而不是内层节点的原因，因为一旦放到内层节点，那么每个节点中能保存索引的个数会大幅度下降，导致树增高。当每个节点中(数据)索引个数为1时会退化成线性表。</li>
+<li>最左匹配原则(这里只做一个通俗理解，后面文章还会提到)：当b+树的数据项是复合的数据结构，比如(name,age,sex)的时候，b+数是按照从左到右的顺序来建立搜索树的，比如当(张三,20,F)这样的数据来检索的时候，b+树会优先比较name来确定下一步的所搜方向，如果name相同再依次比较age和sex，最后得到检索的数据；但当(20,F)这样的没有name的数据来的时候，b+树就不知道下一步该查哪个节点，因为建立搜索树的时候name就是第一个比较因子，必须要先根据name来搜索才能知道下一步去哪里查询。比如当(张三,F)这样的数据来检索时，b+树可以用name来指定搜索方向，但下一个字段age的缺失，所以只能把名字等于张三的数据都找到，然后再匹配性别是F的数据了， 这个是非常重要的性质，即索引的最左匹配特性。</li>
+</ol>
+</blockquote>
+</li>
+</ol>
+<ol start="3">
+<li><h3 id="MySQL索引实现"><a href="#MySQL索引实现" class="headerlink" title="MySQL索引实现"></a>MySQL索引实现</h3><ol>
+<li><h4 id="myISAM索引实现"><a href="#myISAM索引实现" class="headerlink" title="myISAM索引实现"></a>myISAM索引实现</h4><p>myISAM引擎使用B+Tree作为索引结构，叶节点的data域存放的是<strong>数据记录的地址</strong>。下图是myISAM索引的原理图：</p>
+<p><img src="https://s1.ax1x.com/2020/05/27/tEDrtg.png" alt="tEDrtg.png"></p>
+<p>这里设表共有三列，假设我们以Col1为主键，则上图便是一个myISAM表的主索引示意图。可以看出myISAM的索引文件仅仅保存数据记录的地址。<strong>在myISAM中</strong>，主索引和辅助索引在结构上没有任何区别，只是主索引要求key是唯一的，而辅助索引的key可以重复。如果我们在Col2上建立一个辅助索引，则此索引的结构如下图所示：</p>
+<p><img src="https://s1.ax1x.com/2020/05/27/tE6W24.png" alt="tE6W24.png"></p>
+<p>同样也是一棵B+Tree，data域保存数据记录的地址。因此，myISAM中索引检索的算法为首先按照B+Tree搜索算法搜索索引，如果指定的Key存在，则取出其data域的值，然后以data域的值为地址，读取相应数据记录。</p>
+<p><strong>myISAM的索引是非聚集索引。</strong></p>
+</li>
+<li><h4 id="InnoDB索引实现"><a href="#InnoDB索引实现" class="headerlink" title="InnoDB索引实现"></a>InnoDB索引实现</h4><p>InnoDB索引实现可以和myISAM对比来看。</p>
+<p>1）第一个重大区别是InnoDB的数据文件本身就是索引文件。从上文知道，MyISAM索引文件和数据文件是分离的，索引文件仅保存数据记录的地址。而在InnoDB中，表数据文件本身就是按B+Tree组织的一个索引结构，这棵树的叶节点data域保存了完整的数据记录。这个索引的key是数据表的主键，因此InnoDB表数据文件本身就是主索引。如图：</p>
+<p><img src="https://s1.ax1x.com/2020/05/27/tE2UPK.png" alt="tE2UPK.png"></p>
+</li>
+</ol>
+<p>​        上图是Innodb主索引(同时也是数据文件)的示意图，可以看到可以看到叶节点包含了完整的数据记录。这种索引叫做聚集索引。因为InnoDB的数据文件本身要按主键聚集，所以InnoDB要求表必须有主键(MyISAM可以没有)，如果没有显式指定，则MySQL系统会自动选择一个可以唯一标识数据记录的列作为主键，如果不存在这种列，则MySQL自动为InnoDB表生成一个隐含字段作为主键，这个字段长度为6个字节，类型为长整形。</p>
+<p>​    2）第二个与myISAM索引不同的是InnoDB的辅助索引data域存储的是相应记录的主键而不是记录地址。换句话说，InnoDB的所有辅助索引都引用主键作为data域。例如，下图为定义在Col3上的一个辅助索引:</p>
+<p><img src="https://s1.ax1x.com/2020/05/27/tE469x.png" alt="tE469x.png"></p>
+<p>这里以英文字符的ASCII码作为比较准则。聚集索引这种实现方式使得按主键的搜索十分高效，但是辅助索引搜索需要检索两遍索引：首先检索辅助索引获得主键，然后用主键到主索引中检索获得记录。</p>
+<p>了解不同存储引擎的索引实现方式对于正确使用和优化索引都非常有帮助，例如知道了InnoDB的索引实现后，就很容易明白为什么不建议使用过长的字段作为主键，因为所有辅助索引都引用主索引，过长的主索引会令辅助索引变得过大。再例如，用非单调的字段作为主键在InnoDB中不是个好主意，因为InnoDB数据文件本身是一颗B+Tree，非单调的主键会造成在插入新记录时数据文件为了维持B+Tree的特性而频繁的分裂调整，十分低效，而使用自增字段作为主键则是一个很好的选择。</p>
+</li>
+<li><h3 id="myISAM和innoDB的区别与选择："><a href="#myISAM和innoDB的区别与选择：" class="headerlink" title="myISAM和innoDB的区别与选择："></a>myISAM和innoDB的区别与选择：</h3><ol>
+<li><h4 id="区别"><a href="#区别" class="headerlink" title="区别"></a>区别</h4></li>
+</ol>
+<p>​    1）InnoDB 支持事务，MyISAM 不支持事务。这是 MySQL 将默认存储引擎从 MyISAM 变成 InnoDB 的重要原因之一；</p>
+<p>​    2）InnoDB 支持外键，而 MyISAM 不支持。对一个包含外键的 InnoDB 表转为 MYISAM 会失败；  </p>
+<p>​    3）InnoDB 是聚集索引，MyISAM 是非聚集索引。聚簇索引的文件存放在主键索引的叶子节点上，因此 InnoDB 必    须要有主键，通过主键索引效率很高。但是辅助索引需要两次查询，先查询到主键，然后再通过主键查询到数据。    因此，主键不应该过大，因为主键太大，其他索引也都会很大。而 MyISAM 是非聚集索引，数据文件是分离的，索    引保存的是数据文件的指针。主键索引和辅助索引是独立的。 </p>
+<p>​    4）InnoDB 不保存表的具体行数，执行 select count(*) from table 时需要全表扫描。而MyISAM 用一个变量保存了整个表的行数，执行上述语句时只需要读出该变量即可，速度很快；    </p>
+<p>​    5）InnoDB 最小的锁粒度是行锁，MyISAM 最小的锁粒度是表锁。一个更新语句会锁住整张表，导致其他查询和更新都会被阻塞，因此并发访问受限。这也是 MySQL 将默认存储引擎从 MyISAM 变成 InnoDB 的重要原因之一；</p>
+<ol start="2">
+<li><h4 id="如何选择"><a href="#如何选择" class="headerlink" title="如何选择"></a>如何选择</h4><p>1）是否要支持事务，如果要请选择 InnoDB，如果不需要可以考虑 MyISAM；</p>
+<p>2）如果表中绝大多数都只是读查询，可以考虑 MyISAM，如果既有读写也挺频繁，请使用InnoDB。</p>
+<p>3）系统崩溃后，MyISAM恢复起来更困难，能否接受，不能接受就选 InnoDB；</p>
+<p>4）MySQL5.5版本开始Innodb已经成为Mysql的默认引擎(之前是MyISAM)，说明其优势是有目共睹的。如果你不知道用什么存储引擎，那就用InnoDB，至少不会差。</p>
+</li>
+</ol>
+</li>
+<li><h3 id="建立一个合适索引-为后面索引优化做一个抛砖引玉"><a href="#建立一个合适索引-为后面索引优化做一个抛砖引玉" class="headerlink" title="建立一个合适索引(为后面索引优化做一个抛砖引玉)"></a>建立一个合适索引(为后面索引优化做一个抛砖引玉)</h3><ol>
+<li><h4 id="建立索引的原理"><a href="#建立索引的原理" class="headerlink" title="建立索引的原理"></a>建立索引的原理</h4><p>一个最重要的原则是最左前缀原理，在提这个之前要先说下联合索引，MySQL中的索引可以以一定顺序引用多个列，这种索引叫做联合索引，一般的，一个联合索引是一个有序元组&lt;a1, a2, …, an&gt;，其中各个元素均为数据表的一列。另外，单列索引可以看成联合索引元素数为1的特例。</p>
+<p>索引匹配的最左原则具体是说，假如索引列分别为A，B，C，顺序也是A，B，C：</p>
+<ul>
+<li>那么查询的时候，如果查询【A】【A，B】 【A，B，C】，那么可以通过索引查询</li>
+<li>如果查询的时候，采用【A，C】，那么C这个虽然是索引，但是由于中间缺失了B，因此C这个索引是用不到的，只能用到A索引</li>
+<li>如果查询的时候，采用【B】 【B，C】 【C】，由于没有用到第一列索引，不是最左前缀，那么后面的索引也是用不到了</li>
+<li>如果查询的时候，采用范围查询，并且是最左前缀，也就是第一列索引，那么可以用到索引，但是范围后面的列无法用到索引</li>
+</ul>
+<p>因为索引虽然加快了查询速度，但索引也是有代价的：索引文件本身要消耗存储空间，同时索引会加重插入、删除和修改记录时的负担(要维护索引数据结构)，另外，MySQL在运行时也要消耗资源维护索引，因此索引并不是越多越好。</p>
+<p>在使用InnoDB存储引擎时，如果没有特别的需要，请永远使用一个与业务无关的自增字段作为主键。如果从数据库索引优化角度看，使用InnoDB引擎而不使用自增主键绝对是一个糟糕的主意。</p>
+<p>InnoDB使用聚集索引，数据记录本身被存于主索引(一颗B+Tree)的叶子节点上。这就要求同一个叶子节点内(大小为一个内存页或磁盘页)的各条数据记录按主键顺序存放，因此每当有一条新的记录插入时，MySQL会根据其主键将其插入适当的节点和位置，如果页面达到装载因子(InnoDB默认为15/16)，则开辟一个新的页(节点)。如果表使用自增主键，那么每次插入新的记录，记录就会顺序添加到当前索引节点的后续位置，当一页写满，就会自动开辟一个新的页。如下：</p>
+<p><img src="https://s1.ax1x.com/2020/05/28/tVfght.gif" alt="tVfght.gif"></p>
+<p>这样就会形成一个紧凑的索引结构，近似顺序填满。由于每次插入时也不需要移动已有数据，因此效率很高，也不会增加很多开销在维护索引上。</p>
+<p>如果使用非自增主键（如果身份证号或学号等），由于每次插入主键的值近似于随机，因此每次新纪录都要被插到现有索引页得中间某个位置，如下<strong>(注意D080的位置)</strong>：</p>
+<p><img src="https://s1.ax1x.com/2020/05/28/tVhKUA.gif" alt="tVhKUA.gif"></p>
+<p>此时MySQL不得不为了将新记录插到合适位置而移动数据，甚至目标页面可能已经被回写到磁盘上而从缓存中清掉，此时又要从磁盘上读回来，这增加了很多开销，同时频繁的移动、分页操作造成了大量的碎片，得到了不够紧凑的索引结构，后续不得不通过OPTIMIZE TABLE来重建表并优化填充页面。</p>
+<p>页分裂：如果主键是非自增 id，为了确保索引有序，mysql 就需要将每次插入的数据都放到合适的位置上。当往一个快满或已满的数据页中插入数据时，新插入的数据会将数据页写满，mysql 就需要申请新的数据页，并且把上个数据页中的部分数据挪到新的数据页上。这就造成了页分裂，这个大量移动数据的过程是会严重影响插入效率的。</p>
+</li>
+<li><h4 id="建立索引的一些注意点"><a href="#建立索引的一些注意点" class="headerlink" title="建立索引的一些注意点"></a>建立索引的一些注意点</h4><ol>
+<li><p>最左前缀匹配原则，非常重要的原则，mysql会一直向右匹配直到遇到范围查询(&gt;、&lt;、between、like)就停止匹配，比如a = 1 and b = 2 and c &gt; 3 and d = 4 如果建立(a,b,c,d)顺序的索引，d是用不到索引的，如果建立(a,b,d,c)的索引则都可以用到，a,b,d的顺序可以任意调整。where子句中使用最频繁的一列放在最左边。</p>
+</li>
+<li><p>=和in可以乱序，比如a = 1 and b = 2 and c = 3 建立(a,b,c)索引可以任意顺序，mysql的查询优化器会帮你优化成索引可以识别的形式</p>
+</li>
+<li><p>尽量选择区分度高的列作为索引,区分度的公式是count(distinct col)/count(*)，表示字段不重复的比例，比例越大我们扫描的记录数越少，唯一键(索引)的区分度是1，而一些状态、性别字段可能在大数据面前区分度就是0，那可能有人会问，这个比例有什么经验值吗？使用场景不同，这个值也很难确定，一般需要join的字段我们都要求是0.1以上，即平均1条扫描10条记录</p>
+</li>
+<li><p>索引列不能参与计算和函数运算，保持列“干净”，比如from_unixtime(create_time) = ’2014-05-29’就不能使用到索引，原因很简单，b+树中存的都是数据表中的字段值，但进行检索时，需要把所有元素都应用函数才能比较，显然成本太大。所以语句应该写成create_time = unix_timestamp(’2014-05-29’);</p>
+</li>
+<li><p>尽量的扩展索引，不要新建索引。比如表中已经有a的索引，现在要加(a,b)的索引，那么只需要修改原来的索引即可，当然要考虑原有数据和线上使用情况</p>
+</li>
+<li><p>主键不推荐有业务含义：(1)因为任何有业务含义的列都有改变的可能性,主键一旦带上了业务含义，那么主键就有可能发生变更。主键一旦发生变更，该数据在磁盘上的存储位置就会发生变更，有可能会引发页分裂，产生空间碎片。(2)带有业务含义的主键，不一定是顺序自增的。那么就会导致数据的插入顺序，并不能保证后面插入数据的主键一定比前面的数据大。如果出现了，后面插入数据的主键比前面的小，就有可能引发页分裂，产生空间碎片。</p>
+</li>
+<li><p>较频繁作为查询条件的字段才去创建索引，更新频繁字段不适合创建索引</p>
+</li>
+<li><p>定义有外键的数据列一定要建立索引</p>
+</li>
+<li><p>索引字段越小越好，为较长的字符串使用前缀索引，当然前提是前缀的标识度高。比如密码就适合建立前缀索引，因为密码几乎各不相同。</p>
+<p>[^前缀索引：如果索引列长度过长，这种列索引时将会产生很大的索引文件，不便于操作，可以使用前缀索引方式进行索引前缀索引应该控制在一个合适的点，控制在0.31黄金值即可（大于这个值就可以创建）。SELECT COUNT(DISTINCT(LEFT(<code>title</code>,10)))/COUNT(*) FROM Arctic; — 这个值大于0.31就可以创建前缀索引，Distinct去重复 ALTER TABLE <code>user</code> ADD INDEX <code>uname</code>(title(10)); — 增加前缀索引SQL，将人名的索引建立在10，这样可以减少索引文件大小，加快索引查询速度。]: </p>
+</li>
+<li><p>使用组合索引，可以减少文件索引大小，在使用时速度要优于多个单列索引</p>
+</li>
+<li><p>不要过多创建索引，除了增加额外的磁盘空间外，对于DML操作的速度影响很大，因为其每增删改一次就得从新建立索引</p>
+</li>
+<li><p>数字和字符串比较不会使用索引，前缀模糊查询不走索引(如select * from table_name where name like ‘%jack’;)</p>
+</li>
+<li><p>应该指定列为NOT NULL，除非你想存储NULL。在mysql中，含有空值的列很难进行查询优化，因为它们使得索引、索引的统计信息以及比较运算更加复杂。你应该用0、一个特殊的值或者一个空串代替空值；</p>
+</li>
+<li><p>通常，通过索引查询数据比全表扫描要快。但是我们也必须注意到它的代价。</p>
+<p>索引需要空间来存储，也需要定期维护， 每当有记录在表中增减或索引列被修改时，索引本身也会被修改。 这意味着每条记录的INSERT，DELETE，UPDATE将为此多付出4，5 次的磁盘I/O。 因为索引需要额外的存储空间和处理，那些不必要的索引反而会使查询反应时间变慢。使用索引查询不一定能提高查询性能，索引范围查询(INDEX RANGE SCAN)适用于两种情况:</p>
+<p>​    1. 基于一个范围的检索，一般查询返回结果集小于表中记录数的30%</p>
+<p>​    2. 基于非唯一性索引的检索</p>
+</li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+]]></content>
+      <categories>
+        <category>数据库</category>
+      </categories>
+      <tags>
+        <tag>offer</tag>
+        <tag>mysql索引</tag>
       </tags>
   </entry>
   <entry>
@@ -838,6 +1015,233 @@
       <tags>
         <tag>java后端须知</tag>
         <tag>swagger</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>vscode配置python环境</title>
+    <url>/2023/09/16/vscode%E5%AE%89%E8%A3%85python%E7%8E%AF%E5%A2%83/</url>
+    <content><![CDATA[<h2 id="1-下载并安装vscode"><a href="#1-下载并安装vscode" class="headerlink" title="1 下载并安装vscode"></a>1 下载并安装vscode</h2><h3 id="1-1-下载地址"><a href="#1-1-下载地址" class="headerlink" title="1.1 下载地址"></a>1.1 下载地址</h3><p><a href="https://code.visualstudio.com/Download" target="_blank" rel="external nofollow noopener noreferrer">https://code.visualstudio.com/Download</a></p>
+<h3 id="1-2-安装vscode（其他系统安装方式这里不再赘述，这里推荐使用-zip方式安装）"><a href="#1-2-安装vscode（其他系统安装方式这里不再赘述，这里推荐使用-zip方式安装）" class="headerlink" title="1.2 安装vscode（其他系统安装方式这里不再赘述，这里推荐使用.zip方式安装）"></a>1.2 安装vscode（其他系统安装方式这里不再赘述，这里推荐使用<strong>.zip</strong>方式安装）</h3><ul>
+<li>选择对应机器以及版本下载zip包</li>
+<li>解压之后在和Code.exe同级的目录下创建<strong>data</strong>文件夹(如果没有按照这步来，vscode可能就会在一些你无法预知的目录输出数据，比如在系统盘下的Appdata或program files目录下)</li>
+<li>这样相关插件&amp;用户数据就都会在data文件夹下(这也是推荐使用.zip安装vscode的理由)</li>
+</ul>
+<h2 id="2-下载python解释器"><a href="#2-下载python解释器" class="headerlink" title="2 下载python解释器"></a>2 下载python解释器</h2><h3 id="2-1-下载地址-官网有个时候打不开，多刷几次"><a href="#2-1-下载地址-官网有个时候打不开，多刷几次" class="headerlink" title="2.1 下载地址(官网有个时候打不开，多刷几次)"></a>2.1 下载地址(官网有个时候打不开，多刷几次)</h3><p><a href="https://www.python.org/downloads/" target="_blank" rel="external nofollow noopener noreferrer">https://www.python.org/downloads/</a></p>
+<h3 id="2-2-安装python解释器-以python-3-10-0-amd64-exe为例"><a href="#2-2-安装python解释器-以python-3-10-0-amd64-exe为例" class="headerlink" title="2.2 安装python解释器(以python-3.10.0-amd64.exe为例)"></a>2.2 安装python解释器(以python-3.10.0-amd64.exe为例)</h3><ul>
+<li>双击<strong>python-3.10.0-amd64.exe</strong>进入安装界面</li>
+<li>务必勾选最下面<strong>Add Python 3.10  to PATH</strong>（这里是自动帮你将python路径加到环境变量中去，如果这里不勾选，后面需要自己手动去添加python环境变量：计算机-&gt;属性-&gt;更改配置-&gt;高级-&gt;环境变量-&gt;将python安装路径以及python下的Scripts路径加到用户变量的path中或者系统变量的PATH中)</li>
+<li>选择customize installation</li>
+<li>建议：Optional Features使用默认勾选 -&gt; Advanced Options除了download debug相关不勾选，其他都勾选，安装路径自定义选择</li>
+<li>点击安装</li>
+</ul>
+<h2 id="3-vscode配置python环境"><a href="#3-vscode配置python环境" class="headerlink" title="3 vscode配置python环境"></a>3 vscode配置python环境</h2><p>vscode配置python环境主要就是插件安装以及vscode用户配置</p>
+<h3 id="3-1-插件安装（注意插件全部安装完之后重启vscode）"><a href="#3-1-插件安装（注意插件全部安装完之后重启vscode）" class="headerlink" title="3.1 插件安装（注意插件全部安装完之后重启vscode）"></a>3.1 插件安装（注意插件全部安装完之后重启vscode）</h3><ul>
+<li>搜索插件”中文”然后选择安装(汉化vscode)</li>
+<li>搜索插件”Python”并点击安装(配置vscode python环境最主要的插件)</li>
+<li>搜索插件”intellicode”并点击安装(代码提示&amp;补全)</li>
+<li>搜索插件”pylance”并点击安装(intellicode插件针对python只支持pylance语言服务器)</li>
+<li>搜索插件”AREPL”并点击安装(实时执行python代码，类似预览效果，非必须安装)</li>
+</ul>
+<h3 id="3-2-用户配置"><a href="#3-2-用户配置" class="headerlink" title="3.2 用户配置"></a>3.2 用户配置</h3><ul>
+<li>检查python环境是否生效：新建一个.py文件，正常是可以在vscode左下角看到安装的python版本，并且点击左下角可以切换python版本</li>
+<li>代码提示与自动补全配置：选择：文件-&gt;首选项-&gt;设置，然后搜索”language server”，选择出现的Python那一栏，最下面那个，如果是”Jedi”或者其他服务器，则需要替换成”Pylance”，否则<strong>没有代码提示和自动补全</strong></li>
+<li>指定默认python版本：如果有多个python解释器版本，并且想要设置默认的python解释器，那么可以在用户的”settings.json”文件中添加需要指定的python版本路径：比如：<code>&quot;python.pythonPath&quot;: &quot;D:\\Pythonpkg\\python3.11.5&quot;</code></li>
+<li>静态检查配置：vscode配置完python环境后，右下角可能会报找不到pylint或者报pylint不存在，这主要是python静态检查需要用到的配置，<strong>注意这里要选择prospector进行安装(耗时可能会有点久)，不要选择其他的</strong></li>
+</ul>
+]]></content>
+      <categories>
+        <category>python</category>
+      </categories>
+      <tags>
+        <tag>python基础</tag>
+        <tag>vscode</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>java泛型</title>
+    <url>/2020/07/17/java%E6%B3%9B%E5%9E%8B/</url>
+    <content><![CDATA[<ol>
+<li><h3 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h3><p>java推出泛型以前，程序员可以构建一个元素类型为Object的集合，该集合能够存储任意的数据类型对象，而在使用该集合的过程中，需要程序员明确知道存储的每个元素的数据类型，否则很容易引发ClassCastException异常</p>
+</li>
+<li><h3 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h3><p>java泛型是jdk5中引入的新特性。泛型提供了编译时类型安全监测机制，该机制允许我们在编译时检测到非法的类型数据</p>
+</li>
+<li><h3 id="本质"><a href="#本质" class="headerlink" title="本质"></a>本质</h3><p>泛型的本质是参数化类型，也就是所操作的数据类型被指定为一个参数</p>
+</li>
+<li><h3 id="好处"><a href="#好处" class="headerlink" title="好处"></a>好处</h3><ol>
+<li>类型安全。</li>
+<li>避免了强制类型的转换。</li>
+</ol>
+</li>
+<li><h3 id="常用的泛型标识符：T，E，K，V"><a href="#常用的泛型标识符：T，E，K，V" class="headerlink" title="常用的泛型标识符：T，E，K，V"></a>常用的泛型标识符：T，E，K，V</h3><a id="more"></a>
+</li>
+<li><h3 id="泛型类"><a href="#泛型类" class="headerlink" title="泛型类"></a>泛型类</h3><ol>
+<li><h4 id="泛型类的定义语法"><a href="#泛型类的定义语法" class="headerlink" title="泛型类的定义语法"></a>泛型类的定义语法</h4><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> 类名称&lt;泛型标识,泛型标识...&gt;</span>&#123;</span><br><span class="line">	<span class="keyword">private</span> 泛型标识 变量名;</span><br><span class="line">	...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><h4 id="泛型类的使用语法"><a href="#泛型类的使用语法" class="headerlink" title="泛型类的使用语法"></a>泛型类的使用语法</h4><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">//jdk1.7之前</span></span><br><span class="line">类名&lt;具体的数据类型&gt; 对象名 = <span class="keyword">new</span> 类名&lt;具体的数据类型名&gt;();</span><br><span class="line"><span class="comment">//jdk1.7之后</span></span><br><span class="line">类名&lt;具体的数据类型&gt; 对象名 = <span class="keyword">new</span> 类名&lt;&gt;();</span><br></pre></td></tr></table></figure>
+
+<p>注意：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">//假如我们有一个泛型类Animal</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Animal</span>&lt;<span class="title">T</span>&gt;</span>&#123;</span><br><span class="line">    <span class="keyword">private</span> T name;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setName</span><span class="params">(T name)</span></span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.name = name;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> T <span class="title">getName</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="keyword">return</span> name;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ol>
+<li><p>泛型类在创建对象的时候如果没有指定T的具体数据类型，将会按照Object类型来操作，比如：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">//如果对Animal使用如下：</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span></span>&#123;</span><br><span class="line">    Animal an = <span class="keyword">new</span> Animal();<span class="comment">//没有指定Animal中T的具体数据类型</span></span><br><span class="line">    Object name = an.getName();<span class="comment">//那么这里得到的就是Object对象</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>泛型类不支持基本数据类型，即T不能指定为8个基本数据类型：byte，short，int，long，float，double，char，boolean</p>
+</li>
+<li><p>同一泛型类，根据不同的数据类型创建的对象，本质上是同一类型。即泛型类型在逻辑上可以看成是多个不同的类型，但实际上都是同一类型。比如：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">//验证</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span></span>&#123;</span><br><span class="line">    Animal&lt;String&gt; sAn = <span class="keyword">new</span> Animal&lt;&gt;();<span class="comment">//指定Animal中T为String</span></span><br><span class="line">    Animal&lt;Integer&gt; iAn = <span class="keyword">new</span> Animal&lt;&gt;();<span class="comment">//指定Animal中T为Integer</span></span><br><span class="line">    System.out.println(sAn.getClass() == iAn.getClass());<span class="comment">//结果为true</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+</li>
+<li><h4 id="从泛型类派生子类"><a href="#从泛型类派生子类" class="headerlink" title="从泛型类派生子类"></a>从泛型类派生子类</h4><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">//情况1：子类也是泛型类，子类的泛型标识符需要包括父类的泛型标识符</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Child</span>&lt;<span class="title">T</span>&gt; <span class="keyword">extends</span> <span class="title">Parent</span>&lt;<span class="title">T</span>&gt;</span>&#123;...&#125;</span><br><span class="line"><span class="comment">//或者</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Child</span>&lt;<span class="title">T</span>,<span class="title">E</span>,...&gt; <span class="keyword">extends</span> <span class="title">Parent</span>&lt;<span class="title">T</span>&gt;</span>&#123;...&#125;</span><br><span class="line"><span class="comment">//情况2：子类不是泛型类，那么父类需要明确指出泛型的数据类型</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Child</span> <span class="keyword">extends</span> <span class="title">Parent</span>&lt;<span class="title">String</span>&gt;</span>&#123;...&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+</li>
+<li><h3 id="泛型接口"><a href="#泛型接口" class="headerlink" title="泛型接口"></a>泛型接口</h3><ol>
+<li><h4 id="泛型接口的定义语法"><a href="#泛型接口的定义语法" class="headerlink" title="泛型接口的定义语法"></a>泛型接口的定义语法</h4><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">interface</span> 接口名称&lt;泛型标识符,泛型标识符...&gt;</span>&#123;</span><br><span class="line">    泛型标识符 方法名();</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><h4 id="泛型接口的实现类要求"><a href="#泛型接口的实现类要求" class="headerlink" title="泛型接口的实现类要求"></a>泛型接口的实现类要求</h4><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">//泛型接口</span></span><br><span class="line"><span class="class"><span class="keyword">interface</span> <span class="title">parent</span>&lt;<span class="title">T</span>&gt;</span>&#123;</span><br><span class="line">    <span class="function">T <span class="title">getName</span><span class="params">()</span></span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//情况1：实现类不是泛型类，接口要明确指定具体的数据类型</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">child</span> <span class="keyword">implements</span> <span class="title">parent</span>&lt;<span class="title">String</span>&gt;</span>&#123;<span class="comment">//parent指定具体数据类型为String</span></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getName</span><span class="params">()</span></span>&#123;...&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//情况2：实现类也是泛型类，那么实现类的泛型标识符要包括接口的泛型标识符</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">child</span>&lt;<span class="title">T</span>,<span class="title">E</span>&gt; <span class="keyword">implements</span> <span class="title">parent</span>&lt;<span class="title">T</span>&gt;</span>&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> T <span class="title">getName</span><span class="params">()</span> </span>&#123;...&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+</li>
+<li><h3 id="泛型方法"><a href="#泛型方法" class="headerlink" title="泛型方法"></a>泛型方法</h3><ol>
+<li><h4 id="泛型方法定义"><a href="#泛型方法定义" class="headerlink" title="泛型方法定义"></a>泛型方法定义</h4><figure class="highlight java"><table><tr><td class="code"><pre><span class="line">修饰符 &lt;泛型标识符,泛型标识符,...&gt; 返回值类型 方法名(形参列表)&#123;</span><br><span class="line">    方法体...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>注意：</p>
+<ol>
+<li><p>修饰符与返回值类型中间的&lt;泛型标识符…&gt;很重要，可以理解为声明此方法为泛型方法。同时，<strong>只有在该&lt;泛型标识符…&gt;中声明的泛型标识符，才可在方法中使用</strong>。</p>
+</li>
+<li><p>只有声明了&lt;泛型标识符…&gt;的方法才是泛型方法，泛型类中的使用了泛型的成员方法不是泛型方法。比如：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">//泛型类</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Parent</span>&lt;<span class="title">T</span>&gt;</span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> T <span class="title">getName</span><span class="params">(T name)</span></span>&#123;...&#125;<span class="comment">//成员方法</span></span><br><span class="line">    </span><br><span class="line">    <span class="keyword">public</span> &lt;T&gt; <span class="function">T <span class="title">getName</span><span class="params">(T name)</span></span>&#123;...&#125;<span class="comment">//泛型方法</span></span><br><span class="line">    </span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> &lt;T&gt; <span class="function">T <span class="title">getName</span><span class="params">(T name)</span></span>&#123;...&#125;<span class="comment">//静态泛型方法</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>泛型类中泛型方法可以被声明为静态方法，成员方法不可以被声明为静态方法</strong></p>
+</li>
+<li><p>泛型类中的泛型方法是“独立的”。比如：对于泛型类使用的标识符T</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">//泛型类</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">parent</span>&lt;<span class="title">T</span>&gt;</span>&#123;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">public</span> &lt;T&gt; <span class="function">T <span class="title">getName</span><span class="params">(T name)</span></span>&#123;...&#125;<span class="comment">//这个T和泛型类中声明的T是相互独立的</span></span><br><span class="line">    </span><br><span class="line">    <span class="comment">//也就是说，泛型类和它里面的泛型方法使用了相同的泛型标识符的话，</span></span><br><span class="line">    <span class="comment">//可以在指定泛型类为某一种具体的数据类型的同时，</span></span><br><span class="line">    <span class="comment">//可以给泛型类中的泛型方法指定另一种具体的数据类型</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//调用</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span></span>&#123;</span><br><span class="line">    parent&lt;Integer&gt; pa = <span class="keyword">new</span> parent&lt;&gt;();<span class="comment">//这里的T为Integer类型</span></span><br><span class="line">    pa.getName(<span class="string">"zhangsan"</span>);<span class="comment">//这里的T为String类型</span></span><br><span class="line">    <span class="comment">//上面语句是合法的</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+</li>
+<li><h4 id="泛型方法支持可变参数"><a href="#泛型方法支持可变参数" class="headerlink" title="泛型方法支持可变参数"></a>泛型方法支持可变参数</h4><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> &lt;E&gt; <span class="function"><span class="keyword">void</span> <span class="title">print</span><span class="params">(E... es)</span></span>&#123;<span class="comment">//可变参数</span></span><br><span class="line">    <span class="keyword">for</span>(E e : es)&#123;</span><br><span class="line">        System.out.println(e);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+</li>
+<li><h3 id="类型通配符"><a href="#类型通配符" class="headerlink" title="类型通配符"></a>类型通配符</h3><ol>
+<li><h4 id="概念："><a href="#概念：" class="headerlink" title="概念："></a>概念：</h4><ol>
+<li>类型通配符一般是使用”?”代替具体的类型实参</li>
+<li>所以，类型通配符是类型实参，而不是类型形参</li>
+</ol>
+</li>
+<li><h4 id="类型通配符上限"><a href="#类型通配符上限" class="headerlink" title="类型通配符上限"></a>类型通配符上限</h4><p>类/接口&lt;? extends 实参类型&gt;，泛型方法同理。要求该泛型的类型只能是实参类型或实参类型的子类类型</p>
+</li>
+<li><h4 id="类型通配符下限"><a href="#类型通配符下限" class="headerlink" title="类型通配符下限"></a>类型通配符下限</h4><p>类/接口&lt;? super 实参类型&gt;，泛型方法同理。要求该泛型的类型只能是实参类型或实参类型的父类类型</p>
+</li>
+<li><h4 id="比较"><a href="#比较" class="headerlink" title="比较"></a>比较</h4><p>上限：&lt;? extends T&gt; ?是T和T的子类，下限：&lt;? super T&gt; ?是T和T的父类。怎么看待这个上限和下限呢？</p>
+<ul>
+<li>首先应该想，其实对于Java来说 &lt;? extends T&gt;，&lt;? super T&gt; 是两个确定的类型，因为它不可能由你的赋值完了再确定吧。所以，对于&lt;? extends T&gt; 来说，集合里的元素应该是什么类型呢？应该是T类型，因为你添加的是T或者T的子类，设置为T就可以激发多态了。由此，所以你也只能从这个集合中取出T类型，因为它里面的元素本来设置的就是T类型，你赋值进去只不过是将T的子类赋值给了T，多态。<strong>但是呢，你就不能给这个集合里添加元素了，因为这个集合里元素的类型是T，假如可以添加元素，你初始化的时候初始化成T的一个子类，然后添加值的时候，却添加的另一个子类，</strong>事实上是可以添加的，因为集合元素类型是T，但里面就有了多种T的子类，这样的话，你初始化的时候是这个子类，你取出元素的时候肯定也想着取出的是可以给这个子类赋值的类型，但很有可能取出来的是T的另一个子类，你没法赋值，因为你允许添加另一个子类。<strong>所以一开始就禁止添加元素是对的。</strong></li>
+<li>&lt;? super T&gt;里面的元素，应该设置为什么呢？显然应该是object，因为系统不知道你会把?当成什么，所以只能设置成object，所以你取出元素的时候，取出的是object类。<strong>可不可以添加元素呢？可以，因为下限有保证，所以可以添加T和T的子类</strong>。你初始化的时候，初始化的是T的某个父类，好了，你现在取元素，你希望取出的是你初始化的那个父类，因为你只能添加T和T的子类，所以你取出的元素，肯定可以赋值给那个父类。</li>
+<li><strong>综上，&lt;? extends T&gt; 不可以添加元素，但可以取出类型为T的元素。 &lt;? super T&gt; 可以添加T或者T的子类，取出的一定是object类。</strong></li>
+<li>比如方法参数为：ArrayList&lt;? extends topClass&gt; list，在方法体中list是无法add数据的。但如果方法参数是：ArrayList&lt;? super bottomClass&gt; list，那么是可以add数据的，并且可以添加bottomClass及其子类类型。</li>
+</ul>
+</li>
+</ol>
+</li>
+<li><h3 id="类型擦除"><a href="#类型擦除" class="headerlink" title="类型擦除"></a>类型擦除</h3><ol>
+<li><h4 id="概念-1"><a href="#概念-1" class="headerlink" title="概念"></a>概念</h4><p>泛型是jdk1.5才引进的概念，在这之前是没有泛型的，但是，泛型代码能够很好的的和之前版本的代码兼容，那是因为泛型信息只存在于代码编译阶段，在进入JVM之前，与泛型相关的信息会被擦除掉，我们称之为—-类型擦除。</p>
+</li>
+<li><h4 id="类型擦除的种类"><a href="#类型擦除的种类" class="headerlink" title="类型擦除的种类"></a>类型擦除的种类</h4><ol>
+<li><h5 id="无限制类型擦除"><a href="#无限制类型擦除" class="headerlink" title="无限制类型擦除"></a>无限制类型擦除</h5><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">//泛型类</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Erasure</span>&lt;<span class="title">T</span>&gt;</span>&#123;</span><br><span class="line">    <span class="keyword">private</span> T key;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setKey</span><span class="params">(T key)</span></span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.key = key;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> T <span class="title">getKey</span><span class="params">()</span></span>&#123;</span><br><span class="line">	   <span class="keyword">return</span> <span class="keyword">this</span>.key;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//经过类型擦除之后</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Erasure</span></span>&#123;</span><br><span class="line">    <span class="keyword">private</span> Object key;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setKey</span><span class="params">(Object key)</span></span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.key = key;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> Object <span class="title">getKey</span><span class="params">()</span></span>&#123;</span><br><span class="line">	   <span class="keyword">return</span> <span class="keyword">this</span>.key;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//泛型方法</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Erasure</span></span>&#123;</span><br><span class="line">    <span class="keyword">public</span> &lt;T&gt; <span class="function">T <span class="title">getValue</span><span class="params">(T val)</span></span>&#123;</span><br><span class="line">        <span class="keyword">return</span> val;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//经过类型擦除之后</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Erasure</span></span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> Object <span class="title">getValue</span><span class="params">(Object val)</span></span>&#123;</span><br><span class="line">        <span class="keyword">return</span> val;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><h5 id="有限制类型擦除"><a href="#有限制类型擦除" class="headerlink" title="有限制类型擦除"></a>有限制类型擦除</h5><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">//泛型类</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Erasure</span>&lt;<span class="title">T</span> <span class="keyword">extends</span> <span class="title">Number</span>&gt;</span>&#123;</span><br><span class="line">    <span class="keyword">private</span> T key;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setKey</span><span class="params">(T key)</span></span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.key = key;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> T <span class="title">getKey</span><span class="params">()</span></span>&#123;</span><br><span class="line">	   <span class="keyword">return</span> <span class="keyword">this</span>.key;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//经过类型擦除之后</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Erasure</span></span>&#123;</span><br><span class="line">    <span class="keyword">private</span> Number key;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setKey</span><span class="params">(Number key)</span></span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.key = key;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> Number <span class="title">getKey</span><span class="params">()</span></span>&#123;</span><br><span class="line">	   <span class="keyword">return</span> <span class="keyword">this</span>.key;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//泛型方法</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Erasure</span></span>&#123;</span><br><span class="line">    <span class="keyword">public</span> &lt;T extends Number&gt; <span class="function">T <span class="title">getValue</span><span class="params">(T val)</span></span>&#123;</span><br><span class="line">        <span class="keyword">return</span> val;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//经过类型擦除之后</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Erasure</span></span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> Number <span class="title">getValue</span><span class="params">(Number val)</span></span>&#123;</span><br><span class="line">        <span class="keyword">return</span> val;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+</li>
+<li><h4 id="类型擦除中的桥接方法"><a href="#类型擦除中的桥接方法" class="headerlink" title="类型擦除中的桥接方法"></a>类型擦除中的桥接方法</h4><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">//泛型接口</span></span><br><span class="line"><span class="class"><span class="keyword">interface</span> <span class="title">info</span>&lt;<span class="title">T</span>&gt;</span>&#123;</span><br><span class="line">    <span class="function">T <span class="title">info</span><span class="params">(T val)</span></span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//接口实现</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">infoImpl</span> <span class="keyword">implements</span> <span class="title">info</span>&lt;<span class="title">String</span>&gt;</span>&#123;<span class="comment">//注意这里实现类是非泛型类</span></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">info</span><span class="params">(String val)</span></span>&#123;</span><br><span class="line">        <span class="keyword">return</span> val;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//经过类型擦除之后</span></span><br><span class="line"><span class="class"><span class="keyword">interface</span> <span class="title">info</span></span>&#123;</span><br><span class="line">    <span class="function">Object <span class="title">info</span><span class="params">(Object val)</span></span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">infoImpl</span> <span class="keyword">implements</span> <span class="title">info</span></span>&#123;</span><br><span class="line">    <span class="comment">//需要我们显示的实现</span></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">info</span><span class="params">(String val)</span></span>&#123;</span><br><span class="line">        <span class="keyword">return</span> val;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">//桥接方法，用来保持接口和类之间的实现关系</span></span><br><span class="line">    <span class="comment">//因为接口类型擦除之后，其中的方法也就随之进行类型擦除，</span></span><br><span class="line">    <span class="comment">//根据接口实现的要求，需要将接口中的所有方法实现，也就是说</span></span><br><span class="line">    <span class="comment">//接口中有Object info(Object val)方法，那我们就需要去实现它</span></span><br><span class="line">    <span class="comment">//只不过这是编译器帮我们做的，所以我们看不到</span></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Object <span class="title">info</span><span class="params">(Object val)</span></span>&#123;</span><br><span class="line">        <span class="keyword">return</span> info((String)val);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+</li>
+<li><h3 id="泛型与数组"><a href="#泛型与数组" class="headerlink" title="泛型与数组"></a>泛型与数组</h3><ol>
+<li><h4 id="泛型数组的创建："><a href="#泛型数组的创建：" class="headerlink" title="泛型数组的创建："></a>泛型数组的创建：</h4><ol>
+<li><p>可以声明带泛型的数组引用，但是不能创建带泛型的数组对象。即：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">T[] arr;<span class="comment">//是允许的</span></span><br><span class="line">T[] arr = <span class="keyword">new</span> T[<span class="number">4</span>];<span class="comment">//是不允许的</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>可以通过java.lang.reflect.Array的newInstance(Class&lt;?&gt; clazz，int length)反射创建泛型数组</p>
+</li>
+</ol>
+</li>
+<li><h4 id="一个关于泛型数组的错误使用示例"><a href="#一个关于泛型数组的错误使用示例" class="headerlink" title="一个关于泛型数组的错误使用示例"></a>一个关于泛型数组的错误使用示例</h4><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span></span>&#123;</span><br><span class="line">    ArrayList[] list = <span class="keyword">new</span> ArrayList[<span class="number">5</span>];<span class="comment">//创建ArrayList数组，长度为5</span></span><br><span class="line">    ArrayList&lt;String&gt;[] listArr = list;<span class="comment">//listArr引用指向list</span></span><br><span class="line">    </span><br><span class="line">    ArrayList&lt;Integer&gt; intList = <span class="keyword">new</span> ArrayList&lt;&gt;();<span class="comment">//创建一个整数类型的ArrayList</span></span><br><span class="line">    inList.add(<span class="number">100</span>);<span class="comment">//为它添加一个元素</span></span><br><span class="line">    </span><br><span class="line">    list[<span class="number">0</span>] = intList;<span class="comment">//将list[0]引用指向intList</span></span><br><span class="line">    String s = listArr[<span class="number">0</span>].get(<span class="number">0</span>);<span class="comment">//获取的时候通过listArr引用来获取</span></span><br><span class="line">    System.out.println(s);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>上面整个程序在运行之前一切正常，而当运行之后，会出现ClassCastException异常，即Integer无法转为String。主要就是给数组元素赋值时用的是list引用，而获取数组中元素时使用listArr引用，而两个引用的具体数据类型不同，导致出现ClassCastException。</p>
+</li>
+<li><h4 id="改造上面错误示例"><a href="#改造上面错误示例" class="headerlink" title="改造上面错误示例"></a>改造上面错误示例</h4><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">//可以运行示例：</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span></span>&#123;</span><br><span class="line">    <span class="comment">//ArrayList[] list = new ArrayList[5];//创建ArrayList数组，长度为5</span></span><br><span class="line">    <span class="comment">//ArrayList&lt;String&gt;[] listArr = list;//listArr引用指向list</span></span><br><span class="line">    ArrayList&lt;String&gt;[] listArr = <span class="keyword">new</span> ArrayList[<span class="number">5</span>];<span class="comment">//在创建的时候就指定数组中每个ArrayList中的具体数据类型</span></span><br><span class="line">    </span><br><span class="line">    ArrayList&lt;Integer&gt; intList = <span class="keyword">new</span> ArrayList&lt;&gt;();<span class="comment">//创建一个整数类型的ArrayList</span></span><br><span class="line">    inList.add(<span class="number">100</span>);<span class="comment">//为它添加一个元素</span></span><br><span class="line">    </span><br><span class="line">    ArrayList&lt;String&gt; strList = <span class="keyword">new</span> ArrayList&lt;&gt;();<span class="comment">//创建一个字符串类型的ArrayList</span></span><br><span class="line">    inList.add(<span class="string">"abc"</span>);<span class="comment">//为它添加一个元素</span></span><br><span class="line">    </span><br><span class="line">    <span class="comment">//list[0] = intList;//将list[0]引用指向intList</span></span><br><span class="line">    listArr[<span class="number">0</span>] = strList;<span class="comment">//成功</span></span><br><span class="line">    listArr[<span class="number">1</span>] = intList;<span class="comment">//在没运行之前就报错</span></span><br><span class="line">    </span><br><span class="line">    String s = listArr[<span class="number">0</span>].get(<span class="number">0</span>);<span class="comment">//获取的时候通过listArr引用来获取</span></span><br><span class="line">    System.out.println(s);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><h4 id="反射构建数组"><a href="#反射构建数组" class="headerlink" title="反射构建数组"></a>反射构建数组</h4><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Fruit</span>&lt;<span class="title">T</span>&gt;</span>&#123;</span><br><span class="line">    <span class="keyword">private</span> T[] arr;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">Fruit</span><span class="params">(Class&lt;T&gt; clazz,<span class="keyword">int</span> len)</span></span>&#123;</span><br><span class="line">        <span class="comment">//通过Array.newInstance创建泛型数组</span></span><br><span class="line">        arr = (T[])Array.newInstance(clazz,len);</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">//给数组添加元素</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">put</span><span class="params">(<span class="keyword">int</span> index,T item)</span></span>&#123;</span><br><span class="line">        arr[index] = T;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">//获取数组中元素</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> T <span class="title">get</span><span class="params">(<span class="keyword">int</span> index)</span></span>&#123;</span><br><span class="line">        <span class="keyword">return</span> arr[index];</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">//获取整个数组</span></span><br><span class="line">    </span><br><span class="line">    <span class="keyword">public</span> T[] getArr()&#123;</span><br><span class="line">        <span class="keyword">return</span> arr;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+</li>
+</ol>
+</li>
+</ol>
+]]></content>
+      <categories>
+        <category>java后端基础</category>
+      </categories>
+      <tags>
+        <tag>java基础</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>懒人的项目Demo</title>
+    <url>/2020/06/25/%E6%87%92%E4%BA%BA%E7%9A%84%E9%A1%B9%E7%9B%AEDemo/</url>
+    <content><![CDATA[<h2 id="lazywork"><a href="#lazywork" class="headerlink" title="lazywork"></a>lazywork</h2><p><a href="https://github.com/VampireSmile/lazywork" target="_blank" rel="external nofollow noopener noreferrer">https://github.com/VampireSmile/lazywork</a></p>
+<ol>
+<li><h3 id="基础的CRUD"><a href="#基础的CRUD" class="headerlink" title="基础的CRUD"></a>基础的CRUD</h3><ul>
+<li>使用ajax+ssm框架利用Maven构建一个简单的CRUD小Demo</li>
+<li>开发及测试环境：Windows_10(google_81 + IDEA2019_3.2 + Tomcat_9) + CentOS_7(mysql_5.7)。</li>
+<li>注意：Demo是使用mybatis的逆向工程生成的bean实体类、dao接口类、以及mybatis的mapper文件。其次，如果有需要，首先根据resources目录下的sql文件建好表，同时需要更改dp.properties中的mysql所在服务器的地址</li>
+<li>传送门：<a href="https://github.com/VampireSmile/lazywork/tree/master/base_ssm_crud" target="_blank" rel="external nofollow noopener noreferrer">https://github.com/VampireSmile/lazywork/tree/master/base_ssm_crud</a></li>
+</ul>
+<a id="more"></a>
+</li>
+<li><h3 id="学生人脸识别考勤App"><a href="#学生人脸识别考勤App" class="headerlink" title="学生人脸识别考勤App"></a>学生人脸识别考勤App</h3><ul>
+<li><p>一个简单的app，后台使用简单的servlet，手机客户端调用的是虹软的人脸识别sdk和高德地图的定位sdk，通过手机客户端与web服务器端之间的人脸特征数据交互最终达到一个实现人脸一对一比对的效果。</p>
+</li>
+<li><p>开发及测试环境：Windows(androidStudio_3.5（手机端） + eclipseJavaEE（web端） + Tomcat_9 ) +  CentOS_7（mysql_5.7.25） + Honor Play_COR-AL10_9</p>
+</li>
+<li><p>注意：</p>
+<ol>
+<li><p>因为这是我只花了一周时间做的人脸识别考勤课设题目，后台只是使用了简单的Servlet，所以很多地方比较草率，比较僵硬，如果测试至少需要两台手机(一台模拟老师，一台模拟学生)</p>
+</li>
+<li><p>因为我这是直接在虹软的官方demo上参照其官方文档进行修改，所以demo中SingleImageActivity和FaceAttrPreviewActivity已被修改，没带Activity后缀的是我添加的，如果要查看虹软官方原始的人脸识别demo请去官方查看下载</p>
+</li>
+<li><p>项目中两个SDK(虹软和高德)的appid和sdkid分别是我在虹软平台和高德地图平台申请的，如有需要请自行申请，修改即可(虹软是在common.Constants下，高德是在清单文件中)</p>
+</li>
+<li><p>如果服务器和数据库都已准备好，可以在自己构建一个“局域网”下通信(即将手机，服务器和mysql所在机器连接到同一wifi)进行测试</p>
+</li>
+</ol>
+</li>
+<li><p>传送门：<a href="https://github.com/VampireSmile/lazywork/tree/master/ArcSoft_ArcFace_Android_V3.0" target="_blank" rel="external nofollow noopener noreferrer">https://github.com/VampireSmile/lazywork/tree/master/ArcSoft_ArcFace_Android_V3.0</a></p>
+</li>
+</ul>
+</li>
+<li><h3 id="PixabayApp-Java"><a href="#PixabayApp-Java" class="headerlink" title="PixabayApp-Java"></a>PixabayApp-Java</h3><ul>
+<li><p>实现对<a href="https://pixabay.com/" target="_blank" rel="external nofollow noopener noreferrer">Pixabay</a>网站图片的浏览 + 搜索 + 下载</p>
+</li>
+<li><p>开发及测试环境：window_10pro + AndroidStudio_4.0.1 + jdk_1.8 + Pixel 2 XL API 26</p>
+</li>
+<li><p>传送门：<a href="https://github.com/VampireSmile/lazywork/tree/master/PixabayApp" target="_blank" rel="external nofollow noopener noreferrer">https://github.com/VampireSmile/lazywork/tree/master/PixabayApp</a></p>
+</li>
+</ul>
+</li>
+</ol>
+]]></content>
+      <categories>
+        <category>lazywork</category>
+        <category>demo</category>
+      </categories>
+      <tags>
+        <tag>lazywork</tag>
+        <tag>demo</tag>
       </tags>
   </entry>
   <entry>
@@ -1434,352 +1838,6 @@
       </tags>
   </entry>
   <entry>
-    <title>mysql索引总结-优化篇</title>
-    <url>/2020/05/28/mysql%E7%B4%A2%E5%BC%95%E6%80%BB%E7%BB%93-%E4%BC%98%E5%8C%96%E7%AF%87/</url>
-    <content><![CDATA[<ol>
-<li><h3 id="MySQL优化的一般步骤"><a href="#MySQL优化的一般步骤" class="headerlink" title="MySQL优化的一般步骤"></a>MySQL优化的一般步骤</h3><ol>
-<li><h4 id="通过show-status-命令了解各种sql的执行效率"><a href="#通过show-status-命令了解各种sql的执行效率" class="headerlink" title="通过show status 命令了解各种sql的执行效率"></a>通过show status 命令了解各种sql的执行效率</h4><ul>
-<li>SHOW STATUS提供msyql服务器的状态信息，一般情况下，我们只需要了解以”Com”开头的指令</li>
-<li>show session status like ‘Com%’；显示当前的连接的统计结果</li>
-<li>show global status like ‘Com%’ ；显示自数据库上次启动至今的统计结果</li>
-<li>show status like ‘Connections’；// 试图连接MySQL服务器的次数</li>
-<li>show status like ‘Uptime’；//服务器工作的时间（单位秒）</li>
-<li>show status like ‘Slow_queries’；//慢查询的次数 (默认是10秒中就当做是慢查询)</li>
-<li>Show variables like ‘long_query_time’；//查询mysql的慢查询时间：</li>
-<li>set long_query_time=2；//修改mysql 慢查询时间：如果查询时间超过2秒就算作是慢查询</li>
-</ul>
-<p>注：默认是session级别的，其中Com_XXX表示XXX语句所执行的次数。Com_select，Com_insert，Com_update，Com_delete通过这几个参数，可以容易地了解到当前数据库的应用是以插入更新为主还是以查询操作为主，以及各类的SQL大致的执行比例是多少。</p>
-<a id="more"></a>
-</li>
-<li><h4 id="定位执行效率较低的SQL语句（dql出现问题的概率较dml的大）"><a href="#定位执行效率较低的SQL语句（dql出现问题的概率较dml的大）" class="headerlink" title="定位执行效率较低的SQL语句（dql出现问题的概率较dml的大）"></a>定位执行效率较低的SQL语句（dql出现问题的概率较dml的大）</h4><p>在一个项目中，找到慢查询的select语句：mysql支持把慢查询语句记录到日志文件中。程序员需要修改php.ini的配置文件，默认情况下，慢查询记录是不开启的。开启慢查询记录的方法：打开 my.ini，找到 [mysqld] 在其下面添加：long_query_time = 2和log-slow-queries = D:/mysql/logs/slow.log     #设置把日志写在那里，可以为空，系统会给一个缺省的文件，例子：我们数据表中有1千万条的数据量，DQL语句：SELECT * FROM order_copy WHERE id=12345; 查询耗时：19s &gt; 2s，所以mysql会将该条select语句记录到慢查询日志中，SELECT * FROM order_copy WHERE id=12345的执行时间：<strong>添加索引前：19s</strong>，<strong>添加索引后：0.08s</strong></p>
-</li>
-<li><h4 id="通过explain分析低效率的SQL语句的执行情况"><a href="#通过explain分析低效率的SQL语句的执行情况" class="headerlink" title="通过explain分析低效率的SQL语句的执行情况"></a>通过explain分析低效率的SQL语句的执行情况</h4><p>使用explain分析该dql语句：</p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">EXPLAIN</span> <span class="keyword">SELECT</span> * <span class="keyword">FROM</span> order_copy <span class="keyword">WHERE</span> <span class="keyword">id</span> = <span class="number">12345</span>;</span><br></pre></td></tr></table></figure>
-
-<p>会产生如下信息：</p>
-<ul>
-<li>select_type:表示查询的类型。</li>
-<li>table:输出结果集的表</li>
-<li>type:表示表的连接类型(system和const为佳)</li>
-<li>possible_keys:表示查询时，可能使用的索引</li>
-<li>key:表示实际使用的索引</li>
-<li>key_len:索引字段的长度</li>
-<li>rows:扫描的行数</li>
-<li>Extra:执行情况的描述和说明</li>
-</ul>
-<p><strong>注意：要尽量避免让type的结果为all，extra的结果为：using filesort</strong></p>
-</li>
-<li><h4 id="确定问题并采取相应的优化措施"><a href="#确定问题并采取相应的优化措施" class="headerlink" title="确定问题并采取相应的优化措施"></a>确定问题并采取相应的优化措施</h4><p>常用的优化措施是添加索引。添加索引，我们不用加内存，不用改程序，不用调sql，只要执行个正确的’create index’，查询速度就可能提高百倍千倍。但是天下没有免费的午餐，查询速度的提高是以插入、更新、删除的速度为代价的，这些写操作，增加了大量的I/O。例如：给字段id添加索引：</p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">ALTER</span> <span class="keyword">TABLE</span> order_copy <span class="keyword">ADD</span> PRIMARY <span class="keyword">KEY</span>(<span class="keyword">id</span>);</span><br></pre></td></tr></table></figure>
-
-<p>给1千万的数据添加primary key 需要耗时： 428秒（7分钟）</p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">EXPLAIN</span> <span class="keyword">SELECT</span> * <span class="keyword">FROM</span> order_copy <span class="keyword">WHERE</span> <span class="keyword">id</span> = <span class="number">12345</span>;</span><br></pre></td></tr></table></figure>
-
-<p>正是因为给id添加了索引，才使得rows的结果为1，<strong>但是索引并不是可以随便添加的，以下几种情况需牢记在心：</strong></p>
-<ul>
-<li>较频繁的作为查询条件字段应该创建索引</li>
-</ul>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> * <span class="keyword">FROM</span> order_copy <span class="keyword">WHERE</span> <span class="keyword">id</span> = $<span class="keyword">id</span>;</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li>唯一性太差的字段不适合单独创建索引，即使频繁作为查询条件</li>
-</ul>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> * <span class="keyword">FROM</span> order_copy <span class="keyword">WHERE</span> sex = <span class="string">'女'</span>;</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li>更新非常频繁的字段不适合创建索引</li>
-</ul>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> * <span class="keyword">FROM</span> order_copy <span class="keyword">WHERE</span> order_state = <span class="string">'未付款'</span>;</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li>不会出现在WHERE子句中的字段不该创建索引</li>
-</ul>
-<p><strong>索引的使用</strong></p>
-<ul>
-<li><p>建立索引</p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> [<span class="keyword">UNIQUE</span>|FULLTEXT] <span class="keyword">index</span> index_name <span class="keyword">ON</span> tbl_name (col_name [(<span class="keyword">length</span>)] [<span class="keyword">ASC</span> | <span class="keyword">DESC</span>],...);</span><br><span class="line"><span class="keyword">ALTER</span> <span class="keyword">TABLE</span> table_name <span class="keyword">ADD</span> <span class="keyword">INDEX</span> index_name (column_list);</span><br><span class="line"><span class="keyword">ALTER</span> <span class="keyword">TABLE</span> table_name <span class="keyword">ADD</span> <span class="keyword">UNIQUE</span> (column_list);</span><br><span class="line"><span class="keyword">ALTER</span> <span class="keyword">TABLE</span> table_name <span class="keyword">ADD</span> PRIMARY <span class="keyword">KEY</span> (column_list);</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>删除索引</p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">DROP</span> <span class="keyword">INDEX</span> index_name <span class="keyword">ON</span> talbe_name;</span><br><span class="line"><span class="keyword">ALTER</span> <span class="keyword">TABLE</span> table_name <span class="keyword">DROP</span> <span class="keyword">INDEX</span> index_name;//等价于第一条</span><br><span class="line"><span class="keyword">ALTER</span> <span class="keyword">TABLE</span> table_name <span class="keyword">DROP</span> PRIMARY <span class="keyword">KEY</span>;</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>查询索引(均可) </p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SHOW</span> <span class="keyword">keys</span> <span class="keyword">FROM</span> table_name;</span><br><span class="line"><span class="keyword">SHOW</span> <span class="keyword">index</span> <span class="keyword">FROM</span> table_name;</span><br></pre></td></tr></table></figure>
-</li>
-</ul>
-</li>
-</ol>
-</li>
-<li><h3 id="MySQL优化实践，其实就是要将前篇文章中的创建索引的注意点给用上"><a href="#MySQL优化实践，其实就是要将前篇文章中的创建索引的注意点给用上" class="headerlink" title="MySQL优化实践，其实就是要将前篇文章中的创建索引的注意点给用上"></a>MySQL优化实践，其实就是要将前篇文章中的创建索引的注意点给用上</h3><p><strong>一个小提示：返回表中 30% 内的数据会走索引，返回超过 30% 数据就使用全表扫描。当然这个结论太绝对了，也并不是绝对的30%，只是一个大概的范围，这个有时很重要。</strong></p>
-<p>现在我们有一张user表：</p>
-<ol>
-<li><h4 id="如果MySQL估计使用索引比全表扫描还慢，则不会使用索引"><a href="#如果MySQL估计使用索引比全表扫描还慢，则不会使用索引" class="headerlink" title="如果MySQL估计使用索引比全表扫描还慢，则不会使用索引"></a>如果MySQL估计使用索引比全表扫描还慢，则不会使用索引</h4><p>返回数据的比例是重要的指标，比例越低越容易命中索引。记住这个范围值——30%，后面所讲的内容都是建立在返回数据的比例在30%以内的基础上。</p>
-</li>
-<li><h4 id="前导模糊查询查询不能命中索引"><a href="#前导模糊查询查询不能命中索引" class="headerlink" title="前导模糊查询查询不能命中索引"></a>前导模糊查询查询不能命中索引</h4><p>比如我们给user表中name字段加索引，然后执行：</p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">EXPLAIN</span> <span class="keyword">SELECT</span> * <span class="keyword">FROM</span> <span class="keyword">user</span> <span class="keyword">WHERE</span> <span class="keyword">name</span> <span class="keyword">LIKE</span> <span class="string">'%s%'</span>;</span><br></pre></td></tr></table></figure>
-
-<p>通过explain解释器发现并没有走索引，此时我们可以优化成非前导模糊查询就会走索引：</p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">EXPLAIN</span> <span class="keyword">SELECT</span> * <span class="keyword">FROM</span> <span class="keyword">user</span> <span class="keyword">WHERE</span> <span class="keyword">name</span> <span class="keyword">LIKE</span> <span class="string">'s%'</span>;</span><br></pre></td></tr></table></figure>
-</li>
-<li><h4 id="数据类型出现隐式转换的时候不会命中索引，特别是当列类型是字符串，一定要将字符常量值用引号引起来"><a href="#数据类型出现隐式转换的时候不会命中索引，特别是当列类型是字符串，一定要将字符常量值用引号引起来" class="headerlink" title="数据类型出现隐式转换的时候不会命中索引，特别是当列类型是字符串，一定要将字符常量值用引号引起来"></a>数据类型出现隐式转换的时候不会命中索引，特别是当列类型是字符串，一定要将字符常量值用引号引起来</h4><p>还是name字段加索引，name为varchar类型，那么下面这个语句不会走索引：</p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">EXPLAIN</span> <span class="keyword">SELECT</span> * <span class="keyword">FROM</span> <span class="keyword">user</span> <span class="keyword">WHERE</span> <span class="keyword">name</span> = <span class="number">1</span>;</span><br></pre></td></tr></table></figure>
-
-<p>但优化成如下这个语句会走索引：</p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">EXPLAIN</span> <span class="keyword">SELECT</span> * <span class="keyword">FROM</span> <span class="keyword">user</span> <span class="keyword">WHERE</span> <span class="keyword">name</span> = <span class="string">'1'</span>;</span><br></pre></td></tr></table></figure>
-</li>
-<li><h4 id="复合索引的情况下，查询条件不包含索引列最左边部分（不满足最左原则），不会命中复合索引"><a href="#复合索引的情况下，查询条件不包含索引列最左边部分（不满足最左原则），不会命中复合索引" class="headerlink" title="复合索引的情况下，查询条件不包含索引列最左边部分（不满足最左原则），不会命中复合索引"></a>复合索引的情况下，查询条件不包含索引列最左边部分（不满足最左原则），不会命中复合索引</h4><p>比如给name、age、status加复合索引，执行下面语句：</p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">ALTER</span> <span class="keyword">TABLE</span> <span class="string">'user'</span> <span class="keyword">ADD</span> <span class="keyword">INDEX</span>  index_name (<span class="keyword">name</span>,age,<span class="keyword">status</span>);</span><br></pre></td></tr></table></figure>
-
-<p>下面两条语句都能命中索引：</p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">EXPLAIN</span> <span class="keyword">SELECT</span> * <span class="keyword">FROM</span> <span class="keyword">user</span> <span class="keyword">WHERE</span> <span class="keyword">name</span> = <span class="string">'yjw'</span> <span class="keyword">AND</span> <span class="keyword">status</span> = <span class="number">1</span>;</span><br><span class="line"><span class="keyword">EXPLAIN</span> <span class="keyword">SELECT</span> * <span class="keyword">FROM</span> <span class="keyword">user</span> <span class="keyword">WHERE</span> <span class="keyword">status</span> = <span class="number">1</span> <span class="keyword">AND</span> <span class="keyword">name</span> = <span class="string">'yjw'</span>;</span><br></pre></td></tr></table></figure>
-
-<p><strong>注意：最左原则不是说查询的条件的顺序，而是查询条件中是否包含索引最左列字段</strong></p>
-</li>
-<li><h4 id="union、in和or都可以命中索引，推荐in"><a href="#union、in和or都可以命中索引，推荐in" class="headerlink" title="union、in和or都可以命中索引，推荐in"></a>union、in和or都可以命中索引，推荐in</h4><p>比如对status加索引后，union：</p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">EXPLAIN</span> <span class="keyword">SELECT</span> * <span class="keyword">FROM</span> <span class="keyword">user</span> <span class="keyword">WHERE</span> <span class="keyword">status</span> = <span class="number">1</span></span><br><span class="line"><span class="keyword">UNION</span> <span class="keyword">ALL</span></span><br><span class="line"><span class="keyword">SELECT</span> * <span class="keyword">FROM</span> <span class="keyword">user</span> <span class="keyword">WHERE</span> <span class="keyword">status</span> = <span class="number">2</span>;</span><br></pre></td></tr></table></figure>
-
-<p>in：</p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">EXPLAIN</span> <span class="keyword">SELECT</span> * <span class="keyword">FROM</span> <span class="keyword">user</span> <span class="keyword">WHERE</span> <span class="keyword">status</span> <span class="keyword">IN</span> (<span class="number">1</span>,<span class="number">2</span>);</span><br></pre></td></tr></table></figure>
-
-<p>or：</p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">EXPLAIN</span> <span class="keyword">SELECT</span> * <span class="keyword">FROM</span> <span class="keyword">user</span> <span class="keyword">WHERE</span> <span class="keyword">status</span> = <span class="number">1</span> <span class="keyword">OR</span> <span class="keyword">status</span> = <span class="number">2</span>;</span><br></pre></td></tr></table></figure>
-
-<p>注意：查询的CPU消耗：or &gt; in &gt; union</p>
-</li>
-<li><h4 id="用or分割开的条件，如果or前的条件中列有索引，而后面的列中没有索引，那么涉及到的索引都不会被用到"><a href="#用or分割开的条件，如果or前的条件中列有索引，而后面的列中没有索引，那么涉及到的索引都不会被用到" class="headerlink" title="用or分割开的条件，如果or前的条件中列有索引，而后面的列中没有索引，那么涉及到的索引都不会被用到"></a>用or分割开的条件，如果or前的条件中列有索引，而后面的列中没有索引，那么涉及到的索引都不会被用到</h4><p>假如我们给name加索引，age不加索引，然后执行下面语句：</p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">EXPLAIN</span> <span class="keyword">SELECT</span> * <span class="keyword">FROM</span> <span class="keyword">user</span> <span class="keyword">WHERE</span> <span class="keyword">name</span> = <span class="string">'yjw'</span> <span class="keyword">OR</span> age = <span class="number">19</span>;</span><br></pre></td></tr></table></figure>
-
-<p>因为or后面的条件列中没有索引，那么后面的查询肯定要走全表扫描，在存在全表扫描的情况下，就没有必要多一次索引扫描增加IO访问。</p>
-</li>
-<li><h4 id="负向条件查询不能使用索引，可以优化为-in-查询"><a href="#负向条件查询不能使用索引，可以优化为-in-查询" class="headerlink" title="负向条件查询不能使用索引，可以优化为 in 查询"></a>负向条件查询不能使用索引，可以优化为 in 查询</h4><p>负向条件有：!=、&lt;&gt;、not in、not exists、not like等。</p>
-<p>比如我们给status加索引，然后执行：</p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">EXPLAIN</span> <span class="keyword">SELECT</span> * <span class="keyword">FROM</span> <span class="keyword">user</span> <span class="keyword">WHERE</span> <span class="keyword">status</span> != <span class="number">1</span> <span class="keyword">AND</span> <span class="keyword">status</span> != <span class="number">2</span>;</span><br></pre></td></tr></table></figure>
-
-<p>会发现并没有命中索引，但是我们可以优化为in查询，但是前提区分度要高，返回的数据的比例在30%以内。</p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">EXPLAIN</span> <span class="keyword">SELECT</span> * <span class="keyword">FROM</span> <span class="keyword">user</span> <span class="keyword">WHERE</span> <span class="keyword">status</span> <span class="keyword">in</span> (<span class="number">0</span>,<span class="number">3</span>,<span class="number">4</span>,<span class="number">5</span>,<span class="number">6</span>);</span><br></pre></td></tr></table></figure>
-</li>
-<li><h4 id="范围查询可以命中缓存"><a href="#范围查询可以命中缓存" class="headerlink" title="范围查询可以命中缓存"></a>范围查询可以命中缓存</h4><p>范围列可以用到索引（联合索引必须是最左前缀），但是范围列后面的列无法用到索引，索引最多用于一个范围列，如果查询条件中有两个范围列则无法全用到索引。</p>
-<p>如果是范围查询和等值查询同时存在，优先匹配等值查询列的索引</p>
-</li>
-<li><h4 id="索引列参与计算-包括函数运算-的法则无法命中索引"><a href="#索引列参与计算-包括函数运算-的法则无法命中索引" class="headerlink" title="索引列参与计算(包括函数运算)的法则无法命中索引"></a>索引列参与计算(包括函数运算)的法则无法命中索引</h4></li>
-<li><h4 id="利用覆盖索引进行查询，避免回表"><a href="#利用覆盖索引进行查询，避免回表" class="headerlink" title="利用覆盖索引进行查询，避免回表"></a>利用覆盖索引进行查询，避免回表</h4></li>
-<li><h4 id="建立索引的列，不允许为-null"><a href="#建立索引的列，不允许为-null" class="headerlink" title="建立索引的列，不允许为 null"></a>建立索引的列，不允许为 null</h4><p>单列索引不存 null 值，复合索引不存全为 null 的值，如果列允许为 null，可能会得到“不符合预期”的结果集，所以，请使用 not null 约束以及默认值。</p>
-<p>比如我们给一个remark字段(允许为null)加索引，执行如下语句：</p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">EXPLAIN</span> <span class="keyword">SELECT</span> * <span class="keyword">FROM</span> <span class="keyword">user</span> <span class="keyword">WHERE</span> remark <span class="keyword">IS</span> <span class="literal">NULL</span>;</span><br></pre></td></tr></table></figure>
-
-<p>发现命中索引，而执行下面这条语句：</p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">EXPLAIN</span> <span class="keyword">SELECT</span> * <span class="keyword">FROM</span> <span class="keyword">user</span> <span class="keyword">WHERE</span> remark <span class="keyword">IS</span> <span class="keyword">NOT</span> <span class="literal">NULL</span>;</span><br></pre></td></tr></table></figure>
-
-<p>发现没有命中索引。<strong>虽然IS NULL可以命中索引，但是NULL本身就不是一种好的数据库设计，应该使用NOT NULL 约束以及默认值</strong></p>
-</li>
-<li><h4 id="更新十分频繁的字段上不宜建立索引"><a href="#更新十分频繁的字段上不宜建立索引" class="headerlink" title="更新十分频繁的字段上不宜建立索引"></a>更新十分频繁的字段上不宜建立索引</h4><p>因为更新操作会变更B+树，重建索引。这个过程是十分消耗数据库性能的。</p>
-</li>
-<li><h4 id="区分度不大的字段上不宜建立索引"><a href="#区分度不大的字段上不宜建立索引" class="headerlink" title="区分度不大的字段上不宜建立索引"></a>区分度不大的字段上不宜建立索引</h4><p>类似于性别这种区分度不大的字段，建立索引的意义不大。因为不能有效过滤数据，性能和全表扫描相当。另外返回数据的比例在30%以外的情况下，优化器不会选择使用索引。</p>
-</li>
-<li><h4 id="多表关联时，要保证关联字段上一定有索引"><a href="#多表关联时，要保证关联字段上一定有索引" class="headerlink" title="多表关联时，要保证关联字段上一定有索引"></a>多表关联时，要保证关联字段上一定有索引</h4></li>
-<li><h4 id="SQL语句中IN包含的值不应过多"><a href="#SQL语句中IN包含的值不应过多" class="headerlink" title="SQL语句中IN包含的值不应过多"></a>SQL语句中IN包含的值不应过多</h4><p>MySQL对于IN做了相应的优化，即将IN中的常量全部存储在一个数组里面，而且这个数组是排好序的。但是如果数值较多，产生的消耗也是比较大的。再例如：<code>select id from table_name where num in(1,2,3)</code> 对于连续的数值，能用 between 就不要用 in 了；再或者使用连接来替换。</p>
-</li>
-<li><h4 id="SELECT语句务必指明字段名称"><a href="#SELECT语句务必指明字段名称" class="headerlink" title="SELECT语句务必指明字段名称"></a>SELECT语句务必指明字段名称</h4><p>SELECT * 增加很多不必要的消耗（cpu、io、内存、网络带宽）；增加了使用覆盖索引的可能性；当表结构发生改变时，前端也需要更新。所以要求直接在select后面接上字段名。</p>
-</li>
-<li><h4 id="区分in和exists，-not-in和not-exists"><a href="#区分in和exists，-not-in和not-exists" class="headerlink" title="区分in和exists， not in和not exists"></a>区分in和exists， not in和not exists</h4><p>区分in和exists主要是造成了驱动顺序的改变（这是性能变化的关键），如果是exists，那么以外层表为驱动表，先被访问，如果是IN，那么先执行子查询。所以<strong>IN适合于外表大而内表小的情况；EXISTS适合于外表小而内表大的情况。</strong></p>
-<p>关于not in和not exists，推荐使用not exists，不仅仅是效率问题，not in可能存在逻辑问题。<strong>如何高效的写出一个替代not exists的sql语句？</strong></p>
-<p>如下语句：</p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">EXPLAIN</span> <span class="keyword">SELECT</span> colname... <span class="keyword">FROM</span> A表 a <span class="keyword">WHERE</span> <span class="keyword">id</span> <span class="keyword">NOT</span> <span class="keyword">IN</span> (<span class="keyword">SELECT</span> b.id <span class="keyword">FROM</span> B表 b);</span><br></pre></td></tr></table></figure>
-
-<p>可以优化成：</p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">EXPLAIN</span> <span class="keyword">SELECT</span> colname... <span class="keyword">FROM</span> A表 a <span class="keyword">LEFT</span> <span class="keyword">JOIN</span> B表 b <span class="keyword">WHERE</span> a.id = b.id;</span><br></pre></td></tr></table></figure>
-</li>
-<li><h4 id="创建索引时避免以下错误观念"><a href="#创建索引时避免以下错误观念" class="headerlink" title="创建索引时避免以下错误观念"></a>创建索引时避免以下错误观念</h4><ul>
-<li>索引越多越好，认为一个查询就需要建一个索引。</li>
-<li>宁缺勿滥，认为索引会消耗空间、严重拖慢更新和新增速度。</li>
-<li>抵制唯一索引，认为业务的唯一性一律需要在应用层通过“先查后插”方式解决。</li>
-<li>过早优化，在不了解系统的情况下就开始优化。</li>
-</ul>
-</li>
-</ol>
-</li>
-</ol>
-]]></content>
-      <categories>
-        <category>数据库</category>
-      </categories>
-      <tags>
-        <tag>offer</tag>
-        <tag>mysql索引</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>mysql索引总结-基础原理篇</title>
-    <url>/2020/05/26/mysql%E7%B4%A2%E5%BC%95%E6%80%BB%E7%BB%93-%E5%9F%BA%E7%A1%80%E5%8E%9F%E7%90%86%E7%AF%87/</url>
-    <content><![CDATA[<ol>
-<li><h3 id="MySQL索引本质"><a href="#MySQL索引本质" class="headerlink" title="MySQL索引本质"></a>MySQL索引本质</h3><p>是一种用来帮助mysql高速获取排好序的数据的<strong>数据结构</strong>。</p>
-</li>
-</ol>
-<ol start="2">
-<li><h3 id="MySQL索引原理"><a href="#MySQL索引原理" class="headerlink" title="MySQL索引原理"></a>MySQL索引原理</h3><ol>
-<li><h4 id="索引分类"><a href="#索引分类" class="headerlink" title="索引分类"></a>索引分类</h4><ol>
-<li>从存储结构上来划分：BTree索引(B-Tree或B+Tree索引)，Hash索引，full-index全文索引，R-Tree索引。</li>
-<li>从应用层次来分：普通索引，唯一索引，复合索引，主键索引</li>
-<li>根据数据的物理顺序与键值的逻辑(索引)顺序关系：聚集索引，非聚集索引。</li>
-</ol>
-<a id="more"></a>
-
-<blockquote>
-<p>注意：</p>
-<p>普通索引：基本的索引类型，没有唯一性的限制，允许为NULL值，即一个索引只包含单个列，一个表可以有多个单列索引，叶节点包含了主键(注意不是记录所在硬盘的地址)，因此有个回表的概念：即普通索引中先找到我们需要的数据的主键，然后再在表中进行一次查询，myISAM是典型的一种需要”回表查询”的引擎。</p>
-<p><strong>回表：</strong>当对一个列创建索引之后，索引会包含该列的键值及键值对应行所在的 rowid。通过索引中记录的 rowid 访问表中的数据就叫回表。回表次数太多会严重影响 SQL 性能，如果回表次数太多，就不应该走索引扫描，应该直接走全表扫描。</p>
-<p><strong>EXPLAIN命令结果中的<code>Using Index</code>意味着不会回表，通过索引就可以获得主要的数据。<code>Using Where</code>则意味着需要回表取数据。</strong></p>
-<p>额外说一句mysql中主要文件结构，我们主要比较myISAM和InnoDB(后文还会提到)：</p>
-<p>mysql中所有的表存储在mysql目录/data目录下</p>
-<p>对于使用myISAM引擎的表：.frm是表结构文件，.MYD是表记录文件，.MYI是表索引记录文件</p>
-<p>而对于使用innoDB引擎的表：.frm是表结构文件，.ibd是表记录和索引文件</p>
-<p>由上可知，myISAM索引文件和数据文件是分离的（非聚集），所以查询是先从.MYI文件中查找索引(如果有的话),然后根据索引查询表记录所在磁盘地址。innoDB索引文件和数据文件是在一起的（聚集），所以查询是直接在.ibd文件中查询索引(如果有的话)，而叶子节点存储着表记录，所以查询到索引即查询到表记录</p>
-<p>然后，再由上我们可以知道：InnoDB一定要有主键，因为InnoDB是默认用B+tree数据结构来组织数据记录的，所以如果不设置主键的话，数据就无法进行组织存储。当然InnoDB会自动选一个可以用来唯一标识一张表中所有记录的字段（简单说就是该字段所有记录不重复）来做主键索引字段，如果找不到这样的字段，就会自动生成一个这样的字段用作唯一索引字段row_id</p>
-<p>唯一索引：索引列的值必须唯一，但允许有空值，一个表允许多个列创建唯一索引。</p>
-<p>主键索引：数据列不允许重复，不允许为NULL，一个表只能有一个主键。</p>
-<p>复合索引：即一个索引包含多一个列</p>
-<p>聚集索引：并不是一种单独的索引类型，而是一种数据存储方式，也可以说叶节点包含了完整的数据记录。具体细节取决于不同的实现，InnoDB的聚簇索引其实就是在同一个结构中保存了B-Tree索引(技术上来说是B+Tree)和数据行</p>
-<p>非聚集索引：不是聚集索引就是非聚集索引(^_^)，当然了，前面有说过，数据和索引不是在一起存储的可以看做非聚集索引。</p>
-<p><strong>注意区分主键和索引的区别：</strong></p>
-<p>​    定义：</p>
-<p>​    主键：唯一标识一条记录，不能有重复的，不允许为空</p>
-<p>​    外键：表的外键是另一表的主键, 外键可以有重复的, 可以是空值</p>
-<p>​    索引：是对数据库表中一列或多列的值进行排序的一种结构</p>
-<p>​    作用：</p>
-<p>​    主键：用来保证数据完整性</p>
-<p>​    外键：用来和其他表建立联系用的</p>
-<p>​    索引：是提高查询排序的速度</p>
-<p>​    个数：</p>
-<p>​    主键：主键只能有一个</p>
-<p>​    外键：一个表可以有多个外键</p>
-<p>​    索引：一个表可以有多个唯一索引</p>
-<p>​    添加：</p>
-<p>​    主键：ALTER TABLE “表名” ADD PRIMARY KEY (字段名)</p>
-<p>​    外键：ALTER TABLE “表名” ADD FOREIGN KEY (字段名) REFERENCES “另一张表名”( 字段名)</p>
-<p>​    索引：ALTER TABLE “表名” ADD INDEX (字段名)</p>
-</blockquote>
-</li>
-</ol>
-</li>
-</ol>
-<ol start="2">
-<li><h4 id="各个索引比较"><a href="#各个索引比较" class="headerlink" title="各个索引比较"></a>各个索引比较</h4><p>​    0x01. 默认不使用二叉查找树的原因:比如给col列加索引，而col列分别为1，2，3，4，5，6，根据二叉查找树的特点，最终索引将会变成只有右子树形状的二叉树，而这时进行查询的效果就和链表一样了，所以不适用</p>
-<p>​    0x02. 默认不使用红黑树的原因:当数据很大(上百万上千万)时树的高度就比较高，假如我们需要的数值位于叶子节点，那么需要进行的磁盘i/o就比较多(比如树高5，则至少要进行5次磁盘i/o)，而进行磁盘i/o会让效率降低，因为其需要很多的时间</p>
-<p>​    0x03. 默认不使用hash表的原因:1.不支持范围查询。2.不支持排序，也不支持模糊查询以及多列索引的最左前缀匹配。3.当数据量上去了之后，hash冲突的概率也会变大，效率将会明细降低。4.hash索引任何时候都避免不了回表查询数据，而B+树在符合某些条件(聚簇索引，覆盖索引等)的时候可以只通过索引完成查询。5.hash索引虽然在等值查询上较快，但是不稳定。性能不可预测，当某个键值存在大量重复的时候，发生hash碰撞，此时效率可能极差。而B+树的查询效率比较稳定，对于所有的查询都是从根节点到叶子节点，且树的高度较低。</p>
-<p>​    0x04. b+tree是btree的变种：1.非叶子节点不存储data，只存储索引(冗余)，可以放更多的索引。2.叶子节点包含所有索引字段与data。3.叶子节点用双向指针相连，提高区间访问的性能。很明显非叶子节点不存data之后就可以存储更多的索引，从而可以让树的高度更小，同时叶子节点加了指针相连之后，可以很好的支持范围查找</p>
-<p>​    0x05. b树也有好处：B树可以在内部节点同时存储键和值，因此，把频繁访问的数据放在靠近根节点的地方将会大大提高热点数据的查询效率。这种特性使得B树在特定数据重复多次查询的场景中更加高效。</p>
-<blockquote>
-<p>注意：</p>
-<p>通过上面的比较我们可以知道：</p>
-<ol>
-<li>节点中(数据)索引占用空间越小，那么该节点中数据(索引)的数量就越多，从而数的高度越低，从而IO次数更少。所以一般推荐整型主键做索引，因为这样不仅比较更快，同时占用的空间也小。同时这也是为什么b+tree要求把真正的数据记录放到叶子节点而不是内层节点的原因，因为一旦放到内层节点，那么每个节点中能保存索引的个数会大幅度下降，导致树增高。当每个节点中(数据)索引个数为1时会退化成线性表。</li>
-<li>最左匹配原则(这里只做一个通俗理解，后面文章还会提到)：当b+树的数据项是复合的数据结构，比如(name,age,sex)的时候，b+数是按照从左到右的顺序来建立搜索树的，比如当(张三,20,F)这样的数据来检索的时候，b+树会优先比较name来确定下一步的所搜方向，如果name相同再依次比较age和sex，最后得到检索的数据；但当(20,F)这样的没有name的数据来的时候，b+树就不知道下一步该查哪个节点，因为建立搜索树的时候name就是第一个比较因子，必须要先根据name来搜索才能知道下一步去哪里查询。比如当(张三,F)这样的数据来检索时，b+树可以用name来指定搜索方向，但下一个字段age的缺失，所以只能把名字等于张三的数据都找到，然后再匹配性别是F的数据了， 这个是非常重要的性质，即索引的最左匹配特性。</li>
-</ol>
-</blockquote>
-</li>
-</ol>
-<ol start="3">
-<li><h3 id="MySQL索引实现"><a href="#MySQL索引实现" class="headerlink" title="MySQL索引实现"></a>MySQL索引实现</h3><ol>
-<li><h4 id="myISAM索引实现"><a href="#myISAM索引实现" class="headerlink" title="myISAM索引实现"></a>myISAM索引实现</h4><p>myISAM引擎使用B+Tree作为索引结构，叶节点的data域存放的是<strong>数据记录的地址</strong>。下图是myISAM索引的原理图：</p>
-<p><img src="https://s1.ax1x.com/2020/05/27/tEDrtg.png" alt="tEDrtg.png"></p>
-<p>这里设表共有三列，假设我们以Col1为主键，则上图便是一个myISAM表的主索引示意图。可以看出myISAM的索引文件仅仅保存数据记录的地址。<strong>在myISAM中</strong>，主索引和辅助索引在结构上没有任何区别，只是主索引要求key是唯一的，而辅助索引的key可以重复。如果我们在Col2上建立一个辅助索引，则此索引的结构如下图所示：</p>
-<p><img src="https://s1.ax1x.com/2020/05/27/tE6W24.png" alt="tE6W24.png"></p>
-<p>同样也是一棵B+Tree，data域保存数据记录的地址。因此，myISAM中索引检索的算法为首先按照B+Tree搜索算法搜索索引，如果指定的Key存在，则取出其data域的值，然后以data域的值为地址，读取相应数据记录。</p>
-<p><strong>myISAM的索引是非聚集索引。</strong></p>
-</li>
-<li><h4 id="InnoDB索引实现"><a href="#InnoDB索引实现" class="headerlink" title="InnoDB索引实现"></a>InnoDB索引实现</h4><p>InnoDB索引实现可以和myISAM对比来看。</p>
-<p>1）第一个重大区别是InnoDB的数据文件本身就是索引文件。从上文知道，MyISAM索引文件和数据文件是分离的，索引文件仅保存数据记录的地址。而在InnoDB中，表数据文件本身就是按B+Tree组织的一个索引结构，这棵树的叶节点data域保存了完整的数据记录。这个索引的key是数据表的主键，因此InnoDB表数据文件本身就是主索引。如图：</p>
-<p><img src="https://s1.ax1x.com/2020/05/27/tE2UPK.png" alt="tE2UPK.png"></p>
-</li>
-</ol>
-<p>​        上图是Innodb主索引(同时也是数据文件)的示意图，可以看到可以看到叶节点包含了完整的数据记录。这种索引叫做聚集索引。因为InnoDB的数据文件本身要按主键聚集，所以InnoDB要求表必须有主键(MyISAM可以没有)，如果没有显式指定，则MySQL系统会自动选择一个可以唯一标识数据记录的列作为主键，如果不存在这种列，则MySQL自动为InnoDB表生成一个隐含字段作为主键，这个字段长度为6个字节，类型为长整形。</p>
-<p>​    2）第二个与myISAM索引不同的是InnoDB的辅助索引data域存储的是相应记录的主键而不是记录地址。换句话说，InnoDB的所有辅助索引都引用主键作为data域。例如，下图为定义在Col3上的一个辅助索引:</p>
-<p><img src="https://s1.ax1x.com/2020/05/27/tE469x.png" alt="tE469x.png"></p>
-<p>这里以英文字符的ASCII码作为比较准则。聚集索引这种实现方式使得按主键的搜索十分高效，但是辅助索引搜索需要检索两遍索引：首先检索辅助索引获得主键，然后用主键到主索引中检索获得记录。</p>
-<p>了解不同存储引擎的索引实现方式对于正确使用和优化索引都非常有帮助，例如知道了InnoDB的索引实现后，就很容易明白为什么不建议使用过长的字段作为主键，因为所有辅助索引都引用主索引，过长的主索引会令辅助索引变得过大。再例如，用非单调的字段作为主键在InnoDB中不是个好主意，因为InnoDB数据文件本身是一颗B+Tree，非单调的主键会造成在插入新记录时数据文件为了维持B+Tree的特性而频繁的分裂调整，十分低效，而使用自增字段作为主键则是一个很好的选择。</p>
-</li>
-<li><h3 id="myISAM和innoDB的区别与选择："><a href="#myISAM和innoDB的区别与选择：" class="headerlink" title="myISAM和innoDB的区别与选择："></a>myISAM和innoDB的区别与选择：</h3><ol>
-<li><h4 id="区别"><a href="#区别" class="headerlink" title="区别"></a>区别</h4></li>
-</ol>
-<p>​    1）InnoDB 支持事务，MyISAM 不支持事务。这是 MySQL 将默认存储引擎从 MyISAM 变成 InnoDB 的重要原因之一；</p>
-<p>​    2）InnoDB 支持外键，而 MyISAM 不支持。对一个包含外键的 InnoDB 表转为 MYISAM 会失败；  </p>
-<p>​    3）InnoDB 是聚集索引，MyISAM 是非聚集索引。聚簇索引的文件存放在主键索引的叶子节点上，因此 InnoDB 必    须要有主键，通过主键索引效率很高。但是辅助索引需要两次查询，先查询到主键，然后再通过主键查询到数据。    因此，主键不应该过大，因为主键太大，其他索引也都会很大。而 MyISAM 是非聚集索引，数据文件是分离的，索    引保存的是数据文件的指针。主键索引和辅助索引是独立的。 </p>
-<p>​    4）InnoDB 不保存表的具体行数，执行 select count(*) from table 时需要全表扫描。而MyISAM 用一个变量保存了整个表的行数，执行上述语句时只需要读出该变量即可，速度很快；    </p>
-<p>​    5）InnoDB 最小的锁粒度是行锁，MyISAM 最小的锁粒度是表锁。一个更新语句会锁住整张表，导致其他查询和更新都会被阻塞，因此并发访问受限。这也是 MySQL 将默认存储引擎从 MyISAM 变成 InnoDB 的重要原因之一；</p>
-<ol start="2">
-<li><h4 id="如何选择"><a href="#如何选择" class="headerlink" title="如何选择"></a>如何选择</h4><p>1）是否要支持事务，如果要请选择 InnoDB，如果不需要可以考虑 MyISAM；</p>
-<p>2）如果表中绝大多数都只是读查询，可以考虑 MyISAM，如果既有读写也挺频繁，请使用InnoDB。</p>
-<p>3）系统崩溃后，MyISAM恢复起来更困难，能否接受，不能接受就选 InnoDB；</p>
-<p>4）MySQL5.5版本开始Innodb已经成为Mysql的默认引擎(之前是MyISAM)，说明其优势是有目共睹的。如果你不知道用什么存储引擎，那就用InnoDB，至少不会差。</p>
-</li>
-</ol>
-</li>
-<li><h3 id="建立一个合适索引-为后面索引优化做一个抛砖引玉"><a href="#建立一个合适索引-为后面索引优化做一个抛砖引玉" class="headerlink" title="建立一个合适索引(为后面索引优化做一个抛砖引玉)"></a>建立一个合适索引(为后面索引优化做一个抛砖引玉)</h3><ol>
-<li><h4 id="建立索引的原理"><a href="#建立索引的原理" class="headerlink" title="建立索引的原理"></a>建立索引的原理</h4><p>一个最重要的原则是最左前缀原理，在提这个之前要先说下联合索引，MySQL中的索引可以以一定顺序引用多个列，这种索引叫做联合索引，一般的，一个联合索引是一个有序元组&lt;a1, a2, …, an&gt;，其中各个元素均为数据表的一列。另外，单列索引可以看成联合索引元素数为1的特例。</p>
-<p>索引匹配的最左原则具体是说，假如索引列分别为A，B，C，顺序也是A，B，C：</p>
-<ul>
-<li>那么查询的时候，如果查询【A】【A，B】 【A，B，C】，那么可以通过索引查询</li>
-<li>如果查询的时候，采用【A，C】，那么C这个虽然是索引，但是由于中间缺失了B，因此C这个索引是用不到的，只能用到A索引</li>
-<li>如果查询的时候，采用【B】 【B，C】 【C】，由于没有用到第一列索引，不是最左前缀，那么后面的索引也是用不到了</li>
-<li>如果查询的时候，采用范围查询，并且是最左前缀，也就是第一列索引，那么可以用到索引，但是范围后面的列无法用到索引</li>
-</ul>
-<p>因为索引虽然加快了查询速度，但索引也是有代价的：索引文件本身要消耗存储空间，同时索引会加重插入、删除和修改记录时的负担(要维护索引数据结构)，另外，MySQL在运行时也要消耗资源维护索引，因此索引并不是越多越好。</p>
-<p>在使用InnoDB存储引擎时，如果没有特别的需要，请永远使用一个与业务无关的自增字段作为主键。如果从数据库索引优化角度看，使用InnoDB引擎而不使用自增主键绝对是一个糟糕的主意。</p>
-<p>InnoDB使用聚集索引，数据记录本身被存于主索引(一颗B+Tree)的叶子节点上。这就要求同一个叶子节点内(大小为一个内存页或磁盘页)的各条数据记录按主键顺序存放，因此每当有一条新的记录插入时，MySQL会根据其主键将其插入适当的节点和位置，如果页面达到装载因子(InnoDB默认为15/16)，则开辟一个新的页(节点)。如果表使用自增主键，那么每次插入新的记录，记录就会顺序添加到当前索引节点的后续位置，当一页写满，就会自动开辟一个新的页。如下：</p>
-<p><img src="https://s1.ax1x.com/2020/05/28/tVfght.gif" alt="tVfght.gif"></p>
-<p>这样就会形成一个紧凑的索引结构，近似顺序填满。由于每次插入时也不需要移动已有数据，因此效率很高，也不会增加很多开销在维护索引上。</p>
-<p>如果使用非自增主键（如果身份证号或学号等），由于每次插入主键的值近似于随机，因此每次新纪录都要被插到现有索引页得中间某个位置，如下<strong>(注意D080的位置)</strong>：</p>
-<p><img src="https://s1.ax1x.com/2020/05/28/tVhKUA.gif" alt="tVhKUA.gif"></p>
-<p>此时MySQL不得不为了将新记录插到合适位置而移动数据，甚至目标页面可能已经被回写到磁盘上而从缓存中清掉，此时又要从磁盘上读回来，这增加了很多开销，同时频繁的移动、分页操作造成了大量的碎片，得到了不够紧凑的索引结构，后续不得不通过OPTIMIZE TABLE来重建表并优化填充页面。</p>
-<p>页分裂：如果主键是非自增 id，为了确保索引有序，mysql 就需要将每次插入的数据都放到合适的位置上。当往一个快满或已满的数据页中插入数据时，新插入的数据会将数据页写满，mysql 就需要申请新的数据页，并且把上个数据页中的部分数据挪到新的数据页上。这就造成了页分裂，这个大量移动数据的过程是会严重影响插入效率的。</p>
-</li>
-<li><h4 id="建立索引的一些注意点"><a href="#建立索引的一些注意点" class="headerlink" title="建立索引的一些注意点"></a>建立索引的一些注意点</h4><ol>
-<li><p>最左前缀匹配原则，非常重要的原则，mysql会一直向右匹配直到遇到范围查询(&gt;、&lt;、between、like)就停止匹配，比如a = 1 and b = 2 and c &gt; 3 and d = 4 如果建立(a,b,c,d)顺序的索引，d是用不到索引的，如果建立(a,b,d,c)的索引则都可以用到，a,b,d的顺序可以任意调整。where子句中使用最频繁的一列放在最左边。</p>
-</li>
-<li><p>=和in可以乱序，比如a = 1 and b = 2 and c = 3 建立(a,b,c)索引可以任意顺序，mysql的查询优化器会帮你优化成索引可以识别的形式</p>
-</li>
-<li><p>尽量选择区分度高的列作为索引,区分度的公式是count(distinct col)/count(*)，表示字段不重复的比例，比例越大我们扫描的记录数越少，唯一键(索引)的区分度是1，而一些状态、性别字段可能在大数据面前区分度就是0，那可能有人会问，这个比例有什么经验值吗？使用场景不同，这个值也很难确定，一般需要join的字段我们都要求是0.1以上，即平均1条扫描10条记录</p>
-</li>
-<li><p>索引列不能参与计算和函数运算，保持列“干净”，比如from_unixtime(create_time) = ’2014-05-29’就不能使用到索引，原因很简单，b+树中存的都是数据表中的字段值，但进行检索时，需要把所有元素都应用函数才能比较，显然成本太大。所以语句应该写成create_time = unix_timestamp(’2014-05-29’);</p>
-</li>
-<li><p>尽量的扩展索引，不要新建索引。比如表中已经有a的索引，现在要加(a,b)的索引，那么只需要修改原来的索引即可，当然要考虑原有数据和线上使用情况</p>
-</li>
-<li><p>主键不推荐有业务含义：(1)因为任何有业务含义的列都有改变的可能性,主键一旦带上了业务含义，那么主键就有可能发生变更。主键一旦发生变更，该数据在磁盘上的存储位置就会发生变更，有可能会引发页分裂，产生空间碎片。(2)带有业务含义的主键，不一定是顺序自增的。那么就会导致数据的插入顺序，并不能保证后面插入数据的主键一定比前面的数据大。如果出现了，后面插入数据的主键比前面的小，就有可能引发页分裂，产生空间碎片。</p>
-</li>
-<li><p>较频繁作为查询条件的字段才去创建索引，更新频繁字段不适合创建索引</p>
-</li>
-<li><p>定义有外键的数据列一定要建立索引</p>
-</li>
-<li><p>索引字段越小越好，为较长的字符串使用前缀索引，当然前提是前缀的标识度高。比如密码就适合建立前缀索引，因为密码几乎各不相同。</p>
-<p>[^前缀索引：如果索引列长度过长，这种列索引时将会产生很大的索引文件，不便于操作，可以使用前缀索引方式进行索引前缀索引应该控制在一个合适的点，控制在0.31黄金值即可（大于这个值就可以创建）。SELECT COUNT(DISTINCT(LEFT(<code>title</code>,10)))/COUNT(*) FROM Arctic; — 这个值大于0.31就可以创建前缀索引，Distinct去重复 ALTER TABLE <code>user</code> ADD INDEX <code>uname</code>(title(10)); — 增加前缀索引SQL，将人名的索引建立在10，这样可以减少索引文件大小，加快索引查询速度。]: </p>
-</li>
-<li><p>使用组合索引，可以减少文件索引大小，在使用时速度要优于多个单列索引</p>
-</li>
-<li><p>不要过多创建索引，除了增加额外的磁盘空间外，对于DML操作的速度影响很大，因为其每增删改一次就得从新建立索引</p>
-</li>
-<li><p>数字和字符串比较不会使用索引，前缀模糊查询不走索引(如select * from table_name where name like ‘%jack’;)</p>
-</li>
-<li><p>应该指定列为NOT NULL，除非你想存储NULL。在mysql中，含有空值的列很难进行查询优化，因为它们使得索引、索引的统计信息以及比较运算更加复杂。你应该用0、一个特殊的值或者一个空串代替空值；</p>
-</li>
-<li><p>通常，通过索引查询数据比全表扫描要快。但是我们也必须注意到它的代价。</p>
-<p>索引需要空间来存储，也需要定期维护， 每当有记录在表中增减或索引列被修改时，索引本身也会被修改。 这意味着每条记录的INSERT，DELETE，UPDATE将为此多付出4，5 次的磁盘I/O。 因为索引需要额外的存储空间和处理，那些不必要的索引反而会使查询反应时间变慢。使用索引查询不一定能提高查询性能，索引范围查询(INDEX RANGE SCAN)适用于两种情况:</p>
-<p>​    1. 基于一个范围的检索，一般查询返回结果集小于表中记录数的30%</p>
-<p>​    2. 基于非唯一性索引的检索</p>
-</li>
-</ol>
-</li>
-</ol>
-</li>
-</ol>
-]]></content>
-      <categories>
-        <category>数据库</category>
-      </categories>
-      <tags>
-        <tag>offer</tag>
-        <tag>mysql索引</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>设计模式基础</title>
     <url>/2020/07/24/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%E5%9F%BA%E7%A1%80/</url>
     <content><![CDATA[<ol>
@@ -1944,108 +2002,6 @@
       <tags>
         <tag>offer</tag>
         <tag>java设计模式</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>懒人的项目Demo</title>
-    <url>/2020/06/25/%E6%87%92%E4%BA%BA%E7%9A%84%E9%A1%B9%E7%9B%AEDemo/</url>
-    <content><![CDATA[<h2 id="lazywork"><a href="#lazywork" class="headerlink" title="lazywork"></a>lazywork</h2><p><a href="https://github.com/VampireSmile/lazywork" target="_blank" rel="external nofollow noopener noreferrer">https://github.com/VampireSmile/lazywork</a></p>
-<ol>
-<li><h3 id="基础的CRUD"><a href="#基础的CRUD" class="headerlink" title="基础的CRUD"></a>基础的CRUD</h3><ul>
-<li>使用ajax+ssm框架利用Maven构建一个简单的CRUD小Demo</li>
-<li>开发及测试环境：Windows_10(google_81 + IDEA2019_3.2 + Tomcat_9) + CentOS_7(mysql_5.7)。</li>
-<li>注意：Demo是使用mybatis的逆向工程生成的bean实体类、dao接口类、以及mybatis的mapper文件。其次，如果有需要，首先根据resources目录下的sql文件建好表，同时需要更改dp.properties中的mysql所在服务器的地址</li>
-<li>传送门：<a href="https://github.com/VampireSmile/lazywork/tree/master/base_ssm_crud" target="_blank" rel="external nofollow noopener noreferrer">https://github.com/VampireSmile/lazywork/tree/master/base_ssm_crud</a></li>
-</ul>
-<a id="more"></a>
-</li>
-<li><h3 id="学生人脸识别考勤App"><a href="#学生人脸识别考勤App" class="headerlink" title="学生人脸识别考勤App"></a>学生人脸识别考勤App</h3><ul>
-<li><p>一个简单的app，后台使用简单的servlet，手机客户端调用的是虹软的人脸识别sdk和高德地图的定位sdk，通过手机客户端与web服务器端之间的人脸特征数据交互最终达到一个实现人脸一对一比对的效果。</p>
-</li>
-<li><p>开发及测试环境：Windows(androidStudio_3.5（手机端） + eclipseJavaEE（web端） + Tomcat_9 ) +  CentOS_7（mysql_5.7.25） + Honor Play_COR-AL10_9</p>
-</li>
-<li><p>注意：</p>
-<ol>
-<li><p>因为这是我只花了一周时间做的人脸识别考勤课设题目，后台只是使用了简单的Servlet，所以很多地方比较草率，比较僵硬，如果测试至少需要两台手机(一台模拟老师，一台模拟学生)</p>
-</li>
-<li><p>因为我这是直接在虹软的官方demo上参照其官方文档进行修改，所以demo中SingleImageActivity和FaceAttrPreviewActivity已被修改，没带Activity后缀的是我添加的，如果要查看虹软官方原始的人脸识别demo请去官方查看下载</p>
-</li>
-<li><p>项目中两个SDK(虹软和高德)的appid和sdkid分别是我在虹软平台和高德地图平台申请的，如有需要请自行申请，修改即可(虹软是在common.Constants下，高德是在清单文件中)</p>
-</li>
-<li><p>如果服务器和数据库都已准备好，可以在自己构建一个“局域网”下通信(即将手机，服务器和mysql所在机器连接到同一wifi)进行测试</p>
-</li>
-</ol>
-</li>
-<li><p>传送门：<a href="https://github.com/VampireSmile/lazywork/tree/master/ArcSoft_ArcFace_Android_V3.0" target="_blank" rel="external nofollow noopener noreferrer">https://github.com/VampireSmile/lazywork/tree/master/ArcSoft_ArcFace_Android_V3.0</a></p>
-</li>
-</ul>
-</li>
-<li><h3 id="PixabayApp-Java"><a href="#PixabayApp-Java" class="headerlink" title="PixabayApp-Java"></a>PixabayApp-Java</h3><ul>
-<li><p>实现对<a href="https://pixabay.com/" target="_blank" rel="external nofollow noopener noreferrer">Pixabay</a>网站图片的浏览 + 搜索 + 下载</p>
-</li>
-<li><p>开发及测试环境：window_10pro + AndroidStudio_4.0.1 + jdk_1.8 + Pixel 2 XL API 26</p>
-</li>
-<li><p>传送门：<a href="https://github.com/VampireSmile/lazywork/tree/master/PixabayApp" target="_blank" rel="external nofollow noopener noreferrer">https://github.com/VampireSmile/lazywork/tree/master/PixabayApp</a></p>
-</li>
-</ul>
-</li>
-</ol>
-]]></content>
-      <categories>
-        <category>lazywork</category>
-        <category>demo</category>
-      </categories>
-      <tags>
-        <tag>lazywork</tag>
-        <tag>demo</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>JVM之运行时数据区域</title>
-    <url>/2020/06/06/JVM%E4%B9%8B%E8%BF%90%E8%A1%8C%E6%97%B6%E6%95%B0%E6%8D%AE%E5%8C%BA%E5%9F%9F/</url>
-    <content><![CDATA[<ol>
-<li><h3 id="先来看看运行时数据区域长啥样"><a href="#先来看看运行时数据区域长啥样" class="headerlink" title="先来看看运行时数据区域长啥样"></a>先来看看运行时数据区域长啥样</h3><p><img src="https://s1.ax1x.com/2020/06/06/tcK3Pf.png" alt="tcK3Pf.png"></p>
-<p>注意：</p>
-<ul>
-<li>线程私有数据区域生命周期与线程相同, 依赖用户线程的启动/结束而创建/销毁(在HotspotVM内, 每个线程都与操作系统的本地线程直接映射, 因此这部分内存区域的存/否跟随本地线程的生/死对应)。</li>
-<li>线程共享区域随虚拟机的启动/关闭而创建/销毁。</li>
-<li><strong>直接内存并不是JVM运行时数据区的一部分</strong>，但也会被频繁的使用：在JDK 1.4引入的NIO提供了基于Channel与Buffer的IO方式，它可以使用Native函数库直接分配堆外内存，然后使用DirectByteBuffer对象作为这块内存的引用进行操作(详见：Java I/O 扩展)，这样就避免了在Java堆和Native堆中来回复制数据，因此在一些场景中可以显著提高性能。</li>
-</ul>
-</li>
-<li><h3 id="再来看看各个区域的大概功能"><a href="#再来看看各个区域的大概功能" class="headerlink" title="再来看看各个区域的大概功能"></a>再来看看各个区域的大概功能</h3><p><img src="https://s1.ax1x.com/2020/06/06/tcMd6e.png" alt="tcMd6e.png"></p>
-<a id="more"></a>
-</li>
-<li><h3 id="接下来仔细分析一下各个区域"><a href="#接下来仔细分析一下各个区域" class="headerlink" title="接下来仔细分析一下各个区域"></a>接下来仔细分析一下各个区域</h3><ol>
-<li><h4 id="程序计数器-线程私有"><a href="#程序计数器-线程私有" class="headerlink" title="程序计数器(线程私有)"></a>程序计数器(线程私有)</h4><ul>
-<li>一块较小的内存空间, 是当前线程所执行的字节码的行号指示器，每条线程都要有一个独立的程序计数器，这类内存也称为“线程私有”的内存。</li>
-<li>正在执行java方法的话，<strong>计数器记录的是虚拟机字节码指令的地址(当前指令的地址)</strong>。如果还是Native方法，则为空。</li>
-<li>这个内存区域是唯一一个在虚拟机中<strong>没有规定任何OutOfMemoryError(OOM)情况的区域</strong>。</li>
-</ul>
-</li>
-<li><h4 id="java虚拟机栈-线程私有"><a href="#java虚拟机栈-线程私有" class="headerlink" title="java虚拟机栈(线程私有)"></a>java虚拟机栈(线程私有)</h4><p>是描述java方法执行的内存模型，每个方法在执行的同时都会<strong>创建一个栈帧(Stack Frame)用于存储局部变量表、操作数栈、动态链接、方法出口等信息</strong>。每一个方法从调用直至执行完成的过程，就对应着一个栈帧在虚拟机栈中入栈到出栈的过程，如图：</p>
-<p><img src="https://s1.ax1x.com/2020/06/06/tclSKg.png" alt="tclSKg.png"></p>
-</li>
-<li><h4 id="本地方法栈-线程私有"><a href="#本地方法栈-线程私有" class="headerlink" title="本地方法栈(线程私有)"></a>本地方法栈(线程私有)</h4><p>本地方法栈和java虚拟机栈作用类似，<strong>区别是虚拟机栈为执行Java方法服务, 而本地方法栈则为Native方法服务，</strong>如果一个VM实现使用C-linkage模型来支持Native调用，那么该栈将会是一个C栈，但HotSpot VM直接就把本地方法栈和虚拟机栈合二为一。</p>
-</li>
-<li><h4 id="堆-heap-线程共享"><a href="#堆-heap-线程共享" class="headerlink" title="堆(heap-线程共享)"></a>堆(heap-线程共享)</h4><p>是被线程共享的一块内存区域，创建的对象和数组都保存在Java堆内存中，也是垃圾收集器进行垃圾收集的最重要的内存区域。由于现代VM采用分代收集算法，因此Java堆从GC的角度还可以细分为：新生代(Eden区 、 FromSurvivor区和ToSurvivor区)和老年代。</p>
-</li>
-<li><h4 id="方法区-永久代-线程共享"><a href="#方法区-永久代-线程共享" class="headerlink" title="方法区/永久代(线程共享)"></a>方法区/永久代(线程共享)</h4><ul>
-<li>我们常说的永久代(Permanent Generation)，<strong>用于存储被 JVM 加载的类信息、常量、静态变量、即时编译器编译后的代码等数据</strong>。HotSpot VM把GC分代收集扩展至方法区，即使用Java堆的永久代来实现方法区，这样HotSpot 的垃圾收集器就可以像管理 Java 堆一样管理这部分内存,而不必为方法区开发专门的内存管理器(永久带的内存回收的主要目标是针对常量池的回收和类型的卸载，因此收益一般很小)。</li>
-<li><strong>方法区是一个 JVM 规范，永久代与元空间都是其一种实现方式</strong></li>
-<li>HotSpot 虚拟机把它当成永久代来进行垃圾回收。但很难确定永久代的大小，因为它受到很多因素影响，并且每次Full GC之后永久代的大小都会改变，所以经常会抛出OutOfMemoryError异常。为了更容易管理方法区，<strong>从JDK 1.8开始，移除永久代，并把方法区移至元空间，它位于本地内存中，而不是虚拟机内存中</strong>。因此，默认情况下，元空间的大小仅受本地内存限制。<strong>类的元数据放入native memory，字符串池和类的静态变量放入java堆中</strong>，这样可以加载多少类的元数据就不再由MaxPermSize控制，而由系统的实际可用空间来控制。</li>
-<li><strong>运行时常量池（Runtime Constant Pool）是方法区的一部分</strong>。Class文件中除了有类的版本、字段、方法、接口等描述等信息外，还有一项信息是常量池（Constant Pool Table），用于存放编译期生成的各种字面量和符号引用，这部分内容将在类加载后存放到方法区的运行时常量池中。Java虚拟机对Class文件的每一部分（自然也包括常量池）的格式都有严格的规定，每一个字节用于存储哪种数据都必须符合规范上的要求，这样才会被虚拟机认可、装载和执行。</li>
-</ul>
-</li>
-</ol>
-</li>
-</ol>
-]]></content>
-      <categories>
-        <category>java后端基础</category>
-      </categories>
-      <tags>
-        <tag>JVM</tag>
-        <tag>offer</tag>
       </tags>
   </entry>
   <entry>
@@ -2257,6 +2213,56 @@
       </categories>
       <tags>
         <tag>权限系统</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Ajax学习</title>
+    <url>/2020/06/18/Ajax%E5%AD%A6%E4%B9%A0/</url>
+    <content><![CDATA[<ol>
+<li><h3 id="ajax介绍"><a href="#ajax介绍" class="headerlink" title="ajax介绍"></a>ajax介绍</h3><p>ajax是异步的javaScript和xml，是一种无需重新加载整个网页的情况下，能够更新部分网页数据的技术（比如我们常见的搜索引擎框中输入关键词，就利用到了ajax发送请求到服务器，服务器返回一个搜索列表）</p>
+</li>
+<li><h3 id="ajax再介绍"><a href="#ajax再介绍" class="headerlink" title="ajax再介绍"></a>ajax再介绍</h3><ol>
+<li>相比传统网页（即不使用ajax的网页），想要更新内容或提交一个表单，都需要重新加载整个页面，而使用ajax的网页，通过在后台服务器进行少量的数据交换，就可以实现异步局部更新。增强B/S的体验</li>
+<li>Ajax的核心是XMLHttpRequest对象（XHR）。XHR为向服务器发送请求和解析服务器响应提供了接口。能够以异步方式从服务器获取新数据。</li>
+<li>通过Ajax方法，可以使用Http GET和Http Post从远程服务器上请求文本、HTML、XML或JSON数据—-同时可以将这些数据直接载入网页的被选元素中。</li>
+</ol>
+</li>
+<li><h3 id="ajax使用概览"><a href="#ajax使用概览" class="headerlink" title="ajax使用概览"></a>ajax使用概览</h3><ol>
+<li><p>肯定先要导入jQuery包</p>
+</li>
+<li><p>jQuery Ajax本质就是XMLHttpRequest，对他进行了封装，下面就是他的一些方法：</p>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="number">1.</span>JQuery.get(...)</span><br><span class="line">           所有参数：</span><br><span class="line">           		url:待载入的页面URL地址</span><br><span class="line">           		data:待发送Key/Value参数</span><br><span class="line">           		success:载入成功时回调函数</span><br><span class="line">           		dataType:返回内容格式（xml，json，script，text，html）（一般不用）</span><br><span class="line">             </span><br><span class="line"><span class="number">2.</span>JQuery.post(...)</span><br><span class="line">		  所有参数：</span><br><span class="line">          		url:待载入的页面URL地址</span><br><span class="line">           		data:待发送Key/Value参数</span><br><span class="line">           		success:载入成功时回调函数</span><br><span class="line">           		dataType:返回内容格式（xml，json，script，text，html）（一般不用）</span><br><span class="line">            </span><br><span class="line"><span class="number">3.</span>jQuery.ajax(...)</span><br><span class="line">          所有参数见：https:<span class="comment">//www.runoob.com/jquery/ajax-ajax.html</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>和springmvc中@ResponseBody注解配合使用</p>
+<p>springMVC中的@ResponseBody负责返回一个json字符串，这样直接可以通过ajax发送请求获取json数据，然后解析渲染</p>
+<a id="more"></a>
+</li>
+</ol>
+</li>
+<li><h3 id="使用ajax做一个登录小demo"><a href="#使用ajax做一个登录小demo" class="headerlink" title="使用ajax做一个登录小demo"></a>使用ajax做一个登录小demo</h3><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">//这些都是代码片段</span></span><br><span class="line"><span class="comment">//假设我们项目名logindemo，项目地址：http://localhost:8080/logindemo</span></span><br><span class="line"><span class="comment">//name和password都写死了的，分别为admin和123456</span></span><br><span class="line"><span class="comment">//后端代码</span></span><br><span class="line"><span class="meta">@RequestMapping</span>(<span class="string">"/selectName"</span>)</span><br><span class="line"><span class="meta">@ResponseBody</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> String <span class="title">selectName</span><span class="params">(String name)</span></span>&#123;</span><br><span class="line">    String msg = <span class="string">"name is null"</span>;</span><br><span class="line">    <span class="keyword">if</span>(name == <span class="keyword">null</span>) <span class="keyword">return</span> msg;</span><br><span class="line">    <span class="keyword">else</span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(!(<span class="string">"admin"</span>.equals(name))) msg = <span class="string">"name is inValid"</span>;</span><br><span class="line">        <span class="keyword">else</span> msg = <span class="string">"ok"</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> msg;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">@RequestMapping</span>(<span class="string">"/selectPass"</span>)</span><br><span class="line"><span class="meta">@ResponseBody</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> String <span class="title">selectPass</span><span class="params">(String password)</span></span>&#123;</span><br><span class="line">    String msg = <span class="string">"password is null"</span>;</span><br><span class="line">    <span class="keyword">if</span>(password == <span class="keyword">null</span>) <span class="keyword">return</span> msg;</span><br><span class="line">    <span class="keyword">else</span>&#123;</span><br><span class="line">       	<span class="keyword">if</span>(!(<span class="string">"123456"</span>.equals(password))) msg = <span class="string">"password is inValid"</span>;</span><br><span class="line">        <span class="keyword">else</span> msg = <span class="string">"ok"</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> msg;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">@RequestMapping</span>(<span class="string">"/login"</span>)</span><br><span class="line"><span class="meta">@ResponseBody</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> String <span class="title">login</span><span class="params">(String name,String password)</span></span>&#123;</span><br><span class="line">    String msg = <span class="string">"name or pass is null"</span>;</span><br><span class="line">    <span class="keyword">if</span>(name == <span class="keyword">null</span> || password == <span class="keyword">null</span>) <span class="keyword">return</span> msg;</span><br><span class="line">    <span class="keyword">else</span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(!(<span class="string">"admin"</span>.equals(name))) msg = <span class="string">"name is inValid"</span>;</span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span>(!(<span class="string">"123456"</span>.equals(password))) msg = <span class="string">"password is inValid"</span>;</span><br><span class="line">        <span class="keyword">else</span> msg = <span class="string">"name and password are both valid"</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> msg;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight"><table><tr><td class="code"><pre><span class="line">&lt;!--前端代码--&gt;</span><br><span class="line">&lt;%@ page contentType=<span class="string">"text/html;charset=UTF-8"</span> language=<span class="string">"java"</span></span><br><span class="line">         pageEncoding=<span class="string">"UTF-8"</span> %&gt;</span><br><span class="line">&lt;html&gt;</span><br><span class="line"></span><br><span class="line">&lt;head&gt;</span><br><span class="line">    &lt;meta http-equiv=<span class="string">"Content-Type"</span> content=<span class="string">"text/html;charset=utf-8"</span>&gt;</span><br><span class="line">    &lt;title&gt;登录界面&lt;/title&gt;</span><br><span class="line">    &lt;%</span><br><span class="line">        pageContext.setAttribute(<span class="string">"APP_PATH"</span>, request.getContextPath());</span><br><span class="line">    %&gt;</span><br><span class="line">    &lt;!--引入jQuery--&gt;</span><br><span class="line">    &lt;!--</span><br><span class="line">    web路径：</span><br><span class="line">        不以/开始的相对路径：找资源，以当前资源的路径为基准，经常容易出问题</span><br><span class="line">        以/开始的相对路径：找资源，以服务器的路径为标准(http:<span class="comment">//localhost:8080)</span></span><br><span class="line">        比如：$&#123;APP_PATH&#125;可以代表路径：http:<span class="comment">//localhost:8080/crud</span></span><br><span class="line">    --&gt;</span><br><span class="line">    &lt;script type="text/javascript" src="$&#123;APP_PATH&#125;/staticSources/jquery1.11.0/jquery-1.11.0.min.js"&gt;&lt;/script&gt;</span><br><span class="line">    </span><br><span class="line">    &lt;script&gt;</span><br><span class="line">    	<span class="function">function <span class="title">nameInfo</span><span class="params">()</span></span>&#123;</span><br><span class="line">            $.post(&#123;</span><br><span class="line">                url:<span class="string">"$&#123;APP_PATH&#125;/selectName"</span>,</span><br><span class="line">                data:&#123;<span class="string">"name"</span>:$(<span class="string">"#name"</span>).val()&#125;,</span><br><span class="line">                success:function(result)&#123;</span><br><span class="line">                    <span class="keyword">if</span>(result.toString() == <span class="string">'ok'</span>)&#123;</span><br><span class="line">                        $(<span class="string">"#infoName"</span>).css(<span class="string">"color"</span>,<span class="string">"green"</span>);</span><br><span class="line">				   &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">                       $(<span class="string">"#infoName"</span>).css(<span class="string">"color"</span>,<span class="string">"green"</span>);</span><br><span class="line">                   	&#125;</span><br><span class="line">                    $(<span class="string">"#infoName"</span>).html(result);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">//注意两种ajax的写法区别</span></span><br><span class="line">        <span class="function">function <span class="title">passInfo</span><span class="params">()</span></span>&#123;</span><br><span class="line">            $.post(<span class="string">"$&#123;APP_PATH&#125;/selectPass"</span>,&#123;<span class="string">"password"</span>:$(<span class="string">"#pass"</span>).val()&#125;,function(result)&#123;</span><br><span class="line">                <span class="keyword">if</span>(result.toString() == <span class="string">'ok'</span>)&#123;</span><br><span class="line">                        $(<span class="string">"#infoPass"</span>).css(<span class="string">"color"</span>,<span class="string">"green"</span>);</span><br><span class="line">				   &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">                       $(<span class="string">"#infoPass"</span>).css(<span class="string">"color"</span>,<span class="string">"green"</span>);</span><br><span class="line">                   	&#125;</span><br><span class="line">                    $(<span class="string">"#infoPass"</span>).html(result);</span><br><span class="line">            &#125;);</span><br><span class="line">        &#125;</span><br><span class="line">    &lt;/script&gt;</span><br><span class="line">    </span><br><span class="line">&lt;/head&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">    &lt;p&gt;</span><br><span class="line">        用户名：</span><br><span class="line">        &lt;input type = <span class="string">"text"</span> id = <span class="string">"name"</span> onblur = <span class="string">"nameInfo()"</span>/&gt;</span><br><span class="line">        &lt;!--span里面就是发送ajax请求后服务器返回name的情况并显示--&gt;</span><br><span class="line">        &lt;span id = "infoName"&gt;&lt;/span&gt;</span><br><span class="line">    &lt;/p&gt;</span><br><span class="line">    &lt;p&gt;</span><br><span class="line">        密码：</span><br><span class="line">        &lt;input type = <span class="string">"password"</span> id = <span class="string">"pass"</span> onblur = <span class="string">"passInfo()"</span>/&gt;</span><br><span class="line">        &lt;!--span里面就是发送ajax请求后服务器返回pass的情况并显示--&gt;</span><br><span class="line">        &lt;span id = "infoPass"&gt;&lt;/span&gt;</span><br><span class="line">    &lt;/p&gt;</span><br><span class="line">    &lt;p&gt;</span><br><span class="line">		&lt;!--doLogin()自己写的js函数--&gt;</span><br><span class="line">        &lt;input type = <span class="string">"button"</span> id = <span class="string">"login"</span> onclick = <span class="string">"doLogin()"</span>/&gt; </span><br><span class="line">    &lt;/p&gt;</span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></table></figure>
+</li>
+<li><h3 id="ajax总结"><a href="#ajax总结" class="headerlink" title="ajax总结"></a>ajax总结</h3><ol>
+<li>编写对应处理的Controller，返回json格式或字符串格式数据；</li>
+<li>编写ajax请求（如上例两种方法），大致需要完成三个要求：<ol>
+<li>url请求地址</li>
+<li>data键值对</li>
+<li>success回调函数</li>
+</ol>
+</li>
+<li>给ajax绑定事件，如点击.click，失去焦点.onblur，键盘弹起.keyup。更多事件可查看：<a href="https://www.jquery123.com/category/attributes/" target="_blank" rel="external nofollow noopener noreferrer">https://www.jquery123.com/category/attributes/</a></li>
+</ol>
+</li>
+</ol>
+]]></content>
+      <categories>
+        <category>java后端基础</category>
+        <category>前端</category>
+      </categories>
+      <tags>
+        <tag>前端</tag>
+        <tag>Ajax</tag>
       </tags>
   </entry>
 </search>
