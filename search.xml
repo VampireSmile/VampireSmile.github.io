@@ -334,86 +334,6 @@
       </tags>
   </entry>
   <entry>
-    <title>jwt学习</title>
-    <url>/2021/01/04/jwt%E5%AD%A6%E4%B9%A0/</url>
-    <content><![CDATA[<h1 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h1><p>官方：jsonwebtoken(JWT)是一个开发标准(rfc7519)，它定义了一种紧凑的、自包含的方式，用于在各方之间以JSON对象安全的传输信息。此信息可以验证和信任，因为它是数字签名的。jwt可以使用加密（HMAC算法)或使用RSA或ECDSA的公钥/私钥对进行签名。</p>
-<p>通俗解释：JWT是Json Web Token的简称，也就是通过JSON形式作为web应用中的令牌，用于在各方之间安全的将信息作为Json对象传输。在数据传输过程中还可以完成数据加密、签名等相关处理。</p>
-<h1 id="功能"><a href="#功能" class="headerlink" title="功能"></a>功能</h1><h2 id="授权"><a href="#授权" class="headerlink" title="授权"></a>授权</h2><p>这是使用JWT的最常见方案。一旦用户登录，每个后续请求将包括JWT，从而允许用户访问该令牌允许的路                    由、服务和资源。单点登录是当今广泛使用JWT的一项功能，因为它的开销很小并且可以在不同的域中轻松使用。</p>
-<h2 id="信息交换"><a href="#信息交换" class="headerlink" title="信息交换"></a>信息交换</h2><p>Json Web Token是在各方之间安全的传输信息的好方法。因为可以对JWT进行签名（例如使用公钥/私钥对），所以你可以确保发送者的身份。此外，由于签名是使用标头和有效负载计算的，因此你还可以验证内容是否遭到篡改。</p>
-<h1 id="与传统认证的差异"><a href="#与传统认证的差异" class="headerlink" title="与传统认证的差异"></a>与传统认证的差异</h1><h2 id="传统Session认证方式"><a href="#传统Session认证方式" class="headerlink" title="传统Session认证方式"></a>传统Session认证方式</h2><p>我们知道，http协议本身是一种无状态协议，而这就意味着如果用户向我们的应用提供了用户名和密码来进行用户认证，那么下一次请求时，用户还要在一次进行认证，因为根据http协议，我们并不能知道是哪个用户发出的请求，所以为了让我们的应用能识别是哪个用户发出的请求，我们只能在服务器存储一份用户登录的信息，这份登录信息会在响应时传给浏览器，告诉其保存为cookie，以便在下次请求时发送给我们的应用，这样我们的应用就能识别请求来自哪个用户了。</p>
-<h2 id="传统认证方式暴露的问题"><a href="#传统认证方式暴露的问题" class="headerlink" title="传统认证方式暴露的问题"></a>传统认证方式暴露的问题</h2><ol>
-<li>当用户经过我们的应用认证之后，我们的应用都要在服务端做一次记录，以方便用户下次请求的鉴别，通常而言，Session是保存在内存中的，而随着认证用户的增多，服务端的开销会明显增大</li>
-<li>用户认证之后，服务端做认证记录，如果认证的记录保存在内存中的话，这意味着用户下一次请求还必须请求在这台服务器上，这样才能拿到授权的资源，这样在分布式的应用上，相应的限制了负载均衡的能力。这也意味着限制了应用的拓展能力</li>
-<li>因为是基于cookie来进行用户识别的，cookie如果被截获，用户就会很容易受到跨站请求伪造攻击</li>
-<li>在前后端分离的系统中尤为突出：当前后端分离后，请求路径：用户-&gt;前台web-&gt;代理-&gt;后端应用，这样用户的一个请求需要转发多次。如果session每次携带sessionId到服务器，服务器还要查询用户信息。同时sessionId只是一个特征值，表达的信息不够丰富，不容易拓展。而且如果你后端应用是多节点部署，那么就需要实现session共享机制，不方便集群应用</li>
-</ol>
-<h1 id="JWT认证流程"><a href="#JWT认证流程" class="headerlink" title="JWT认证流程"></a>JWT认证流程</h1><p><img src="../../../../Zachary%E7%9A%84%E5%9B%BE%E7%89%87/jwt%E5%AD%A6%E4%B9%A0/jwt.png" alt="jwt"></p>
-<ol>
-<li>首先，前端通过web表单将自己的用户名和密码发送到后端接口，这一过程一般是一个Http POST请求。建议方式是通过SSL加密的传输(https协议)，从而避免敏感信息的泄露。</li>
-<li>后端对用户名和密码验证成功后，将用户的id等其他信息作为JWT Payload，将其与头部分别进行Base64编码拼接后签名，形成一个JWT（TOKEN）。形成的JWT就是一个形如lll.xx.sss的字符串，token: head.payload.signature</li>
-<li>后端将生成的JWT字符串作为登录成功的返回结果返回给前端。前端可以将返回结果保存在localStorage或SessionStorage上，退出登录时前端删除保存的JWT即可。</li>
-<li>之后前端每次请求时将JWT放入HTTP Header中的Authorization位。（可以有效解决XSS和XSRF问题）</li>
-<li>然后每次后端检查该JWT是否存在，如果存在则验证有效性。譬如检查签名是否正确；检查Token是否过期；检查Token的接收方是否是自己</li>
-<li>验证通过后后端使用JWT中包含的用户信息进行其他逻辑操作，返回相应结果。</li>
-</ol>
-<h1 id="JWT优势"><a href="#JWT优势" class="headerlink" title="JWT优势"></a>JWT优势</h1><ol>
-<li>简洁：可以通过Url，Post参数或者在Http header发送，因为数据量小，传输速度也很快</li>
-<li>自包含：jwt payload(负载)包含了所有用户所需要的信息，避免了多次查询数据库</li>
-<li>因为Token是以Json加密的形式保存在客户端的，所以Json是跨语言的，原则上任何web形式都支持</li>
-<li>不需要在服务端保存会话信息，特别适合用于分布式微服务</li>
-</ol>
-<h1 id="JWT结构"><a href="#JWT结构" class="headerlink" title="JWT结构"></a>JWT结构</h1><ol>
-<li><p>令牌组成</p>
-<ul>
-<li>标头（header）</li>
-<li>有效载荷（payload）</li>
-<li>签名（signature）</li>
-</ul>
-<p>因此，JWT一般是header.payload.signature形式并经过base64编码的字符串</p>
-</li>
-<li><p>header</p>
-<p>标头通常由两部分组成：令牌的类型和所使用的签名算法，例如HMAC SHA-256 或RSA。它会使用 Base64编码组成JWT结构的第一部分。注意：base64是一种编码，也就是说，它是可以被翻译回原来的形式的。他并不是一种加密过程。</p>
-<figure class="highlight json"><table><tr><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    <span class="attr">"alg"</span>: <span class="string">"HS256"</span>,</span><br><span class="line">    <span class="attr">"typ"</span>: <span class="string">"JWT"</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>payload</p>
-<p>令牌的第二部分是有效负载，其中包含声明。声明是有关实体（通常是用户）和其他数据的声明，但注意里面不要放用户的敏感信息，比如密码。同样的，它会使用base64编码组合成JWT结构的第二部分</p>
-<figure class="highlight json"><table><tr><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    <span class="attr">"id"</span>: <span class="string">"1234"</span>,</span><br><span class="line">    <span class="attr">"name"</span>: <span class="string">"zhangsan"</span>,</span><br><span class="line">    <span class="attr">"age"</span>: <span class="number">18</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>signature</p>
-<p>前面两部分都是使用base64进行编码的，即前端可以解开得到里面的信息。signature需要使用编码后的header和payload以及我们提供的一个密钥，然后使用header中指定的签名算法进行签名，签名的作用是保证整个Token在传输过程中未曾被修改过，比如：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">HMACSHA256(base64UrlEncode(header) + <span class="string">"."</span> + base64UrlEncode(payload), secretKey)</span><br></pre></td></tr></table></figure>
-
-<p>签名目的：最后一步签名的过程，实际上是对头部以及负载内容进行签名，防止内容被篡改。如果有人对头部以及负载的内容解码之后进行修改，再进行编码，最后加上之前的签名组合形成新的JWT的话，那么服务器端会判断出新的头部和负载形成的签名和JWT附带上的签名是不一样的，如果要对新的头部和负载进行签名，在不知道服务器密钥的情况下，那么最终得出的签名是不一样的。</p>
-</li>
-</ol>
-<h1 id="使用JWT"><a href="#使用JWT" class="headerlink" title="使用JWT"></a>使用JWT</h1><ol>
-<li><p>引入依赖（常用的两种jwt库）</p>
-<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="comment">&lt;!-- https://mvnrepository.com/artifact/com.auth0/java-jwt --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>com.auth0<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>java-jwt<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">version</span>&gt;</span>3.10.3<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">&lt;!--jose4j--&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.bitbucket.b_c<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>jose4j<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">version</span>&gt;</span>0.7.3<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
-</li>
-<li><p>生成令牌</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">//设置头部header所需的map</span></span><br><span class="line">Map&lt;String, Object&gt; headerMap = <span class="keyword">new</span> HashMap&lt;&gt;();</span><br><span class="line">Calendar instance = Calendar.getInstance();</span><br><span class="line">instance.add(Calendar.SECOND, <span class="number">20</span>);</span><br><span class="line">String token = JWT.create().withHeader(headerMap)</span><br><span class="line">    <span class="comment">//设置有效负荷payload</span></span><br><span class="line">    .withClaim(<span class="string">"name"</span>, <span class="string">"zhangsan"</span>)</span><br><span class="line">    .withClaim(<span class="string">"age"</span>, <span class="number">19</span>)</span><br><span class="line">    <span class="comment">//设置token过期时间</span></span><br><span class="line">    .withExpiresAt(instance.getTime())</span><br><span class="line">    <span class="comment">//签名</span></span><br><span class="line">    .sign(Algorithm.HMAC256(SECRET_KEY));</span><br></pre></td></tr></table></figure>
-
-<p>令牌结果：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJuYW1lIjoiemhhbmdzYW4iLCJleHAiOjE2MDk4MDk1ODgsImFnZSI6MTl9.kba4SeZ5_G2VbxvQQhHWIpjtIu_68bJXsV6bS5d94yM</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>验证token并取出相关信息</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">String token = getToken();</span><br><span class="line">JWTVerifier verifier = JWT.require(Algorithm.HMAC256(SECRET_KEY)).build();</span><br><span class="line">DecodedJWT result = verifier.verify(token);</span><br><span class="line"><span class="comment">//注意如果有多个claim，需要使用这个</span></span><br><span class="line">String name = result.getClaim(<span class="string">"name"</span>).asString();</span><br><span class="line">Integer age = result.getClaim(<span class="string">"age"</span>).asInt();</span><br><span class="line">System.out.println(name + <span class="string">" : "</span> + age);</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>常见的异常信息</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">SignatureVerificationException: 签名不一致异常</span><br><span class="line">TokenExpiredException: 令牌过期异常</span><br><span class="line">AlgorithmMisMatchException: 算法不匹配异常</span><br><span class="line">InvalidClaimException: 失效的payload异常</span><br></pre></td></tr></table></figure>
-
-</li>
-</ol>
-]]></content>
-      <categories>
-        <category>java后端须知</category>
-      </categories>
-      <tags>
-        <tag>java后端须知</tag>
-        <tag>jwt</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>java线程池</title>
     <url>/2020/11/17/java%E7%BA%BF%E7%A8%8B%E6%B1%A0/</url>
     <content><![CDATA[<ol>
@@ -1039,10 +959,84 @@
       </tags>
   </entry>
   <entry>
-    <title>kafka事务</title>
-    <url>/2024/11/12/kafka%E4%BA%8B%E5%8A%A1/</url>
-    <content><![CDATA[<h1 id="插入图片测试"><a href="#插入图片测试" class="headerlink" title="插入图片测试"></a>插入图片测试</h1><p><img src="kafka%E4%BA%8B%E5%8A%A1/tom%E5%9B%B0.jpg" alt="test"></p>
+    <title>jwt学习</title>
+    <url>/2021/01/04/jwt%E5%AD%A6%E4%B9%A0/</url>
+    <content><![CDATA[<h1 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h1><p>官方：jsonwebtoken(JWT)是一个开发标准(rfc7519)，它定义了一种紧凑的、自包含的方式，用于在各方之间以JSON对象安全的传输信息。此信息可以验证和信任，因为它是数字签名的。jwt可以使用加密（HMAC算法)或使用RSA或ECDSA的公钥/私钥对进行签名。</p>
+<p>通俗解释：JWT是Json Web Token的简称，也就是通过JSON形式作为web应用中的令牌，用于在各方之间安全的将信息作为Json对象传输。在数据传输过程中还可以完成数据加密、签名等相关处理。</p>
+<h1 id="功能"><a href="#功能" class="headerlink" title="功能"></a>功能</h1><h2 id="授权"><a href="#授权" class="headerlink" title="授权"></a>授权</h2><p>这是使用JWT的最常见方案。一旦用户登录，每个后续请求将包括JWT，从而允许用户访问该令牌允许的路                    由、服务和资源。单点登录是当今广泛使用JWT的一项功能，因为它的开销很小并且可以在不同的域中轻松使用。</p>
+<h2 id="信息交换"><a href="#信息交换" class="headerlink" title="信息交换"></a>信息交换</h2><p>Json Web Token是在各方之间安全的传输信息的好方法。因为可以对JWT进行签名（例如使用公钥/私钥对），所以你可以确保发送者的身份。此外，由于签名是使用标头和有效负载计算的，因此你还可以验证内容是否遭到篡改。</p>
+<h1 id="与传统认证的差异"><a href="#与传统认证的差异" class="headerlink" title="与传统认证的差异"></a>与传统认证的差异</h1><h2 id="传统Session认证方式"><a href="#传统Session认证方式" class="headerlink" title="传统Session认证方式"></a>传统Session认证方式</h2><p>我们知道，http协议本身是一种无状态协议，而这就意味着如果用户向我们的应用提供了用户名和密码来进行用户认证，那么下一次请求时，用户还要在一次进行认证，因为根据http协议，我们并不能知道是哪个用户发出的请求，所以为了让我们的应用能识别是哪个用户发出的请求，我们只能在服务器存储一份用户登录的信息，这份登录信息会在响应时传给浏览器，告诉其保存为cookie，以便在下次请求时发送给我们的应用，这样我们的应用就能识别请求来自哪个用户了。</p>
+<h2 id="传统认证方式暴露的问题"><a href="#传统认证方式暴露的问题" class="headerlink" title="传统认证方式暴露的问题"></a>传统认证方式暴露的问题</h2><ol>
+<li>当用户经过我们的应用认证之后，我们的应用都要在服务端做一次记录，以方便用户下次请求的鉴别，通常而言，Session是保存在内存中的，而随着认证用户的增多，服务端的开销会明显增大</li>
+<li>用户认证之后，服务端做认证记录，如果认证的记录保存在内存中的话，这意味着用户下一次请求还必须请求在这台服务器上，这样才能拿到授权的资源，这样在分布式的应用上，相应的限制了负载均衡的能力。这也意味着限制了应用的拓展能力</li>
+<li>因为是基于cookie来进行用户识别的，cookie如果被截获，用户就会很容易受到跨站请求伪造攻击</li>
+<li>在前后端分离的系统中尤为突出：当前后端分离后，请求路径：用户-&gt;前台web-&gt;代理-&gt;后端应用，这样用户的一个请求需要转发多次。如果session每次携带sessionId到服务器，服务器还要查询用户信息。同时sessionId只是一个特征值，表达的信息不够丰富，不容易拓展。而且如果你后端应用是多节点部署，那么就需要实现session共享机制，不方便集群应用</li>
+</ol>
+<h1 id="JWT认证流程"><a href="#JWT认证流程" class="headerlink" title="JWT认证流程"></a>JWT认证流程</h1><p><img src="../../../../Zachary%E7%9A%84%E5%9B%BE%E7%89%87/jwt%E5%AD%A6%E4%B9%A0/jwt.png" alt="jwt"></p>
+<ol>
+<li>首先，前端通过web表单将自己的用户名和密码发送到后端接口，这一过程一般是一个Http POST请求。建议方式是通过SSL加密的传输(https协议)，从而避免敏感信息的泄露。</li>
+<li>后端对用户名和密码验证成功后，将用户的id等其他信息作为JWT Payload，将其与头部分别进行Base64编码拼接后签名，形成一个JWT（TOKEN）。形成的JWT就是一个形如lll.xx.sss的字符串，token: head.payload.signature</li>
+<li>后端将生成的JWT字符串作为登录成功的返回结果返回给前端。前端可以将返回结果保存在localStorage或SessionStorage上，退出登录时前端删除保存的JWT即可。</li>
+<li>之后前端每次请求时将JWT放入HTTP Header中的Authorization位。（可以有效解决XSS和XSRF问题）</li>
+<li>然后每次后端检查该JWT是否存在，如果存在则验证有效性。譬如检查签名是否正确；检查Token是否过期；检查Token的接收方是否是自己</li>
+<li>验证通过后后端使用JWT中包含的用户信息进行其他逻辑操作，返回相应结果。</li>
+</ol>
+<h1 id="JWT优势"><a href="#JWT优势" class="headerlink" title="JWT优势"></a>JWT优势</h1><ol>
+<li>简洁：可以通过Url，Post参数或者在Http header发送，因为数据量小，传输速度也很快</li>
+<li>自包含：jwt payload(负载)包含了所有用户所需要的信息，避免了多次查询数据库</li>
+<li>因为Token是以Json加密的形式保存在客户端的，所以Json是跨语言的，原则上任何web形式都支持</li>
+<li>不需要在服务端保存会话信息，特别适合用于分布式微服务</li>
+</ol>
+<h1 id="JWT结构"><a href="#JWT结构" class="headerlink" title="JWT结构"></a>JWT结构</h1><ol>
+<li><p>令牌组成</p>
+<ul>
+<li>标头（header）</li>
+<li>有效载荷（payload）</li>
+<li>签名（signature）</li>
+</ul>
+<p>因此，JWT一般是header.payload.signature形式并经过base64编码的字符串</p>
+</li>
+<li><p>header</p>
+<p>标头通常由两部分组成：令牌的类型和所使用的签名算法，例如HMAC SHA-256 或RSA。它会使用 Base64编码组成JWT结构的第一部分。注意：base64是一种编码，也就是说，它是可以被翻译回原来的形式的。他并不是一种加密过程。</p>
+<figure class="highlight json"><table><tr><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    <span class="attr">"alg"</span>: <span class="string">"HS256"</span>,</span><br><span class="line">    <span class="attr">"typ"</span>: <span class="string">"JWT"</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>payload</p>
+<p>令牌的第二部分是有效负载，其中包含声明。声明是有关实体（通常是用户）和其他数据的声明，但注意里面不要放用户的敏感信息，比如密码。同样的，它会使用base64编码组合成JWT结构的第二部分</p>
+<figure class="highlight json"><table><tr><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    <span class="attr">"id"</span>: <span class="string">"1234"</span>,</span><br><span class="line">    <span class="attr">"name"</span>: <span class="string">"zhangsan"</span>,</span><br><span class="line">    <span class="attr">"age"</span>: <span class="number">18</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>signature</p>
+<p>前面两部分都是使用base64进行编码的，即前端可以解开得到里面的信息。signature需要使用编码后的header和payload以及我们提供的一个密钥，然后使用header中指定的签名算法进行签名，签名的作用是保证整个Token在传输过程中未曾被修改过，比如：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">HMACSHA256(base64UrlEncode(header) + <span class="string">"."</span> + base64UrlEncode(payload), secretKey)</span><br></pre></td></tr></table></figure>
+
+<p>签名目的：最后一步签名的过程，实际上是对头部以及负载内容进行签名，防止内容被篡改。如果有人对头部以及负载的内容解码之后进行修改，再进行编码，最后加上之前的签名组合形成新的JWT的话，那么服务器端会判断出新的头部和负载形成的签名和JWT附带上的签名是不一样的，如果要对新的头部和负载进行签名，在不知道服务器密钥的情况下，那么最终得出的签名是不一样的。</p>
+</li>
+</ol>
+<h1 id="使用JWT"><a href="#使用JWT" class="headerlink" title="使用JWT"></a>使用JWT</h1><ol>
+<li><p>引入依赖（常用的两种jwt库）</p>
+<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="comment">&lt;!-- https://mvnrepository.com/artifact/com.auth0/java-jwt --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>com.auth0<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>java-jwt<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">version</span>&gt;</span>3.10.3<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">&lt;!--jose4j--&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.bitbucket.b_c<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>jose4j<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">version</span>&gt;</span>0.7.3<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>生成令牌</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">//设置头部header所需的map</span></span><br><span class="line">Map&lt;String, Object&gt; headerMap = <span class="keyword">new</span> HashMap&lt;&gt;();</span><br><span class="line">Calendar instance = Calendar.getInstance();</span><br><span class="line">instance.add(Calendar.SECOND, <span class="number">20</span>);</span><br><span class="line">String token = JWT.create().withHeader(headerMap)</span><br><span class="line">    <span class="comment">//设置有效负荷payload</span></span><br><span class="line">    .withClaim(<span class="string">"name"</span>, <span class="string">"zhangsan"</span>)</span><br><span class="line">    .withClaim(<span class="string">"age"</span>, <span class="number">19</span>)</span><br><span class="line">    <span class="comment">//设置token过期时间</span></span><br><span class="line">    .withExpiresAt(instance.getTime())</span><br><span class="line">    <span class="comment">//签名</span></span><br><span class="line">    .sign(Algorithm.HMAC256(SECRET_KEY));</span><br></pre></td></tr></table></figure>
+
+<p>令牌结果：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJuYW1lIjoiemhhbmdzYW4iLCJleHAiOjE2MDk4MDk1ODgsImFnZSI6MTl9.kba4SeZ5_G2VbxvQQhHWIpjtIu_68bJXsV6bS5d94yM</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>验证token并取出相关信息</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">String token = getToken();</span><br><span class="line">JWTVerifier verifier = JWT.require(Algorithm.HMAC256(SECRET_KEY)).build();</span><br><span class="line">DecodedJWT result = verifier.verify(token);</span><br><span class="line"><span class="comment">//注意如果有多个claim，需要使用这个</span></span><br><span class="line">String name = result.getClaim(<span class="string">"name"</span>).asString();</span><br><span class="line">Integer age = result.getClaim(<span class="string">"age"</span>).asInt();</span><br><span class="line">System.out.println(name + <span class="string">" : "</span> + age);</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>常见的异常信息</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">SignatureVerificationException: 签名不一致异常</span><br><span class="line">TokenExpiredException: 令牌过期异常</span><br><span class="line">AlgorithmMisMatchException: 算法不匹配异常</span><br><span class="line">InvalidClaimException: 失效的payload异常</span><br></pre></td></tr></table></figure>
+
+</li>
+</ol>
 ]]></content>
+      <categories>
+        <category>java后端须知</category>
+      </categories>
+      <tags>
+        <tag>java后端须知</tag>
+        <tag>jwt</tag>
+      </tags>
   </entry>
   <entry>
     <title>mysql索引总结-优化篇</title>
