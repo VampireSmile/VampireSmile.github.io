@@ -1899,6 +1899,8 @@
 <li>功能方面，二者都支持认证、授权等功能，但是shiro不支持安全防护、OAuth等一些拓展功能，而spring-security支持OAuth，并在安全方面加入了诸多考虑。</li>
 </ol>
 <h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>总的来说，如果你只是想要实现一个简单的Web应用，shiro更加的轻量级，学习成本也更低。如果你正在开发一个分布式的、微服务架构的、或者与springcloud系列框架深度集成的项目，那么推荐使用spring-security</p>
+<a id="more"></a>
+
 <h1 id="HttpBasic认证模式"><a href="#HttpBasic认证模式" class="headerlink" title="HttpBasic认证模式"></a>HttpBasic认证模式</h1><p>HttpBasic认证模式是spring-security实现登录认证的最简单的一种方式，无法保证安全性，对于一些无关紧要的接口便可使用HttpBasic认证模式，这是一种”防君子不防小人”的认证模式。</p>
 <p><img src="../../../../Zachary%E7%9A%84%E5%9B%BE%E7%89%87/%E6%9D%83%E9%99%90%E8%AE%BE%E8%AE%A1%E5%AD%A6%E4%B9%A0/httpbasic%E7%99%BB%E5%BD%95%E8%AE%A4%E8%AF%81%E6%B5%81%E7%A8%8B.png" alt="hb认证流程"></p>
 <p>而其中最大的隐患就是客户端的header部分会有一个字段authorization，它后面所跟着的值是经过base64编码的用户名和密码，所以如果有人拿到了这个字符串，自然也就可以逆向解码，从而将用户名和密码泄露。</p>
