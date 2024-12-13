@@ -1,0 +1,1435 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+  
+  
+    
+      
+    
+    
+      
+    
+  <script src="//cdn.bootcss.com/pace/1.0.2/pace.min.js"></script>
+  <link href="//cdn.bootcss.com/pace/1.0.2/themes/blue/pace-theme-flash.min.css" rel="stylesheet">
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+  <link href="//cdn.jsdelivr.net/fancybox/2.1.5/jquery.fancybox.min.css" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+  
+
+<link href="//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/tomkun.jpg?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/tomkun.32px.ico?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/tomkun.16px.ico?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/tomkun.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="offer,mysql索引,">
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Zachary" type="application/atom+xml">
+
+
+
+
+
+
+<meta name="description" content="1. 索引创建添加与删除1.1 索引并不是随便添加的，以下几种情况需牢记在心 频繁作为查询、排序、分组以及统计条件的字段应该创建索引   1SELECT * FROM user WHERE id &#x3D; 1;  查询中与其他表关联的字段，外键关系应该建立索引 1SELECT * FROM user u, orders o WHERE u.id &#x3D; o.uid  区分度太差的字段不适合单独创建索引，即使">
+<meta property="og:type" content="article">
+<meta property="og:title" content="mysql索引总结-经验篇">
+<meta property="og:url" content="https://vampiresmile.github.io/2024/11/12/mysql%E7%B4%A2%E5%BC%95%E6%80%BB%E7%BB%93-%E7%BB%8F%E9%AA%8C%E7%AF%87/index.html">
+<meta property="og:site_name" content="Zachary">
+<meta property="og:description" content="1. 索引创建添加与删除1.1 索引并不是随便添加的，以下几种情况需牢记在心 频繁作为查询、排序、分组以及统计条件的字段应该创建索引   1SELECT * FROM user WHERE id &#x3D; 1;  查询中与其他表关联的字段，外键关系应该建立索引 1SELECT * FROM user u, orders o WHERE u.id &#x3D; o.uid  区分度太差的字段不适合单独创建索引，即使">
+<meta property="article:published_time" content="2024-11-12T14:26:10.000Z">
+<meta property="article:modified_time" content="2024-12-13T08:21:42.213Z">
+<meta property="article:author" content="yinjiawei">
+<meta property="article:tag" content="offer">
+<meta property="article:tag" content="mysql索引">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://vampiresmile.github.io/2024/11/12/mysql索引总结-经验篇/">
+
+
+
+
+
+
+
+
+
+  <title>mysql索引总结-经验篇 | Zachary</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Zachary</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">未来可期</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://vampiresmile.github.io/2024/11/12/mysql%E7%B4%A2%E5%BC%95%E6%80%BB%E7%BB%93-%E7%BB%8F%E9%AA%8C%E7%AF%87/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="yinjiawei">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/tomkun.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Zachary">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">mysql索引总结-经验篇</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2024-11-12T22:26:10+08:00">
+                2024-11-12
+              </time>
+            
+
+            
+              <span class="post-meta-divider">|</span>
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-check-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">更新于&#58;</span>
+              
+              <time title="更新于" itemprop="dateModified" datetime="2024-12-13T16:21:42+08:00">
+                2024-12-13
+              </time>
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/" itemprop="url" rel="index">
+                    <span itemprop="name">数据库</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-file-o"></i>
+            <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+            </span>
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  3.3k 字
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">
+                  12 分钟
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="1-索引创建添加与删除"><a href="#1-索引创建添加与删除" class="headerlink" title="1. 索引创建添加与删除"></a>1. 索引创建添加与删除</h1><h2 id="1-1-索引并不是随便添加的，以下几种情况需牢记在心"><a href="#1-1-索引并不是随便添加的，以下几种情况需牢记在心" class="headerlink" title="1.1 索引并不是随便添加的，以下几种情况需牢记在心"></a>1.1 索引并不是随便添加的，以下几种情况需牢记在心</h2><ul>
+<li><p>频繁作为查询、排序、分组以及统计条件的字段应该创建索引</p>
+  <figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> * <span class="keyword">FROM</span> <span class="keyword">user</span> <span class="keyword">WHERE</span> <span class="keyword">id</span> = <span class="number">1</span>;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>查询中与其他表关联的字段，外键关系应该建立索引</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> * <span class="keyword">FROM</span> <span class="keyword">user</span> u, orders o <span class="keyword">WHERE</span> u.id = o.uid</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>区分度太差的字段不适合单独创建索引，即使频繁作为查询条件</p>
+  <figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> * <span class="keyword">FROM</span> <span class="keyword">user</span> <span class="keyword">WHERE</span> sex = <span class="string">'女'</span>;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>频繁更新的字段不适合创建索引</p>
+  <figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> * <span class="keyword">FROM</span> orders <span class="keyword">WHERE</span> order_state = <span class="string">'未付款'</span>;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>不会出现在WHERE条件里的字段不适合创建索引</p>
+</li>
+</ul>
+<h2 id="1-2-索引的新增、删除与查询"><a href="#1-2-索引的新增、删除与查询" class="headerlink" title="1.2 索引的新增、删除与查询"></a>1.2 索引的新增、删除与查询</h2><ul>
+<li><p>建立索引</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> [<span class="keyword">UNIQUE</span>|FULLTEXT] <span class="keyword">INDEX</span> index_name <span class="keyword">ON</span> tbl_name (col_name [(<span class="keyword">length</span>)] [<span class="keyword">ASC</span> | <span class="keyword">DESC</span>],...);</span><br><span class="line"><span class="keyword">ALTER</span> <span class="keyword">TABLE</span> table_name <span class="keyword">ADD</span> <span class="keyword">INDEX</span> index_name (column_list);</span><br><span class="line"><span class="keyword">ALTER</span> <span class="keyword">TABLE</span> table_name <span class="keyword">ADD</span> <span class="keyword">UNIQUE</span> <span class="keyword">INDEX</span> index_name (column_list);</span><br><span class="line"><span class="keyword">ALTER</span> <span class="keyword">TABLE</span> table_name <span class="keyword">ADD</span> PRIMARY <span class="keyword">KEY</span> (column_list);</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>删除索引</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">DROP</span> <span class="keyword">INDEX</span> index_name <span class="keyword">ON</span> talbe_name;</span><br><span class="line"><span class="keyword">ALTER</span> <span class="keyword">TABLE</span> table_name <span class="keyword">DROP</span> <span class="keyword">INDEX</span> index_name;//等价于第一条</span><br><span class="line"><span class="keyword">ALTER</span> <span class="keyword">TABLE</span> table_name <span class="keyword">DROP</span> PRIMARY <span class="keyword">KEY</span>;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>查询索引(均可) </p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SHOW</span> <span class="keyword">keys</span> <span class="keyword">FROM</span> table_name;</span><br><span class="line"><span class="keyword">SHOW</span> <span class="keyword">index</span> <span class="keyword">FROM</span> table_name;</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<h1 id="2-索引失效及推荐场景"><a href="#2-索引失效及推荐场景" class="headerlink" title="2. 索引失效及推荐场景"></a>2. 索引失效及推荐场景</h1><p><strong>一个小提示：对于索引查询的一般情况，如果mysql估算返回的数据量超过 30% 就可能直接使用全表扫描，而不走索引，当然这个30%只是一个大概的范围，但有时可以作为一个问题排查方向。</strong><a id="more"></a></p>
+<h2 id="2-1-如果mysql估计使用索引比全表扫描还慢，则不会使用索引"><a href="#2-1-如果mysql估计使用索引比全表扫描还慢，则不会使用索引" class="headerlink" title="2.1 如果mysql估计使用索引比全表扫描还慢，则不会使用索引"></a>2.1 如果mysql估计使用索引比全表扫描还慢，则不会使用索引</h2><p>返回数据的比例是重要的指标，比例越低越容易命中索引。一般索引查询的数据量达到30%左右，可能mysql优化器就选择不走索引直接全表扫描了</p>
+<h2 id="2-2-前缀模糊查询一般情况下无法命中索引"><a href="#2-2-前缀模糊查询一般情况下无法命中索引" class="headerlink" title="2.2 前缀模糊查询一般情况下无法命中索引"></a>2.2 前缀模糊查询一般情况下无法命中索引</h2><p>比如我们给user表中name字段加索引，然后执行下面语句是不会走索引的</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">EXPLAIN</span> <span class="keyword">SELECT</span> * <span class="keyword">FROM</span> <span class="keyword">user</span> <span class="keyword">WHERE</span> <span class="keyword">name</span> <span class="keyword">LIKE</span> <span class="string">'%s%'</span>;</span><br></pre></td></tr></table></figure>
+
+<p>此时有两种优化方式：</p>
+<ul>
+<li><p>使用后缀模糊查询</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">EXPLAIN</span> <span class="keyword">SELECT</span> * <span class="keyword">FROM</span> <span class="keyword">user</span> <span class="keyword">WHERE</span> <span class="keyword">name</span> <span class="keyword">LIKE</span> <span class="string">'s%'</span>;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>使用覆盖索引查询</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">EXPLAIN</span> <span class="keyword">SELECT</span> <span class="keyword">name</span> <span class="keyword">FROM</span> <span class="keyword">user</span> <span class="keyword">WHERE</span> <span class="keyword">name</span> <span class="keyword">LIKE</span> <span class="string">'%s'</span>;</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<h2 id="2-3-数据类型出现隐式转换的时候可能不走索引"><a href="#2-3-数据类型出现隐式转换的时候可能不走索引" class="headerlink" title="2.3 数据类型出现隐式转换的时候可能不走索引"></a>2.3 数据类型出现隐式转换的时候可能不走索引</h2><p>还是name字段加索引，name为varchar类型，那么下面这个语句不会走索引：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">EXPLAIN</span> <span class="keyword">SELECT</span> * <span class="keyword">FROM</span> <span class="keyword">user</span> <span class="keyword">WHERE</span> <span class="keyword">name</span> = <span class="number">1</span>;</span><br></pre></td></tr></table></figure>
+
+<p>但优化成如下这个语句会走索引：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">EXPLAIN</span> <span class="keyword">SELECT</span> * <span class="keyword">FROM</span> <span class="keyword">user</span> <span class="keyword">WHERE</span> <span class="keyword">name</span> = <span class="string">'1'</span>;</span><br></pre></td></tr></table></figure>
+
+<p>同时，实践发现，如果数据库中数据为数值类型，用单引号这种字符串传值也是能走索引的，如下语句就会走索引</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- id列是INT类型</span></span><br><span class="line"><span class="keyword">EXPLAIN</span> <span class="keyword">SELECT</span> * <span class="keyword">FROM</span> <span class="keyword">user</span> <span class="keyword">where</span> <span class="keyword">id</span> = <span class="string">'1'</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="2-4-联合索引的情况下，如果不满足最左匹配原则，则无法命中或完全命中联合索引"><a href="#2-4-联合索引的情况下，如果不满足最左匹配原则，则无法命中或完全命中联合索引" class="headerlink" title="2.4 联合索引的情况下，如果不满足最左匹配原则，则无法命中或完全命中联合索引"></a>2.4 联合索引的情况下，如果不满足最左匹配原则，则无法命中或完全命中联合索引</h2><p>比如给name、age、status加联合索引，执行下面语句：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">ALTER</span> <span class="keyword">TABLE</span> <span class="string">'user'</span> <span class="keyword">ADD</span> <span class="keyword">INDEX</span>  index_name (<span class="keyword">name</span>,age,<span class="keyword">status</span>);</span><br></pre></td></tr></table></figure>
+
+<p>下面语句都能命中索引：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 命中部分索引字段。会使用name字段，但用不到status字段，因为age不在条件里面</span></span><br><span class="line"><span class="keyword">EXPLAIN</span> <span class="keyword">SELECT</span> * <span class="keyword">FROM</span> <span class="keyword">user</span> <span class="keyword">WHERE</span> <span class="keyword">name</span> = <span class="string">'yjw'</span> <span class="keyword">AND</span> <span class="keyword">status</span> = <span class="number">1</span>;</span><br><span class="line"><span class="comment">-- 同上</span></span><br><span class="line"><span class="keyword">EXPLAIN</span> <span class="keyword">SELECT</span> * <span class="keyword">FROM</span> <span class="keyword">user</span> <span class="keyword">WHERE</span> <span class="keyword">status</span> = <span class="number">1</span> <span class="keyword">AND</span> <span class="keyword">name</span> = <span class="string">'yjw'</span>;</span><br><span class="line"><span class="comment">-- name、age、status都会用到，完全命中索引</span></span><br><span class="line"><span class="keyword">EXPLAIN</span> <span class="keyword">SELECT</span> * <span class="keyword">FROM</span> <span class="keyword">user</span> <span class="keyword">WHERE</span> <span class="keyword">name</span> = <span class="string">'yjw'</span> <span class="keyword">AND</span> age = <span class="number">18</span> <span class="keyword">AND</span> <span class="keyword">status</span> = <span class="number">1</span>;</span><br></pre></td></tr></table></figure>
+
+<p>下面语句都不能命中索引：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 因为缺失name字段，所以无法命中索引</span></span><br><span class="line"><span class="keyword">EXPLAIN</span> <span class="keyword">SELECT</span> * <span class="keyword">FROM</span> <span class="keyword">user</span> <span class="keyword">WHERE</span> <span class="keyword">status</span> = <span class="number">1</span>;</span><br><span class="line"><span class="keyword">EXPLAIN</span> <span class="keyword">SELECT</span> * <span class="keyword">FROM</span> <span class="keyword">user</span> <span class="keyword">WHERE</span> age = <span class="number">18</span>;</span><br><span class="line"><span class="keyword">EXPLAIN</span> <span class="keyword">SELECT</span> * <span class="keyword">FROM</span> <span class="keyword">user</span> <span class="keyword">WHERE</span> age = <span class="number">18</span> <span class="keyword">AND</span> <span class="keyword">status</span> = <span class="number">1</span>;</span><br></pre></td></tr></table></figure>
+
+<p>联合索引最左匹配原则：假如建立了一个联合索引(A，B，C)：</p>
+<ul>
+<li>当查询条件包含【A】、【A，B】或 【A，B，C】，满足最左匹配原则，都会走索引</li>
+<li>当查询条件仅包含【A，C】，由于缺失了B，因此A走索引、C不走索引</li>
+<li>当查询条件仅包含【B】 、【B，C】或 【C】，由于缺失A，因此索引失效</li>
+<li>当包含范围查询(&gt;、&lt;、between、like等)时，<strong>最左侧</strong>范围条件列之后的不走索引，<strong>最左侧</strong>范围条件列(含列本身)之前的走索引：<ul>
+<li>A = 1 AND B &gt; 2 AND C = 3，那么A、B走索引，C不走索引</li>
+<li>A = 1 AND C like ‘2%’ AND B = 3，那么A、B、C都走索引</li>
+<li>A &gt; 1 AND A &lt; 5 AND B &gt; 1 AND C = 1，那么A走索引，B、C不走索引</li>
+</ul>
+</li>
+</ul>
+<p><strong>注意：最左原则不是说查询的条件的顺序，而是查询条件中是否包含索引最左列字段，同时建议where子句中使用最频繁的一列放在最左边</strong></p>
+<h2 id="2-5-union、in和or都可以命中索引，推荐in"><a href="#2-5-union、in和or都可以命中索引，推荐in" class="headerlink" title="2.5 union、in和or都可以命中索引，推荐in"></a>2.5 union、in和or都可以命中索引，推荐in</h2><p>union：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">EXPLAIN</span> <span class="keyword">SELECT</span> * <span class="keyword">FROM</span> <span class="keyword">user</span> <span class="keyword">WHERE</span> <span class="keyword">status</span> = <span class="number">1</span></span><br><span class="line"><span class="keyword">UNION</span> <span class="keyword">ALL</span></span><br><span class="line"><span class="keyword">SELECT</span> * <span class="keyword">FROM</span> <span class="keyword">user</span> <span class="keyword">WHERE</span> <span class="keyword">status</span> = <span class="number">2</span>;</span><br></pre></td></tr></table></figure>
+
+<p>in：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">EXPLAIN</span> <span class="keyword">SELECT</span> * <span class="keyword">FROM</span> <span class="keyword">user</span> <span class="keyword">WHERE</span> <span class="keyword">status</span> <span class="keyword">IN</span> (<span class="number">1</span>,<span class="number">2</span>);</span><br></pre></td></tr></table></figure>
+
+<p>or：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">EXPLAIN</span> <span class="keyword">SELECT</span> * <span class="keyword">FROM</span> <span class="keyword">user</span> <span class="keyword">WHERE</span> <span class="keyword">status</span> = <span class="number">1</span> <span class="keyword">OR</span> <span class="keyword">status</span> = <span class="number">2</span>;</span><br></pre></td></tr></table></figure>
+
+<p>查询的CPU消耗：or &gt; in &gt; union</p>
+<h2 id="2-6-如果or前的条件列有索引，而or后面的列没有索引，那么涉及到的索引都不会被用到"><a href="#2-6-如果or前的条件列有索引，而or后面的列没有索引，那么涉及到的索引都不会被用到" class="headerlink" title="2.6 如果or前的条件列有索引，而or后面的列没有索引，那么涉及到的索引都不会被用到"></a>2.6 如果or前的条件列有索引，而or后面的列没有索引，那么涉及到的索引都不会被用到</h2><p>假如我们给name加索引，age不加索引，然后执行下面语句会发现不走索引</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">EXPLAIN</span> <span class="keyword">SELECT</span> * <span class="keyword">FROM</span> <span class="keyword">user</span> <span class="keyword">WHERE</span> <span class="keyword">name</span> = <span class="string">'yjw'</span> <span class="keyword">OR</span> age = <span class="number">19</span>;</span><br></pre></td></tr></table></figure>
+
+<p>因为or后面的条件列中没有索引，那么后面的查询肯定要走全表扫描，在存在全表扫描的情况下，就没有必要多一次索引扫描增加IO访问</p>
+<h2 id="2-7-反向条件查询一般情况不走索引-如果是覆盖索引查询则会走索引"><a href="#2-7-反向条件查询一般情况不走索引-如果是覆盖索引查询则会走索引" class="headerlink" title="2.7 反向条件查询一般情况不走索引(如果是覆盖索引查询则会走索引)"></a>2.7 反向条件查询一般情况不走索引(如果是覆盖索引查询则会走索引)</h2><p>负向条件有<code>!=、&lt;&gt;、not in、not exists、not like</code>等</p>
+<p>比如我们给status加索引，然后执行下面语句会发现并没有命中索引</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">EXPLAIN</span> <span class="keyword">SELECT</span> * <span class="keyword">FROM</span> <span class="keyword">user</span> <span class="keyword">WHERE</span> <span class="keyword">status</span> != <span class="number">1</span> <span class="keyword">AND</span> <span class="keyword">status</span> != <span class="number">2</span>;</span><br></pre></td></tr></table></figure>
+
+<p>但是我们可以优化为in查询(前提是区分度高)且返回的数据的比例在30%以内</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">EXPLAIN</span> <span class="keyword">SELECT</span> * <span class="keyword">FROM</span> <span class="keyword">user</span> <span class="keyword">WHERE</span> <span class="keyword">status</span> <span class="keyword">in</span> (<span class="number">0</span>,<span class="number">3</span>,<span class="number">4</span>,<span class="number">5</span>,<span class="number">6</span>);</span><br></pre></td></tr></table></figure>
+
+<h2 id="2-8-在联合索引查询中范围条件列必须是满足最左前缀的第一个才会使用索引"><a href="#2-8-在联合索引查询中范围条件列必须是满足最左前缀的第一个才会使用索引" class="headerlink" title="2.8 在联合索引查询中范围条件列必须是满足最左前缀的第一个才会使用索引"></a>2.8 在联合索引查询中范围条件列必须是满足最左前缀的第一个才会使用索引</h2><p>范围查询列可以用到索引，但是在联合索引中，必须是满足最左前缀的第一个范围查询才能命中索引，因为在联合索引中，范围查询列之后的索引列无法用到索引，所以如果有多个范围查询，最多只会有一个生效</p>
+<p>如果范围查询和等值查询同时存在，会优先匹配等值查询的索引列</p>
+<h2 id="2-9-索引列参与计算-包括函数运算-的查询无法命中索引"><a href="#2-9-索引列参与计算-包括函数运算-的查询无法命中索引" class="headerlink" title="2.9 索引列参与计算(包括函数运算)的查询无法命中索引"></a>2.9 索引列参与计算(包括函数运算)的查询无法命中索引</h2><p>索引列不能参与计算以及函数运算，要保持列“干净”</p>
+<p>比如from_unixtime(create_time) = ’2014-05-29’将无法使用索引</p>
+<p>原因很简单，b+树中存的都是表中的字段值，如果进行检索时，需要把所有索引值都应用函数后再比较，显然成本太大</p>
+<p>所以语句应该写成create_time = unix_timestamp(’2014-05-29’)</p>
+<h2 id="2-10-有联合索引的情况下建议走覆盖索引查询，避免回表带来的性能损耗"><a href="#2-10-有联合索引的情况下建议走覆盖索引查询，避免回表带来的性能损耗" class="headerlink" title="2.10 有联合索引的情况下建议走覆盖索引查询，避免回表带来的性能损耗"></a>2.10 有联合索引的情况下建议走覆盖索引查询，避免回表带来的性能损耗</h2><h2 id="2-11-建立索引的列，不推荐允许为-null"><a href="#2-11-建立索引的列，不推荐允许为-null" class="headerlink" title="2.11 建立索引的列，不推荐允许为 null"></a>2.11 建立索引的列，不推荐允许为 null</h2><p>单列索引不存 null 值，联合索引不存全为 null 的值，如果列允许为 null，可能会得到“不符合预期”的结果集(可能对聚合函数、排序、去重分组结果产生干扰)，同时在mysql中很难对含有空值的列进行查询优化，因为它们使得索引、索引的统计信息以及比较运算更加复杂</p>
+<p>所以，建议使用<code>not null</code>约束或默认值(0、一个特殊的值或者一个空串代替空值)</p>
+<h2 id="2-12-更新十分频繁的字段上不宜建立索引"><a href="#2-12-更新十分频繁的字段上不宜建立索引" class="headerlink" title="2.12 更新十分频繁的字段上不宜建立索引"></a>2.12 更新十分频繁的字段上不宜建立索引</h2><p>因为更新操作会变更B+树，重建索引，这个过程是十分消耗数据库性能的</p>
+<h2 id="2-13-区分度不大的字段上不宜建立索引"><a href="#2-13-区分度不大的字段上不宜建立索引" class="headerlink" title="2.13 区分度不大的字段上不宜建立索引"></a>2.13 区分度不大的字段上不宜建立索引</h2><ul>
+<li>类似于性别这种区分度不大的字段，建立索引的意义不大，因为不能有效过滤数据，性能和全表扫描相当。另外一般当返回数据的比例在大于30%的情况下，优化器不会选择使用索引</li>
+<li>尽量选择区分度高的列作为索引，区分度的公式是<code>count(distinct col)/count(*)</code>，表示字段不重复的比例，比例越大我们扫描的记录数越少，唯一键(索引)的区分度是1，而一些状态、性别字段可能在大量数据的情况下区分度就是0。一般需要join的字段都要求区分度0.1以上</li>
+</ul>
+<h2 id="2-14-多表关联时，保证关联的字段上一定要有索引"><a href="#2-14-多表关联时，保证关联的字段上一定要有索引" class="headerlink" title="2.14 多表关联时，保证关联的字段上一定要有索引"></a>2.14 多表关联时，保证关联的字段上一定要有索引</h2><h2 id="2-15-查询语句如果使用in，则in包含的值不应过多"><a href="#2-15-查询语句如果使用in，则in包含的值不应过多" class="headerlink" title="2.15 查询语句如果使用in，则in包含的值不应过多"></a>2.15 查询语句如果使用in，则in包含的值不应过多</h2><p>mysql对于in做了相应的优化，即将in中的常量全部存储在一个数组里面，而且这个数组是排好序的，但是如果数值较多，产生的消耗也是比较大的</p>
+<p>如果是查询连续的值：<code>select id from table_name where num in(1,2,3)</code> ，可以用 between等范围查询替代</p>
+<p>也可以根据业务场景，考虑使用连接来替代</p>
+<h2 id="2-16-select语句务必指明字段"><a href="#2-16-select语句务必指明字段" class="headerlink" title="2.16 select语句务必指明字段"></a>2.16 select语句务必指明字段</h2><ul>
+<li><code>SELECT *</code> 增加很多不必要的消耗（cpu、io、内存、网络带宽）</li>
+<li>增加了不使用覆盖索引的可能性</li>
+<li>所以业务需要什么字段，就只查这些字段，不要一把全查</li>
+</ul>
+<h2 id="2-17-区分in和exists，-not-in和not-exists"><a href="#2-17-区分in和exists，-not-in和not-exists" class="headerlink" title="2.17 区分in和exists， not in和not exists"></a>2.17 区分in和exists， not in和not exists</h2><p>区分in和exists主要是理解驱动顺序的改变（这是性能变化的关键），如果是exists，那么以外层表为驱动表，先被访问，如果是IN，那么先执行子查询。所以<strong>IN适合于外表大而内表小的情况；EXISTS适合于外表小而内表大的情况。</strong></p>
+<p>关于not in和not exists，推荐使用not exists，不仅仅是效率问题，not in可能存在逻辑问题</p>
+<p>如下语句：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">EXPLAIN</span> <span class="keyword">SELECT</span> colname... <span class="keyword">FROM</span> A表 a <span class="keyword">WHERE</span> <span class="keyword">id</span> <span class="keyword">NOT</span> <span class="keyword">IN</span> (<span class="keyword">SELECT</span> b.id <span class="keyword">FROM</span> B表 b);</span><br></pre></td></tr></table></figure>
+
+<p>可以优化成：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">EXPLAIN</span> <span class="keyword">SELECT</span> colname... <span class="keyword">FROM</span> A表 a <span class="keyword">LEFT</span> <span class="keyword">JOIN</span> B表 b <span class="keyword">WHERE</span> a.id = b.id;</span><br></pre></td></tr></table></figure>
+
+<h2 id="2-18-外连接查询时，如果关联字段的编码格式不一样也可能导致索引失效"><a href="#2-18-外连接查询时，如果关联字段的编码格式不一样也可能导致索引失效" class="headerlink" title="2.18 外连接查询时，如果关联字段的编码格式不一样也可能导致索引失效"></a>2.18 外连接查询时，如果关联字段的编码格式不一样也可能导致索引失效</h2><h2 id="2-19-使用组合索引可以减少文件索引大小，在使用时速度要优于多个单列索引"><a href="#2-19-使用组合索引可以减少文件索引大小，在使用时速度要优于多个单列索引" class="headerlink" title="2.19 使用组合索引可以减少文件索引大小，在使用时速度要优于多个单列索引"></a>2.19 使用组合索引可以减少文件索引大小，在使用时速度要优于多个单列索引</h2><h2 id="2-20-尽量扩展索引，不要新建索引。比如表中已经有a的索引，现在要加-a-b-的索引，那么尽量修改原来的a索引-要考虑原有数据和线上使用情况"><a href="#2-20-尽量扩展索引，不要新建索引。比如表中已经有a的索引，现在要加-a-b-的索引，那么尽量修改原来的a索引-要考虑原有数据和线上使用情况" class="headerlink" title="2.20 尽量扩展索引，不要新建索引。比如表中已经有a的索引，现在要加(a,b)的索引，那么尽量修改原来的a索引(要考虑原有数据和线上使用情况)"></a>2.20 尽量扩展索引，不要新建索引。比如表中已经有a的索引，现在要加(a,b)的索引，那么尽量修改原来的a索引(要考虑原有数据和线上使用情况)</h2><h2 id="2-21-主键不推荐有业务含义"><a href="#2-21-主键不推荐有业务含义" class="headerlink" title="2.21 主键不推荐有业务含义"></a>2.21 主键不推荐有业务含义</h2><ol>
+<li>因为有业务含义的列都有改变的可能性，主键一旦带上了业务含义，那么主键就有可能发生变更。主键一旦发生变更，该数据在磁盘上的存储位置就会发生变更，就有可能产生空间碎片等问题</li>
+<li>带有业务含义的主键，不一定是顺序自增的，如果插入的主键是无序的，就可能导致频繁调整数据页，从而频繁触发页分裂</li>
+</ol>
+<h2 id="2-22-索引字段在不损失精度的情况下越短越好"><a href="#2-22-索引字段在不损失精度的情况下越短越好" class="headerlink" title="2.22 索引字段在不损失精度的情况下越短越好"></a>2.22 索引字段在不损失精度的情况下越短越好</h2><p>考虑为过长的字符串使用前缀索引，当然前提是前缀的标识度高</p>
+<p>前缀索引：如果索引列长度过长，将会产生很大的索引文件，会占用大量内存空间，同时会导致索引页存放的索引数量大大减少，从而增加索引树高度，相当于增加磁盘IO次数。这时可以考虑使用前缀索引进行优化，创建前缀索引应该控制在一个合适的点(通常建议是0.31)，这样可以减小索引文件大小，加快索引查询速度</p>
+<p>可以通过下面类似sql进行大致估算，当这个值大于0.31就可以考虑为其创建前缀索引</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="keyword">COUNT</span>(<span class="keyword">DISTINCT</span>(<span class="keyword">LEFT</span>(<span class="string">`title`</span>,<span class="number">10</span>)))/<span class="keyword">COUNT</span>(*) <span class="keyword">FROM</span> Arctic;</span><br></pre></td></tr></table></figure>
+
+<p>添加前缀索引sql如下</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 将人名的索引建立在10</span></span><br><span class="line"><span class="keyword">ALTER</span> <span class="keyword">TABLE</span> <span class="string">`user`</span> <span class="keyword">ADD</span> <span class="keyword">INDEX</span> <span class="string">`uname`</span>(title(<span class="number">10</span>));</span><br></pre></td></tr></table></figure>
+
+<h2 id="2-23-不要过多创建索引"><a href="#2-23-不要过多创建索引" class="headerlink" title="2.23 不要过多创建索引"></a>2.23 不要过多创建索引</h2><p>因为索引也需要空间来存储和定期维护，每当有记录在表中增减或索引列被修改时，索引本身也会进行维护。这意味着每条记录的insert，delete(delete并不直接释放磁盘，而是将该记录标记为已删除可复用，当mysql加载到的数据页里面有太多已删除数据的话，势必会增加磁盘io次数)，update可能将为此多付出4、5 次的磁盘io</p>
+<h2 id="2-24-创建索引时避免以下错误观念"><a href="#2-24-创建索引时避免以下错误观念" class="headerlink" title="2.24 创建索引时避免以下错误观念"></a>2.24 创建索引时避免以下错误观念</h2><ul>
+<li>索引越多越好，认为一个查询就需要建一个索引。</li>
+<li>宁缺勿滥，认为索引会消耗空间、严重拖慢更新和新增速度。</li>
+<li>抵制唯一索引，认为业务的唯一性一律需要在应用层通过“先查后插”方式解决。</li>
+<li>过早优化，在不了解系统的情况下就开始优化。</li>
+</ul>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者：</strong>
+    yinjiawei
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://vampiresmile.github.io/2024/11/12/mysql%E7%B4%A2%E5%BC%95%E6%80%BB%E7%BB%93-%E7%BB%8F%E9%AA%8C%E7%AF%87/" title="mysql索引总结-经验篇">https://vampiresmile.github.io/2024/11/12/mysql%E7%B4%A2%E5%BC%95%E6%80%BB%E7%BB%93-%E7%BB%8F%E9%AA%8C%E7%AF%87/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>
+    本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/" rel="external nofollow noopener noreferrer" target="_blank">CC BY-NC-SA 3.0</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/offer/" rel="tag"># offer</a>
+          
+            <a href="/tags/mysql%E7%B4%A2%E5%BC%95/" rel="tag"># mysql索引</a>
+          
+        </div>
+      
+
+      
+      
+        <div class="post-widgets">
+        
+
+        
+
+        
+          
+          <div id="needsharebutton-postbottom">
+            <span class="btn">
+              <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </span>
+          </div>
+        
+        </div>
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2023/09/16/vscode%E5%AE%89%E8%A3%85python%E7%8E%AF%E5%A2%83/" rel="next" title="vscode配置python环境">
+                <i class="fa fa-chevron-left"></i> vscode配置python环境
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/tomkun.jpg" alt="yinjiawei">
+            
+              <p class="site-author-name" itemprop="name">yinjiawei</p>
+              <p class="site-description motion-element" itemprop="description">java 技术 分享 博客 学习 总结</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">17</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">12</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">19</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/VampireSmile" target="_blank" title="GitHub" rel="external nofollow noopener noreferrer">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:brcmdb@gmail.com" target="_blank" title="E-Mail" rel="external nofollow noopener noreferrer">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://blog.csdn.net/qq_46126324" target="_blank" title="CSDN" rel="external nofollow noopener noreferrer">
+                      
+                        <i class="fa fa-fw fa-globe"></i>CSDN</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://leetcode-cn.com/u/zachary443/" target="_blank" title="LeetCode" rel="external nofollow noopener noreferrer">
+                      
+                        <i class="fa fa-fw fa-free-code-camp"></i>LeetCode</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#1-索引创建添加与删除"><span class="nav-number">1.</span> <span class="nav-text">1. 索引创建添加与删除</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-1-索引并不是随便添加的，以下几种情况需牢记在心"><span class="nav-number">1.1.</span> <span class="nav-text">1.1 索引并不是随便添加的，以下几种情况需牢记在心</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-2-索引的新增、删除与查询"><span class="nav-number">1.2.</span> <span class="nav-text">1.2 索引的新增、删除与查询</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-索引失效及推荐场景"><span class="nav-number">2.</span> <span class="nav-text">2. 索引失效及推荐场景</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#2-1-如果mysql估计使用索引比全表扫描还慢，则不会使用索引"><span class="nav-number">2.1.</span> <span class="nav-text">2.1 如果mysql估计使用索引比全表扫描还慢，则不会使用索引</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-2-前缀模糊查询一般情况下无法命中索引"><span class="nav-number">2.2.</span> <span class="nav-text">2.2 前缀模糊查询一般情况下无法命中索引</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-3-数据类型出现隐式转换的时候可能不走索引"><span class="nav-number">2.3.</span> <span class="nav-text">2.3 数据类型出现隐式转换的时候可能不走索引</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-4-联合索引的情况下，如果不满足最左匹配原则，则无法命中或完全命中联合索引"><span class="nav-number">2.4.</span> <span class="nav-text">2.4 联合索引的情况下，如果不满足最左匹配原则，则无法命中或完全命中联合索引</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-5-union、in和or都可以命中索引，推荐in"><span class="nav-number">2.5.</span> <span class="nav-text">2.5 union、in和or都可以命中索引，推荐in</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-6-如果or前的条件列有索引，而or后面的列没有索引，那么涉及到的索引都不会被用到"><span class="nav-number">2.6.</span> <span class="nav-text">2.6 如果or前的条件列有索引，而or后面的列没有索引，那么涉及到的索引都不会被用到</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-7-反向条件查询一般情况不走索引-如果是覆盖索引查询则会走索引"><span class="nav-number">2.7.</span> <span class="nav-text">2.7 反向条件查询一般情况不走索引(如果是覆盖索引查询则会走索引)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-8-在联合索引查询中范围条件列必须是满足最左前缀的第一个才会使用索引"><span class="nav-number">2.8.</span> <span class="nav-text">2.8 在联合索引查询中范围条件列必须是满足最左前缀的第一个才会使用索引</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-9-索引列参与计算-包括函数运算-的查询无法命中索引"><span class="nav-number">2.9.</span> <span class="nav-text">2.9 索引列参与计算(包括函数运算)的查询无法命中索引</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-10-有联合索引的情况下建议走覆盖索引查询，避免回表带来的性能损耗"><span class="nav-number">2.10.</span> <span class="nav-text">2.10 有联合索引的情况下建议走覆盖索引查询，避免回表带来的性能损耗</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-11-建立索引的列，不推荐允许为-null"><span class="nav-number">2.11.</span> <span class="nav-text">2.11 建立索引的列，不推荐允许为 null</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-12-更新十分频繁的字段上不宜建立索引"><span class="nav-number">2.12.</span> <span class="nav-text">2.12 更新十分频繁的字段上不宜建立索引</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-13-区分度不大的字段上不宜建立索引"><span class="nav-number">2.13.</span> <span class="nav-text">2.13 区分度不大的字段上不宜建立索引</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-14-多表关联时，保证关联的字段上一定要有索引"><span class="nav-number">2.14.</span> <span class="nav-text">2.14 多表关联时，保证关联的字段上一定要有索引</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-15-查询语句如果使用in，则in包含的值不应过多"><span class="nav-number">2.15.</span> <span class="nav-text">2.15 查询语句如果使用in，则in包含的值不应过多</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-16-select语句务必指明字段"><span class="nav-number">2.16.</span> <span class="nav-text">2.16 select语句务必指明字段</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-17-区分in和exists，-not-in和not-exists"><span class="nav-number">2.17.</span> <span class="nav-text">2.17 区分in和exists， not in和not exists</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-18-外连接查询时，如果关联字段的编码格式不一样也可能导致索引失效"><span class="nav-number">2.18.</span> <span class="nav-text">2.18 外连接查询时，如果关联字段的编码格式不一样也可能导致索引失效</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-19-使用组合索引可以减少文件索引大小，在使用时速度要优于多个单列索引"><span class="nav-number">2.19.</span> <span class="nav-text">2.19 使用组合索引可以减少文件索引大小，在使用时速度要优于多个单列索引</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-20-尽量扩展索引，不要新建索引。比如表中已经有a的索引，现在要加-a-b-的索引，那么尽量修改原来的a索引-要考虑原有数据和线上使用情况"><span class="nav-number">2.20.</span> <span class="nav-text">2.20 尽量扩展索引，不要新建索引。比如表中已经有a的索引，现在要加(a,b)的索引，那么尽量修改原来的a索引(要考虑原有数据和线上使用情况)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-21-主键不推荐有业务含义"><span class="nav-number">2.21.</span> <span class="nav-text">2.21 主键不推荐有业务含义</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-22-索引字段在不损失精度的情况下越短越好"><span class="nav-number">2.22.</span> <span class="nav-text">2.22 索引字段在不损失精度的情况下越短越好</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-23-不要过多创建索引"><span class="nav-number">2.23.</span> <span class="nav-text">2.23 不要过多创建索引</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-24-创建索引时避免以下错误观念"><span class="nav-number">2.24.</span> <span class="nav-text">2.24 创建索引时避免以下错误观念</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2020 &mdash; <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-snowflake-o"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">yinjiawei</span>
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      <i class="fa fa-user"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      
+    </span>
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+      <div id="needsharebutton-float">
+        <span class="btn">
+          <i class="fa fa-share-alt" aria-hidden="true"></i>
+        </span>
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="//cdn.jsdelivr.net/jquery/2.1.3/jquery.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="//cdn.jsdelivr.net/fastclick/1.0.6/fastclick.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="//cdn.jsdelivr.net/jquery.lazyload/1.9.3/jquery.lazyload.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="//cdn.jsdelivr.net/velocity/1.2.3/velocity.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="//cdn.jsdelivr.net/velocity/1.2.3/velocity.ui.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="//cdn.jsdelivr.net/fancybox/2.1.5/jquery.fancybox.pack.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="//cdn.bootcss.com/canvas-nest.js/1.0.1/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('5');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+  
+  <link rel="stylesheet" href="/lib/needsharebutton/needsharebutton.css">
+
+  
+  
+  <script src="/lib/needsharebutton/needsharebutton.js"></script>
+
+  <script>
+    
+      pbOptions = {};
+      
+          pbOptions.iconStyle = "box";
+      
+          pbOptions.boxForm = "horizontal";
+      
+          pbOptions.position = "bottomCenter";
+      
+          pbOptions.networks = "Weibo,Wechat,QQZone,Douban,Mailto,Twitter,Facebook";
+      
+      new needShareButton('#needsharebutton-postbottom', pbOptions);
+    
+    
+      flOptions = {};
+      
+          flOptions.iconStyle = "box";
+      
+          flOptions.boxForm = "horizontal";
+      
+          flOptions.position = "middleRight";
+      
+          flOptions.networks = "Weibo,Wechat,QQZone,Douban,Mailto,Twitter,Facebook";
+      
+      new needShareButton('#needsharebutton-float', flOptions);
+    
+  </script>
+
+  
+
+  
+
+  
+
+  
+
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"model":{"jsonPath":"/live2dw/assets/assets/haruto.model.json"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":true},"log":false});</script></body>
+</html>

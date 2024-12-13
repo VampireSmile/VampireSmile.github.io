@@ -96,14 +96,14 @@
 
 
 
-<meta name="description" content="MySQL优化的一般步骤 通过show status 命令了解各种sql的执行效率 SHOW STATUS提供msyql服务器的状态信息，一般情况下，我们只需要了解以”Com”开头的指令 show session status like ‘Com%’；显示当前的连接的统计结果 show global status like ‘Com%’ ；显示自数据库上次启动至今的统计结果 show statu">
+<meta name="description" content="1. Mysql服务器配置优化(一般是DBA操作，稍作了解)1.1 通过show status查看mysql服务器运行状态 show session status like ‘Com%’; 显示当前的连接的统计结果  show global status like ‘Com%’; 显示自数据库上次启动至今的统计结果  show status like ‘Connections’; 试图连接MySQ">
 <meta property="og:type" content="article">
 <meta property="og:title" content="mysql索引总结-优化篇">
 <meta property="og:url" content="https://vampiresmile.github.io/2020/05/28/mysql%E7%B4%A2%E5%BC%95%E6%80%BB%E7%BB%93-%E4%BC%98%E5%8C%96%E7%AF%87/index.html">
 <meta property="og:site_name" content="Zachary">
-<meta property="og:description" content="MySQL优化的一般步骤 通过show status 命令了解各种sql的执行效率 SHOW STATUS提供msyql服务器的状态信息，一般情况下，我们只需要了解以”Com”开头的指令 show session status like ‘Com%’；显示当前的连接的统计结果 show global status like ‘Com%’ ；显示自数据库上次启动至今的统计结果 show statu">
+<meta property="og:description" content="1. Mysql服务器配置优化(一般是DBA操作，稍作了解)1.1 通过show status查看mysql服务器运行状态 show session status like ‘Com%’; 显示当前的连接的统计结果  show global status like ‘Com%’; 显示自数据库上次启动至今的统计结果  show status like ‘Connections’; 试图连接MySQ">
 <meta property="article:published_time" content="2020-05-28T05:12:30.000Z">
-<meta property="article:modified_time" content="2020-05-28T12:25:00.368Z">
+<meta property="article:modified_time" content="2024-12-13T07:56:04.015Z">
 <meta property="article:author" content="yinjiawei">
 <meta property="article:tag" content="offer">
 <meta property="article:tag" content="mysql索引">
@@ -361,8 +361,8 @@
               
                 <span class="post-meta-item-text">更新于&#58;</span>
               
-              <time title="更新于" itemprop="dateModified" datetime="2020-05-28T20:25:00+08:00">
-                2020-05-28
+              <time title="更新于" itemprop="dateModified" datetime="2024-12-13T15:56:04+08:00">
+                2024-12-13
               </time>
             
           </span>
@@ -380,8 +380,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/" itemprop="url" rel="index">
-                    <span itemprop="name">数据库</span>
+                  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93Mysql/" itemprop="url" rel="index">
+                    <span itemprop="name">数据库Mysql</span>
                   </a>
                 </span>
 
@@ -416,7 +416,7 @@
                   <span class="post-meta-item-text">字数统计&#58;</span>
                 
                 <span title="字数统计">
-                  2.7k 字
+                  2.1k 字
                 </span>
               
 
@@ -432,7 +432,7 @@
                   <span class="post-meta-item-text">阅读时长 &asymp;</span>
                 
                 <span title="阅读时长">
-                  10 分钟
+                  7 分钟
                 </span>
               
             </div>
@@ -453,166 +453,126 @@
       
 
       
-        <ol>
-<li><h3 id="MySQL优化的一般步骤"><a href="#MySQL优化的一般步骤" class="headerlink" title="MySQL优化的一般步骤"></a>MySQL优化的一般步骤</h3><ol>
-<li><h4 id="通过show-status-命令了解各种sql的执行效率"><a href="#通过show-status-命令了解各种sql的执行效率" class="headerlink" title="通过show status 命令了解各种sql的执行效率"></a>通过show status 命令了解各种sql的执行效率</h4><ul>
-<li>SHOW STATUS提供msyql服务器的状态信息，一般情况下，我们只需要了解以”Com”开头的指令</li>
-<li>show session status like ‘Com%’；显示当前的连接的统计结果</li>
-<li>show global status like ‘Com%’ ；显示自数据库上次启动至今的统计结果</li>
-<li>show status like ‘Connections’；// 试图连接MySQL服务器的次数</li>
-<li>show status like ‘Uptime’；//服务器工作的时间（单位秒）</li>
-<li>show status like ‘Slow_queries’；//慢查询的次数 (默认是10秒中就当做是慢查询)</li>
-<li>Show variables like ‘long_query_time’；//查询mysql的慢查询时间：</li>
-<li>set long_query_time=2；//修改mysql 慢查询时间：如果查询时间超过2秒就算作是慢查询</li>
+        <h1 id="1-Mysql服务器配置优化-一般是DBA操作，稍作了解"><a href="#1-Mysql服务器配置优化-一般是DBA操作，稍作了解" class="headerlink" title="1. Mysql服务器配置优化(一般是DBA操作，稍作了解)"></a>1. Mysql服务器配置优化(一般是DBA操作，稍作了解)</h1><h2 id="1-1-通过show-status查看mysql服务器运行状态"><a href="#1-1-通过show-status查看mysql服务器运行状态" class="headerlink" title="1.1 通过show status查看mysql服务器运行状态"></a>1.1 通过show status查看mysql服务器运行状态</h2><ul>
+<li><p>show session status like ‘Com%’; 显示当前的连接的统计结果</p>
+</li>
+<li><p>show global status like ‘Com%’; 显示自数据库上次启动至今的统计结果</p>
+</li>
+<li><p>show status like ‘Connections’; 试图连接MySQL服务器的次数</p>
+</li>
+<li><p>show status like ‘Uptime’; 服务器工作的时间（单位秒）</p>
+</li>
+<li><p>show status like ‘Slow_queries’; 慢查询的次数</p>
+<p>默认是session级别，其中Com_XXX表示XXX语句所执行的次数，比如Com_select，Com_insert，Com_update，Com_delete，可以知道当前数据库是以插入更新为主还是以查询为主，以及各类操作的大致执行比例</p>
+</li>
 </ul>
-<p>注：默认是session级别的，其中Com_XXX表示XXX语句所执行的次数。Com_select，Com_insert，Com_update，Com_delete通过这几个参数，可以容易地了解到当前数据库的应用是以插入更新为主还是以查询操作为主，以及各类的SQL大致的执行比例是多少。</p>
+<h2 id="1-2-通过show-variables查看mysql系统变量"><a href="#1-2-通过show-variables查看mysql系统变量" class="headerlink" title="1.2 通过show variables查看mysql系统变量"></a>1.2 通过show variables查看mysql系统变量</h2><ul>
+<li>show variables like ‘long_query_time’;  慢查询耗时阈值，新版本mysql默认都是1s</li>
+</ul>
 <a id="more"></a>
-</li>
-<li><h4 id="定位执行效率较低的SQL语句（dql出现问题的概率较dml的大）"><a href="#定位执行效率较低的SQL语句（dql出现问题的概率较dml的大）" class="headerlink" title="定位执行效率较低的SQL语句（dql出现问题的概率较dml的大）"></a>定位执行效率较低的SQL语句（dql出现问题的概率较dml的大）</h4><p>在一个项目中，找到慢查询的select语句：mysql支持把慢查询语句记录到日志文件中。程序员需要修改php.ini的配置文件，默认情况下，慢查询记录是不开启的。开启慢查询记录的方法：打开 my.ini，找到 [mysqld] 在其下面添加：long_query_time = 2和log-slow-queries = D:/mysql/logs/slow.log     #设置把日志写在那里，可以为空，系统会给一个缺省的文件，例子：我们数据表中有1千万条的数据量，DQL语句：SELECT * FROM order_copy WHERE id=12345; 查询耗时：19s &gt; 2s，所以mysql会将该条select语句记录到慢查询日志中，SELECT * FROM order_copy WHERE id=12345的执行时间：<strong>添加索引前：19s</strong>，<strong>添加索引后：0.08s</strong></p>
-</li>
-<li><h4 id="通过explain分析低效率的SQL语句的执行情况"><a href="#通过explain分析低效率的SQL语句的执行情况" class="headerlink" title="通过explain分析低效率的SQL语句的执行情况"></a>通过explain分析低效率的SQL语句的执行情况</h4><p>使用explain分析该dql语句：</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">EXPLAIN</span> <span class="keyword">SELECT</span> * <span class="keyword">FROM</span> order_copy <span class="keyword">WHERE</span> <span class="keyword">id</span> = <span class="number">12345</span>;</span><br></pre></td></tr></table></figure>
 
-<p>会产生如下信息：</p>
-<ul>
-<li>select_type:表示查询的类型。</li>
-<li>table:输出结果集的表</li>
-<li>type:表示表的连接类型(system和const为佳)</li>
-<li>possible_keys:表示查询时，可能使用的索引</li>
-<li>key:表示实际使用的索引</li>
-<li>key_len:索引字段的长度</li>
-<li>rows:扫描的行数</li>
-<li>Extra:执行情况的描述和说明</li>
-</ul>
-<p><strong>注意：要尽量避免让type的结果为all，extra的结果为：using filesort</strong></p>
-</li>
-<li><h4 id="确定问题并采取相应的优化措施"><a href="#确定问题并采取相应的优化措施" class="headerlink" title="确定问题并采取相应的优化措施"></a>确定问题并采取相应的优化措施</h4><p>常用的优化措施是添加索引。添加索引，我们不用加内存，不用改程序，不用调sql，只要执行个正确的’create index’，查询速度就可能提高百倍千倍。但是天下没有免费的午餐，查询速度的提高是以插入、更新、删除的速度为代价的，这些写操作，增加了大量的I/O。例如：给字段id添加索引：</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">ALTER</span> <span class="keyword">TABLE</span> order_copy <span class="keyword">ADD</span> PRIMARY <span class="keyword">KEY</span>(<span class="keyword">id</span>);</span><br></pre></td></tr></table></figure>
-
-<p>给1千万的数据添加primary key 需要耗时： 428秒（7分钟）</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">EXPLAIN</span> <span class="keyword">SELECT</span> * <span class="keyword">FROM</span> order_copy <span class="keyword">WHERE</span> <span class="keyword">id</span> = <span class="number">12345</span>;</span><br></pre></td></tr></table></figure>
-
-<p>正是因为给id添加了索引，才使得rows的结果为1，<strong>但是索引并不是可以随便添加的，以下几种情况需牢记在心：</strong></p>
-<ul>
-<li>较频繁的作为查询条件字段应该创建索引</li>
-</ul>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> * <span class="keyword">FROM</span> order_copy <span class="keyword">WHERE</span> <span class="keyword">id</span> = $<span class="keyword">id</span>;</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li>唯一性太差的字段不适合单独创建索引，即使频繁作为查询条件</li>
-</ul>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> * <span class="keyword">FROM</span> order_copy <span class="keyword">WHERE</span> sex = <span class="string">'女'</span>;</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li>更新非常频繁的字段不适合创建索引</li>
-</ul>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> * <span class="keyword">FROM</span> order_copy <span class="keyword">WHERE</span> order_state = <span class="string">'未付款'</span>;</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li>不会出现在WHERE子句中的字段不该创建索引</li>
-</ul>
-<p><strong>索引的使用</strong></p>
-<ul>
-<li><p>建立索引</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> [<span class="keyword">UNIQUE</span>|FULLTEXT] <span class="keyword">index</span> index_name <span class="keyword">ON</span> tbl_name (col_name [(<span class="keyword">length</span>)] [<span class="keyword">ASC</span> | <span class="keyword">DESC</span>],...);</span><br><span class="line"><span class="keyword">ALTER</span> <span class="keyword">TABLE</span> table_name <span class="keyword">ADD</span> <span class="keyword">INDEX</span> index_name (column_list);</span><br><span class="line"><span class="keyword">ALTER</span> <span class="keyword">TABLE</span> table_name <span class="keyword">ADD</span> <span class="keyword">UNIQUE</span> (column_list);</span><br><span class="line"><span class="keyword">ALTER</span> <span class="keyword">TABLE</span> table_name <span class="keyword">ADD</span> PRIMARY <span class="keyword">KEY</span> (column_list);</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>删除索引</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">DROP</span> <span class="keyword">INDEX</span> index_name <span class="keyword">ON</span> talbe_name;</span><br><span class="line"><span class="keyword">ALTER</span> <span class="keyword">TABLE</span> table_name <span class="keyword">DROP</span> <span class="keyword">INDEX</span> index_name;//等价于第一条</span><br><span class="line"><span class="keyword">ALTER</span> <span class="keyword">TABLE</span> table_name <span class="keyword">DROP</span> PRIMARY <span class="keyword">KEY</span>;</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>查询索引(均可) </p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SHOW</span> <span class="keyword">keys</span> <span class="keyword">FROM</span> table_name;</span><br><span class="line"><span class="keyword">SHOW</span> <span class="keyword">index</span> <span class="keyword">FROM</span> table_name;</span><br></pre></td></tr></table></figure>
-</li>
+<h2 id="1-3-快速定位慢SQL"><a href="#1-3-快速定位慢SQL" class="headerlink" title="1.3 快速定位慢SQL"></a>1.3 快速定位慢SQL</h2><ul>
+<li>mysql支持把慢查询语句记录到日志文件中，但默认不记录，需自行开启</li>
+<li>开启记录慢查询(一般DBA操作)<ul>
+<li>打开 my.ini，找到 [mysqld] </li>
+<li>添加：long_query_time = 2和log-slow-queries = D:/mysql/logs/slow.log，如果不指定记录文件，系统会给一个缺省的记录文件</li>
 </ul>
 </li>
-</ol>
-</li>
-<li><h3 id="MySQL优化实践，其实就是要将前篇文章中的创建索引的注意点给用上"><a href="#MySQL优化实践，其实就是要将前篇文章中的创建索引的注意点给用上" class="headerlink" title="MySQL优化实践，其实就是要将前篇文章中的创建索引的注意点给用上"></a>MySQL优化实践，其实就是要将前篇文章中的创建索引的注意点给用上</h3><p><strong>一个小提示：返回表中 30% 内的数据会走索引，返回超过 30% 数据就使用全表扫描。当然这个结论太绝对了，也并不是绝对的30%，只是一个大概的范围，这个有时很重要。</strong></p>
-<p>现在我们有一张user表：</p>
+</ul>
+<h1 id="2-Mysql索引优化"><a href="#2-Mysql索引优化" class="headerlink" title="2. Mysql索引优化"></a>2. Mysql索引优化</h1><h2 id="2-1-通过explain分析低效率SQL语句的执行计划"><a href="#2-1-通过explain分析低效率SQL语句的执行计划" class="headerlink" title="2.1 通过explain分析低效率SQL语句的执行计划"></a>2.1 通过explain分析低效率SQL语句的执行计划</h2><h3 id="2-1-1-使用explain分析下面dql语句"><a href="#2-1-1-使用explain分析下面dql语句" class="headerlink" title="2.1.1 使用explain分析下面dql语句"></a>2.1.1 使用explain分析下面dql语句</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">EXPLAIN</span> <span class="keyword">SELECT</span> * <span class="keyword">FROM</span> order_copy <span class="keyword">WHERE</span> <span class="keyword">id</span> = <span class="number">12345</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 输出信息样例如下</span></span><br><span class="line">mysql&gt; explain select * from user_info where id = 2\G</span><br><span class="line">*************************** 1. row ***************************</span><br><span class="line">           id: 1</span><br><span class="line">  select_type: SIMPLE</span><br><span class="line">        table: user_info</span><br><span class="line">   partitions: NULL</span><br><span class="line">         type: const</span><br><span class="line">possible_keys: PRIMARY</span><br><span class="line">          key: PRIMARY</span><br><span class="line">      key_len: 8</span><br><span class="line">          ref: const</span><br><span class="line">         rows: 1</span><br><span class="line">     filtered: 100.00</span><br><span class="line">        Extra: NULL</span><br><span class="line">1 row in <span class="keyword">set</span>, <span class="number">1</span> <span class="keyword">warning</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-1-2-输出信息字段说明"><a href="#2-1-2-输出信息字段说明" class="headerlink" title="2.1.2 输出信息字段说明"></a>2.1.2 输出信息字段说明</h3><ol>
+<li><p>id：select查询的序列号。表示查询中执行select子句或操作表的顺序，通常有如下三种情况</p>
 <ol>
-<li><h4 id="如果MySQL估计使用索引比全表扫描还慢，则不会使用索引"><a href="#如果MySQL估计使用索引比全表扫描还慢，则不会使用索引" class="headerlink" title="如果MySQL估计使用索引比全表扫描还慢，则不会使用索引"></a>如果MySQL估计使用索引比全表扫描还慢，则不会使用索引</h4><p>返回数据的比例是重要的指标，比例越低越容易命中索引。记住这个范围值——30%，后面所讲的内容都是建立在返回数据的比例在30%以内的基础上。</p>
+<li>如果id都相同，则从上往下执行</li>
+<li>如果id都不相同，则id大的先执行</li>
+<li>如果既有相同又有不同，则id相同的可以看成一组，不同组之间id大的组先执行，同一组之间从上往下执行</li>
+</ol>
 </li>
-<li><h4 id="前导模糊查询查询不能命中索引"><a href="#前导模糊查询查询不能命中索引" class="headerlink" title="前导模糊查询查询不能命中索引"></a>前导模糊查询查询不能命中索引</h4><p>比如我们给user表中name字段加索引，然后执行：</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">EXPLAIN</span> <span class="keyword">SELECT</span> * <span class="keyword">FROM</span> <span class="keyword">user</span> <span class="keyword">WHERE</span> <span class="keyword">name</span> <span class="keyword">LIKE</span> <span class="string">'%s%'</span>;</span><br></pre></td></tr></table></figure>
-
-<p>通过explain解释器发现并没有走索引，此时我们可以优化成非前导模糊查询就会走索引：</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">EXPLAIN</span> <span class="keyword">SELECT</span> * <span class="keyword">FROM</span> <span class="keyword">user</span> <span class="keyword">WHERE</span> <span class="keyword">name</span> <span class="keyword">LIKE</span> <span class="string">'s%'</span>;</span><br></pre></td></tr></table></figure>
+<li><p>select_type：查询的类型。主要用于区别普通查询、联合查询、子查询等复杂查询，常见取值有如下几种</p>
+<ol>
+<li>SIMPLE：最简单的查询，不包含UNION查询或者子查询</li>
+<li>PRIMARY：查询若包含任何复杂的子部分，最外层查询则被标记为PRIMARY</li>
+<li>SUBQUERY：在SELECT或者WHERE列表出现的子查询</li>
+<li>DERIVED：在FROM列表出现的子查询，MYSQL会递归执行这些子查询，把结果放进临时表</li>
+<li>UNION：若第二个SELECT出现在UNION之后，则被标记为UNION；若UNION包含在FROM子句的子查询中，外层SELECT将被标记为DERIVED</li>
+<li>UNION RESULT：从UNION表获取结果的SELECT</li>
+</ol>
 </li>
-<li><h4 id="数据类型出现隐式转换的时候不会命中索引，特别是当列类型是字符串，一定要将字符常量值用引号引起来"><a href="#数据类型出现隐式转换的时候不会命中索引，特别是当列类型是字符串，一定要将字符常量值用引号引起来" class="headerlink" title="数据类型出现隐式转换的时候不会命中索引，特别是当列类型是字符串，一定要将字符常量值用引号引起来"></a>数据类型出现隐式转换的时候不会命中索引，特别是当列类型是字符串，一定要将字符常量值用引号引起来</h4><p>还是name字段加索引，name为varchar类型，那么下面这个语句不会走索引：</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">EXPLAIN</span> <span class="keyword">SELECT</span> * <span class="keyword">FROM</span> <span class="keyword">user</span> <span class="keyword">WHERE</span> <span class="keyword">name</span> = <span class="number">1</span>;</span><br></pre></td></tr></table></figure>
-
-<p>但优化成如下这个语句会走索引：</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">EXPLAIN</span> <span class="keyword">SELECT</span> * <span class="keyword">FROM</span> <span class="keyword">user</span> <span class="keyword">WHERE</span> <span class="keyword">name</span> = <span class="string">'1'</span>;</span><br></pre></td></tr></table></figure>
+<li><p>table：查询涉及的表</p>
 </li>
-<li><h4 id="复合索引的情况下，查询条件不包含索引列最左边部分（不满足最左原则），不会命中复合索引"><a href="#复合索引的情况下，查询条件不包含索引列最左边部分（不满足最左原则），不会命中复合索引" class="headerlink" title="复合索引的情况下，查询条件不包含索引列最左边部分（不满足最左原则），不会命中复合索引"></a>复合索引的情况下，查询条件不包含索引列最左边部分（不满足最左原则），不会命中复合索引</h4><p>比如给name、age、status加复合索引，执行下面语句：</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">ALTER</span> <span class="keyword">TABLE</span> <span class="string">'user'</span> <span class="keyword">ADD</span> <span class="keyword">INDEX</span>  index_name (<span class="keyword">name</span>,age,<span class="keyword">status</span>);</span><br></pre></td></tr></table></figure>
-
-<p>下面两条语句都能命中索引：</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">EXPLAIN</span> <span class="keyword">SELECT</span> * <span class="keyword">FROM</span> <span class="keyword">user</span> <span class="keyword">WHERE</span> <span class="keyword">name</span> = <span class="string">'yjw'</span> <span class="keyword">AND</span> <span class="keyword">status</span> = <span class="number">1</span>;</span><br><span class="line"><span class="keyword">EXPLAIN</span> <span class="keyword">SELECT</span> * <span class="keyword">FROM</span> <span class="keyword">user</span> <span class="keyword">WHERE</span> <span class="keyword">status</span> = <span class="number">1</span> <span class="keyword">AND</span> <span class="keyword">name</span> = <span class="string">'yjw'</span>;</span><br></pre></td></tr></table></figure>
-
-<p><strong>注意：最左原则不是说查询的条件的顺序，而是查询条件中是否包含索引最左列字段</strong></p>
+<li><p>partitions：查询涉及的分区</p>
 </li>
-<li><h4 id="union、in和or都可以命中索引，推荐in"><a href="#union、in和or都可以命中索引，推荐in" class="headerlink" title="union、in和or都可以命中索引，推荐in"></a>union、in和or都可以命中索引，推荐in</h4><p>比如对status加索引后，union：</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">EXPLAIN</span> <span class="keyword">SELECT</span> * <span class="keyword">FROM</span> <span class="keyword">user</span> <span class="keyword">WHERE</span> <span class="keyword">status</span> = <span class="number">1</span></span><br><span class="line"><span class="keyword">UNION</span> <span class="keyword">ALL</span></span><br><span class="line"><span class="keyword">SELECT</span> * <span class="keyword">FROM</span> <span class="keyword">user</span> <span class="keyword">WHERE</span> <span class="keyword">status</span> = <span class="number">2</span>;</span><br></pre></td></tr></table></figure>
-
-<p>in：</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">EXPLAIN</span> <span class="keyword">SELECT</span> * <span class="keyword">FROM</span> <span class="keyword">user</span> <span class="keyword">WHERE</span> <span class="keyword">status</span> <span class="keyword">IN</span> (<span class="number">1</span>,<span class="number">2</span>);</span><br></pre></td></tr></table></figure>
-
-<p>or：</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">EXPLAIN</span> <span class="keyword">SELECT</span> * <span class="keyword">FROM</span> <span class="keyword">user</span> <span class="keyword">WHERE</span> <span class="keyword">status</span> = <span class="number">1</span> <span class="keyword">OR</span> <span class="keyword">status</span> = <span class="number">2</span>;</span><br></pre></td></tr></table></figure>
-
-<p>注意：查询的CPU消耗：or &gt; in &gt; union</p>
+<li><p>type：获取数据的方式类型，可判断是否走了索引以及走的索引类型，常见取值如下(<strong>性能从上往下逐渐变差</strong>)</p>
+<ol>
+<li>system：通常出现在系统表，表中只有一行数据的情况，平时见不到</li>
+<li>const：通常出现在primary key或者unique key的等值匹配查询场景，表示通过索引一次就可以找到，并且找到数据后就结束扫描直接返回结果。因为只需要匹配一行数据，所以效率极高</li>
+<li>eq_ref：通常出现在多表联接查询场景，对于前表的每一条结果数据，都只会匹配后表一条数据，联接的字段有唯一索引或主键索引，并且查询的比较操作通常是<code>=</code></li>
+<li>ref：通常出现在多表联接查询或满足最左前缀的联合索引场景，<code>ref</code>联接的字段一般是普通索引，对于前表每一条记录，都可能在后表存在多条与之匹配的记录</li>
+<li>ref_or_null：在<code>ref</code>的基础上还会检索指定字段为<code>NULL</code>的记录</li>
+<li>index_merge：通常出现在使用了多个索引的查询，查询结果是从多个索引结果合并得来</li>
+<li>unique_subquery：通常出现在<code>IN</code>语句并且<code>IN</code>包含子查询并且<code>IN</code>子查询的结果是主键或唯一键的情况</li>
+<li>index_subquery：和<code>unique_subquery</code>一样，但是<code>IN</code>子查询的结果是普通索引</li>
+<li>range：通常出现在<code>between、&lt;、&lt;=、&gt;、&gt;=、in</code>范围查询场景，只需要检索指定范围的数据，不用扫描整个索引。当type为range类型时，<code>explain</code>输出的<code>ref</code>字段为<code>NULL</code>，并且<code>key_len</code>字段是此次查询中最长的索引长度</li>
+<li>index：通常出现在覆盖索引查询场景，<code>FULL INDEX SCAN</code>，只需要扫描索引就能获得我们查询的字段，此时，<code>explain</code>输出的<code>Extra</code>字段一般是<code>Using index</code></li>
+<li>all：<code>FULL TABLE SCAN</code>，需要遍历整张表，中间可能会有大量磁盘IO，性能最差</li>
+</ol>
 </li>
-<li><h4 id="用or分割开的条件，如果or前的条件中列有索引，而后面的列中没有索引，那么涉及到的索引都不会被用到"><a href="#用or分割开的条件，如果or前的条件中列有索引，而后面的列中没有索引，那么涉及到的索引都不会被用到" class="headerlink" title="用or分割开的条件，如果or前的条件中列有索引，而后面的列中没有索引，那么涉及到的索引都不会被用到"></a>用or分割开的条件，如果or前的条件中列有索引，而后面的列中没有索引，那么涉及到的索引都不会被用到</h4><p>假如我们给name加索引，age不加索引，然后执行下面语句：</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">EXPLAIN</span> <span class="keyword">SELECT</span> * <span class="keyword">FROM</span> <span class="keyword">user</span> <span class="keyword">WHERE</span> <span class="keyword">name</span> = <span class="string">'yjw'</span> <span class="keyword">OR</span> age = <span class="number">19</span>;</span><br></pre></td></tr></table></figure>
-
-<p>因为or后面的条件列中没有索引，那么后面的查询肯定要走全表扫描，在存在全表扫描的情况下，就没有必要多一次索引扫描增加IO访问。</p>
+<li><p>possible_keys：查询时可能用到的索引，但不一定被使用</p>
 </li>
-<li><h4 id="负向条件查询不能使用索引，可以优化为-in-查询"><a href="#负向条件查询不能使用索引，可以优化为-in-查询" class="headerlink" title="负向条件查询不能使用索引，可以优化为 in 查询"></a>负向条件查询不能使用索引，可以优化为 in 查询</h4><p>负向条件有：!=、&lt;&gt;、not in、not exists、not like等。</p>
-<p>比如我们给status加索引，然后执行：</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">EXPLAIN</span> <span class="keyword">SELECT</span> * <span class="keyword">FROM</span> <span class="keyword">user</span> <span class="keyword">WHERE</span> <span class="keyword">status</span> != <span class="number">1</span> <span class="keyword">AND</span> <span class="keyword">status</span> != <span class="number">2</span>;</span><br></pre></td></tr></table></figure>
-
-<p>会发现并没有命中索引，但是我们可以优化为in查询，但是前提区分度要高，返回的数据的比例在30%以内。</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">EXPLAIN</span> <span class="keyword">SELECT</span> * <span class="keyword">FROM</span> <span class="keyword">user</span> <span class="keyword">WHERE</span> <span class="keyword">status</span> <span class="keyword">in</span> (<span class="number">0</span>,<span class="number">3</span>,<span class="number">4</span>,<span class="number">5</span>,<span class="number">6</span>);</span><br></pre></td></tr></table></figure>
+<li><p>key：查询时真正用到的索引，如果为<code>NULL</code>，则表示没有用到索引(包括没有创建索引或者索引失效)，如果查询时使用了覆盖索引，则该索引仅出现在<code>key</code>列表，不会出现在<code>possible_key</code>列表</p>
 </li>
-<li><h4 id="范围查询可以命中缓存"><a href="#范围查询可以命中缓存" class="headerlink" title="范围查询可以命中缓存"></a>范围查询可以命中缓存</h4><p>范围列可以用到索引（联合索引必须是最左前缀），但是范围列后面的列无法用到索引，索引最多用于一个范围列，如果查询条件中有两个范围列则无法全用到索引。</p>
-<p>如果是范围查询和等值查询同时存在，优先匹配等值查询列的索引</p>
-</li>
-<li><h4 id="索引列参与计算-包括函数运算-的法则无法命中索引"><a href="#索引列参与计算-包括函数运算-的法则无法命中索引" class="headerlink" title="索引列参与计算(包括函数运算)的法则无法命中索引"></a>索引列参与计算(包括函数运算)的法则无法命中索引</h4></li>
-<li><h4 id="利用覆盖索引进行查询，避免回表"><a href="#利用覆盖索引进行查询，避免回表" class="headerlink" title="利用覆盖索引进行查询，避免回表"></a>利用覆盖索引进行查询，避免回表</h4></li>
-<li><h4 id="建立索引的列，不允许为-null"><a href="#建立索引的列，不允许为-null" class="headerlink" title="建立索引的列，不允许为 null"></a>建立索引的列，不允许为 null</h4><p>单列索引不存 null 值，复合索引不存全为 null 的值，如果列允许为 null，可能会得到“不符合预期”的结果集，所以，请使用 not null 约束以及默认值。</p>
-<p>比如我们给一个remark字段(允许为null)加索引，执行如下语句：</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">EXPLAIN</span> <span class="keyword">SELECT</span> * <span class="keyword">FROM</span> <span class="keyword">user</span> <span class="keyword">WHERE</span> remark <span class="keyword">IS</span> <span class="literal">NULL</span>;</span><br></pre></td></tr></table></figure>
-
-<p>发现命中索引，而执行下面这条语句：</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">EXPLAIN</span> <span class="keyword">SELECT</span> * <span class="keyword">FROM</span> <span class="keyword">user</span> <span class="keyword">WHERE</span> remark <span class="keyword">IS</span> <span class="keyword">NOT</span> <span class="literal">NULL</span>;</span><br></pre></td></tr></table></figure>
-
-<p>发现没有命中索引。<strong>虽然IS NULL可以命中索引，但是NULL本身就不是一种好的数据库设计，应该使用NOT NULL 约束以及默认值</strong></p>
-</li>
-<li><h4 id="更新十分频繁的字段上不宜建立索引"><a href="#更新十分频繁的字段上不宜建立索引" class="headerlink" title="更新十分频繁的字段上不宜建立索引"></a>更新十分频繁的字段上不宜建立索引</h4><p>因为更新操作会变更B+树，重建索引。这个过程是十分消耗数据库性能的。</p>
-</li>
-<li><h4 id="区分度不大的字段上不宜建立索引"><a href="#区分度不大的字段上不宜建立索引" class="headerlink" title="区分度不大的字段上不宜建立索引"></a>区分度不大的字段上不宜建立索引</h4><p>类似于性别这种区分度不大的字段，建立索引的意义不大。因为不能有效过滤数据，性能和全表扫描相当。另外返回数据的比例在30%以外的情况下，优化器不会选择使用索引。</p>
-</li>
-<li><h4 id="多表关联时，要保证关联字段上一定有索引"><a href="#多表关联时，要保证关联字段上一定有索引" class="headerlink" title="多表关联时，要保证关联字段上一定有索引"></a>多表关联时，要保证关联字段上一定有索引</h4></li>
-<li><h4 id="SQL语句中IN包含的值不应过多"><a href="#SQL语句中IN包含的值不应过多" class="headerlink" title="SQL语句中IN包含的值不应过多"></a>SQL语句中IN包含的值不应过多</h4><p>MySQL对于IN做了相应的优化，即将IN中的常量全部存储在一个数组里面，而且这个数组是排好序的。但是如果数值较多，产生的消耗也是比较大的。再例如：<code>select id from table_name where num in(1,2,3)</code> 对于连续的数值，能用 between 就不要用 in 了；再或者使用连接来替换。</p>
-</li>
-<li><h4 id="SELECT语句务必指明字段名称"><a href="#SELECT语句务必指明字段名称" class="headerlink" title="SELECT语句务必指明字段名称"></a>SELECT语句务必指明字段名称</h4><p>SELECT * 增加很多不必要的消耗（cpu、io、内存、网络带宽）；增加了使用覆盖索引的可能性；当表结构发生改变时，前端也需要更新。所以要求直接在select后面接上字段名。</p>
-</li>
-<li><h4 id="区分in和exists，-not-in和not-exists"><a href="#区分in和exists，-not-in和not-exists" class="headerlink" title="区分in和exists， not in和not exists"></a>区分in和exists， not in和not exists</h4><p>区分in和exists主要是造成了驱动顺序的改变（这是性能变化的关键），如果是exists，那么以外层表为驱动表，先被访问，如果是IN，那么先执行子查询。所以<strong>IN适合于外表大而内表小的情况；EXISTS适合于外表小而内表大的情况。</strong></p>
-<p>关于not in和not exists，推荐使用not exists，不仅仅是效率问题，not in可能存在逻辑问题。<strong>如何高效的写出一个替代not exists的sql语句？</strong></p>
-<p>如下语句：</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">EXPLAIN</span> <span class="keyword">SELECT</span> colname... <span class="keyword">FROM</span> A表 a <span class="keyword">WHERE</span> <span class="keyword">id</span> <span class="keyword">NOT</span> <span class="keyword">IN</span> (<span class="keyword">SELECT</span> b.id <span class="keyword">FROM</span> B表 b);</span><br></pre></td></tr></table></figure>
-
-<p>可以优化成：</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">EXPLAIN</span> <span class="keyword">SELECT</span> colname... <span class="keyword">FROM</span> A表 a <span class="keyword">LEFT</span> <span class="keyword">JOIN</span> B表 b <span class="keyword">WHERE</span> a.id = b.id;</span><br></pre></td></tr></table></figure>
-</li>
-<li><h4 id="创建索引时避免以下错误观念"><a href="#创建索引时避免以下错误观念" class="headerlink" title="创建索引时避免以下错误观念"></a>创建索引时避免以下错误观念</h4><ul>
-<li>索引越多越好，认为一个查询就需要建一个索引。</li>
-<li>宁缺勿滥，认为索引会消耗空间、严重拖慢更新和新增速度。</li>
-<li>抵制唯一索引，认为业务的唯一性一律需要在应用层通过“先查后插”方式解决。</li>
-<li>过早优化，在不了解系统的情况下就开始优化。</li>
+<li><p>key_len：查询使用的索引字节数。可通过该列计算查询中使用的索引长度，在<strong>不损失精度</strong>的前提下，<code>key_len</code>长度越短越好。<code>key_len</code>显示的值为索引字段的最大可能长度，并非实际使用长度，即<code>key_len</code>是根据表定义计算得出，而不是通过检索出的数据得出。这个字段也可以用来评估联合索引是否被完全使用或者评估索引是否过大。常见数据类型计算规则如下，单位都是<strong>字节</strong>（注意如果列允许为<code>NULL</code>，则长度额外加1，如果列为可变长度，比如varchar，则长度额外加2）：</p>
+<p>字符串通用规则：(utf8=3,utf8mb4=4,gbk=2,latin1=1) * 列长度 + 1(允许为NULL才加一) + 2(可变长列)</p>
+<p>非字符串通用规则：数值类型或者时间类型 + 1(允许为NULL)</p>
+<ul>
+<li>字符串<ul>
+<li>char(n)：n字节长度</li>
+<li>varchar(n)：如果是<code>utf8</code>编码，则是<code>3 * n + 2</code>字节，如果是<code>utf8mb4</code>编码，则是<code>4 * n + 2</code></li>
 </ul>
 </li>
+<li>数值类型<ul>
+<li>TINYINT：1字节</li>
+<li>SMALLINT：2字节</li>
+<li>MEDIUMINT：3字节</li>
+<li>INT：4字节</li>
+<li>BIGINT：8字节</li>
+</ul>
+</li>
+<li>时间类型<ul>
+<li>DATE：3字节</li>
+<li>TIMESTAMP：4字节</li>
+<li>DATETIME：8字节</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>ref：显示与当前索引列匹配的列或者常数<code>const</code>。或者说哪些列或者常量被用于查找索引列上的值</p>
+</li>
+<li><p>rows：根据表统计信息和索引选用情况，大致估算出找到结果集所需要扫描读取的数据行数，原则上越少越好</p>
+</li>
+<li><p>filtered：表示符合查询条件的数据百分比，最大100。一般可以和<code>rows</code>一起估算符合条件的记录条数，比如<code>rows = 100，filtered = 50</code>，则估算符合条件的记录数就是<code>100 * 50% = 50</code></p>
+</li>
+<li><p>Extra：包含一些额外的重要信息，常见的信息如下</p>
+<ol>
+<li><p>Using filesort(性能极差，极需优化)</p>
+<p>通常出现在使用<code>order by</code>且排序的字段不满足索引条件的查询语句。当查询语句中包含<code>order by</code>并且无法利用索引完成排序的情况下，<code>Mysql Query Optimizer</code>会选择相应的排序算法来实现：数据较少时在内存完成排序，否则从磁盘排序。<code>explain</code>不会显示告诉客户端使用哪种排序，但只要是无法通过索引完成的排序都称为<code>filesort</code></p>
+</li>
+<li><p>Using temporary(效率不高，建议优化)</p>
+<p>通常出现在使用<code>order by/group by/多表join</code>的场景，有使用临时表保存结果</p>
+</li>
+<li><p>Using index</p>
+<p>通常出现在<strong>覆盖索引扫描</strong>查询。所需结果可以直接从索引树上获取，避免了再次回表读取，效率不错</p>
+</li>
+<li><p>Using where</p>
+<p>表示使用了<code>where</code>过滤</p>
+</li>
+<li><p>Using join buffer</p>
+<p>强调在获取联结条件时没有使用索引，并且需要连接缓冲区来缓存中间结果。如果出现这个提示，需要考虑对连接条件添加索引来改进，同时如果查询时多表join次数非常多，需要考虑将配置文件中<code>join buffer</code>缓冲区调大</p>
+</li>
 </ol>
+</li>
+<li><p><strong>注意：要尽量避免让type显示all或者extra提示 using filesort</strong></p>
 </li>
 </ol>
 
@@ -680,8 +640,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2020/05/26/mysql%E7%B4%A2%E5%BC%95%E6%80%BB%E7%BB%93-%E5%9F%BA%E7%A1%80%E5%8E%9F%E7%90%86%E7%AF%87/" rel="next" title="mysql索引总结-基础原理篇">
-                <i class="fa fa-chevron-left"></i> mysql索引总结-基础原理篇
+              <a href="/2020/05/26/mysql%E7%B4%A2%E5%BC%95%E6%80%BB%E7%BB%93-%E5%8E%9F%E7%90%86%E7%AF%87/" rel="next" title="mysql索引总结-原理篇">
+                <i class="fa fa-chevron-left"></i> mysql索引总结-原理篇
               </a>
             
           </div>
@@ -771,7 +731,7 @@
               
                 <a href="/archives/%7C%7C%20archive">
               
-                  <span class="site-state-item-count">16</span>
+                  <span class="site-state-item-count">17</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -782,7 +742,7 @@
               
               <div class="site-state-item site-state-categories">
                 <a href="/categories/index.html">
-                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-count">12</span>
                   <span class="site-state-item-name">分类</span>
                 </a>
               </div>
@@ -861,7 +821,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#MySQL优化的一般步骤"><span class="nav-number">1.</span> <span class="nav-text">MySQL优化的一般步骤</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#通过show-status-命令了解各种sql的执行效率"><span class="nav-number">1.1.</span> <span class="nav-text">通过show status 命令了解各种sql的执行效率</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#定位执行效率较低的SQL语句（dql出现问题的概率较dml的大）"><span class="nav-number">1.2.</span> <span class="nav-text">定位执行效率较低的SQL语句（dql出现问题的概率较dml的大）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#通过explain分析低效率的SQL语句的执行情况"><span class="nav-number">1.3.</span> <span class="nav-text">通过explain分析低效率的SQL语句的执行情况</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#确定问题并采取相应的优化措施"><span class="nav-number">1.4.</span> <span class="nav-text">确定问题并采取相应的优化措施</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#MySQL优化实践，其实就是要将前篇文章中的创建索引的注意点给用上"><span class="nav-number">2.</span> <span class="nav-text">MySQL优化实践，其实就是要将前篇文章中的创建索引的注意点给用上</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#如果MySQL估计使用索引比全表扫描还慢，则不会使用索引"><span class="nav-number">2.1.</span> <span class="nav-text">如果MySQL估计使用索引比全表扫描还慢，则不会使用索引</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#前导模糊查询查询不能命中索引"><span class="nav-number">2.2.</span> <span class="nav-text">前导模糊查询查询不能命中索引</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#数据类型出现隐式转换的时候不会命中索引，特别是当列类型是字符串，一定要将字符常量值用引号引起来"><span class="nav-number">2.3.</span> <span class="nav-text">数据类型出现隐式转换的时候不会命中索引，特别是当列类型是字符串，一定要将字符常量值用引号引起来</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#复合索引的情况下，查询条件不包含索引列最左边部分（不满足最左原则），不会命中复合索引"><span class="nav-number">2.4.</span> <span class="nav-text">复合索引的情况下，查询条件不包含索引列最左边部分（不满足最左原则），不会命中复合索引</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#union、in和or都可以命中索引，推荐in"><span class="nav-number">2.5.</span> <span class="nav-text">union、in和or都可以命中索引，推荐in</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#用or分割开的条件，如果or前的条件中列有索引，而后面的列中没有索引，那么涉及到的索引都不会被用到"><span class="nav-number">2.6.</span> <span class="nav-text">用or分割开的条件，如果or前的条件中列有索引，而后面的列中没有索引，那么涉及到的索引都不会被用到</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#负向条件查询不能使用索引，可以优化为-in-查询"><span class="nav-number">2.7.</span> <span class="nav-text">负向条件查询不能使用索引，可以优化为 in 查询</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#范围查询可以命中缓存"><span class="nav-number">2.8.</span> <span class="nav-text">范围查询可以命中缓存</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#索引列参与计算-包括函数运算-的法则无法命中索引"><span class="nav-number">2.9.</span> <span class="nav-text">索引列参与计算(包括函数运算)的法则无法命中索引</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#利用覆盖索引进行查询，避免回表"><span class="nav-number">2.10.</span> <span class="nav-text">利用覆盖索引进行查询，避免回表</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#建立索引的列，不允许为-null"><span class="nav-number">2.11.</span> <span class="nav-text">建立索引的列，不允许为 null</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#更新十分频繁的字段上不宜建立索引"><span class="nav-number">2.12.</span> <span class="nav-text">更新十分频繁的字段上不宜建立索引</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#区分度不大的字段上不宜建立索引"><span class="nav-number">2.13.</span> <span class="nav-text">区分度不大的字段上不宜建立索引</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#多表关联时，要保证关联字段上一定有索引"><span class="nav-number">2.14.</span> <span class="nav-text">多表关联时，要保证关联字段上一定有索引</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#SQL语句中IN包含的值不应过多"><span class="nav-number">2.15.</span> <span class="nav-text">SQL语句中IN包含的值不应过多</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#SELECT语句务必指明字段名称"><span class="nav-number">2.16.</span> <span class="nav-text">SELECT语句务必指明字段名称</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#区分in和exists，-not-in和not-exists"><span class="nav-number">2.17.</span> <span class="nav-text">区分in和exists， not in和not exists</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#创建索引时避免以下错误观念"><span class="nav-number">2.18.</span> <span class="nav-text">创建索引时避免以下错误观念</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#1-Mysql服务器配置优化-一般是DBA操作，稍作了解"><span class="nav-number">1.</span> <span class="nav-text">1. Mysql服务器配置优化(一般是DBA操作，稍作了解)</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-1-通过show-status查看mysql服务器运行状态"><span class="nav-number">1.1.</span> <span class="nav-text">1.1 通过show status查看mysql服务器运行状态</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-2-通过show-variables查看mysql系统变量"><span class="nav-number">1.2.</span> <span class="nav-text">1.2 通过show variables查看mysql系统变量</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-3-快速定位慢SQL"><span class="nav-number">1.3.</span> <span class="nav-text">1.3 快速定位慢SQL</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-Mysql索引优化"><span class="nav-number">2.</span> <span class="nav-text">2. Mysql索引优化</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#2-1-通过explain分析低效率SQL语句的执行计划"><span class="nav-number">2.1.</span> <span class="nav-text">2.1 通过explain分析低效率SQL语句的执行计划</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-1-使用explain分析下面dql语句"><span class="nav-number">2.1.1.</span> <span class="nav-text">2.1.1 使用explain分析下面dql语句</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-2-输出信息字段说明"><span class="nav-number">2.1.2.</span> <span class="nav-text">2.1.2 输出信息字段说明</span></a></li></ol></li></ol></li></ol></div>
             
 
           </div>
